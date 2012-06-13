@@ -1,0 +1,3 @@
+*.pyc
+src/mreorg/curator/frontend/data/*
+src/mreorg/curator/frontend/data/images/*
