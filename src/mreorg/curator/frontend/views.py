@@ -31,12 +31,12 @@ from django.shortcuts import render_to_response
 
 from django.http import HttpResponseRedirect,HttpResponseNotFound
 from django.http import HttpResponse
-from models import SimulationFile
+from models import TrackedSimFile
 from models import SimRunStatus
-from models import SimulationFileRun
-from models import SimulationQueueEntry
-from models import SimulationQueueEntryState
-from models import PotentialSimulationFile
+from models import SimFileRun
+from models import SimQueueEntry
+from models import SimQueueEntryState
+from models import UntrackedSimFile
 from models import PotentialSimulationDirectory
 from mreorg import MReOrgConfig
 from django.template import RequestContext
@@ -54,14 +54,14 @@ mimetypes.init()
 
 # Index page:
 def index(request):
-    c = {'simulation_files': SimulationFile.objects.all()  }
+    c = {'simulation_files': TrackedSimFile.objects.all()  }
     csrfContext = RequestContext(request, c)
     return render_to_response('simulation_overview.html',csrfContext )
 
 
 
 def view_simulation_output_summaries(request):
-    sims = SimulationFile.objects.all()
+    sims = TrackedSimFile.objects.all()
     sim_and_dir = [ (s,os.path.dirname(s.full_filename)) for s in sims]
     sim_and_dir.sort()
 
@@ -89,7 +89,7 @@ def view_simulation_output_summaries(request):
 
 
 def simulationfilerun_details(request, id):
-    simrun =  SimulationFileRun.objects.get(id=id)
+    simrun =  SimFileRun.objects.get(id=id)
     r = RequestContext(request, {'simulationrun':simrun,})
     return render_to_response('simulation_run_details.html',r)
 
@@ -98,7 +98,7 @@ def simulationfilerun_details(request, id):
 
 
 def simulationfile_details(request, id):
-    sim =  SimulationFile.objects.get(id=id)
+    sim =  TrackedSimFile.objects.get(id=id)
     c = {'simulationfile': sim }
     csrfContext = RequestContext(request, c)
     return render_to_response('simulation_file_details.html',csrfContext)
@@ -119,20 +119,20 @@ def viewpotentialsimulationfiles(request,):
         mh_adddefault_locations()
 
 
-    potential_files = PotentialSimulationFile.objects.all()
+    potential_files = UntrackedSimFile.objects.all()
     potential_directories = PotentialSimulationDirectory.objects.all().\
                                 order_by('directory_name')
     c = {   'potentialsimulationfiles': potential_files,
             'potential_directories':potential_directories,
-            'simulationfiles':SimulationFile.objects.all(),
+            'simulationfiles':TrackedSimFile.objects.all(),
             }
     csrfContext = RequestContext(request, c)
     return render_to_response('potential_simulation_files.html',csrfContext)
 
 
 def dotrackallsimulationfiles(request):
-    for pot_sim in PotentialSimulationFile.objects.all():
-        sim = SimulationFile( full_filename = pot_sim.full_filename )
+    for pot_sim in UntrackedSimFile.objects.all():
+        sim = TrackedSimFile( full_filename = pot_sim.full_filename )
         sim.save()
         pot_sim.delete()
 
@@ -150,7 +150,7 @@ def doaddpotentialsimulationlocation(request):
 def doupdatepotentialsimulationfiles(request,):
 
     for potential_location in PotentialSimulationDirectory.objects.all():
-        PotentialSimulationFile.update_all_db( potential_location.directory_name)
+        UntrackedSimFile.update_all_db( potential_location.directory_name)
     return HttpResponseRedirect('/viewpotentialsimulationfiles')
 
 
@@ -167,9 +167,9 @@ def dopotentialtoactualsimulationfiles( request):
 
 
     for pot_sim_id in pot_sim_ids:
-        pot_sim = PotentialSimulationFile.objects.get(id=pot_sim_id)
+        pot_sim = UntrackedSimFile.objects.get(id=pot_sim_id)
 
-        sim = SimulationFile( full_filename = pot_sim.full_filename )
+        sim = TrackedSimFile( full_filename = pot_sim.full_filename )
 
         sim.save()
         pot_sim.delete()
@@ -191,7 +191,7 @@ def doactualtopotentialsimulationfiles( request):
     # Delete the old simulations:
     for pot_sim_id in pot_sim_ids:
         print 'Deleting', pot_sim_id
-        sim = SimulationFile.objects.get(id=pot_sim_id)
+        sim = TrackedSimFile.objects.get(id=pot_sim_id)
         sim.delete()
 
     # Update the list of untracked files:
@@ -200,15 +200,15 @@ def doactualtopotentialsimulationfiles( request):
 
 
 def viewsimulationqueue(request):
-    c = {'simulation_queue_executing': SimulationQueueEntry.objects.filter(status=SimulationQueueEntryState.Executing),
-         'simulation_queue': SimulationQueueEntry.objects.filter(status=SimulationQueueEntryState.Waiting),
-         'latest_runs': SimulationFileRun.objects.order_by('-execution_date')[0:10] }
+    c = {'simulation_queue_executing': SimQueueEntry.objects.filter(status=SimQueueEntryState.Executing),
+         'simulation_queue': SimQueueEntry.objects.filter(status=SimQueueEntryState.Waiting),
+         'latest_runs': SimFileRun.objects.order_by('-execution_date')[0:10] }
 
     csrfContext = RequestContext(request, c)
     return render_to_response('view_simulation_queue.html',csrfContext)
 
 def view_simulation_failures(request):
-    fileObjs =  SimulationFile.objects.all()
+    fileObjs =  TrackedSimFile.objects.all()
 
     c = {
         'failed_simulations': [fo for fo in fileObjs if fo.get_status() == SimRunStatus.UnhandledException ],
@@ -233,7 +233,7 @@ def doqueuesimulations(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/viewsimulationqueue')
 
-    print 'Queuing Simulations:'
+    print 'Queuing Sims:'
     print request.POST
     r = re.compile(r"""simid_(?P<id>\d+)""", re.VERBOSE)
     sim_id_matches = [ r.match(k) for k in request.POST ]
@@ -241,9 +241,9 @@ def doqueuesimulations(request):
 
 
     for sim_id in sim_ids:
-        sim = SimulationFile.objects.get(id=sim_id)
+        sim = TrackedSimFile.objects.get(id=sim_id)
 
-        qe = SimulationQueueEntry( simulation_file = sim )
+        qe = SimQueueEntry( simulation_file = sim )
         qe.save()
         #Avoid Duplication
 
@@ -254,7 +254,7 @@ def doqueuesimulations(request):
 def doeditsimulationfile(request, simulationfile_id):
 
     #Open up the file in an editor:
-    sim = SimulationFile.objects.get(id=simulationfile_id)
+    sim = TrackedSimFile.objects.get(id=simulationfile_id)
 
     cwd = os.getcwd()
     os.chdir( os.path.split(sim.full_filename)[0])
@@ -297,7 +297,7 @@ def mh_adddefault_locations(self=None):
         if not l:
             continue
         if l[-1] != '*':
-            PotentialSimulationFile.create(filename = l)
+            UntrackedSimFile.create(filename = l)
         elif l.endswith('**'):
             PotentialSimulationDirectory.create(directory_name=l[:-2], should_recurse = True)
         elif l.endswith('*'):

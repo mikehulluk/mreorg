@@ -48,7 +48,7 @@ p = (
     (r'^viewpotentialsimulationfiles$', 'frontend.views.viewpotentialsimulationfiles'),
     (r'^viewsimulationqueue$', 'frontend.views.viewsimulationqueue'),
 
-    # Untracked/tracked Simulations:
+    # Untracked/tracked Sims:
     (r'^do/update_potential_simulation_files', 'frontend.views.doupdatepotentialsimulationfiles'),
     (r'^do/potential_to_actual_simulation', 'frontend.views.dopotentialtoactualsimulationfiles'),
     (r'^do/actual_to_potential_simulation', 'frontend.views.doactualtopotentialsimulationfiles'),

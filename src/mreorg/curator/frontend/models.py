@@ -78,7 +78,7 @@ class PotentialSimulationFileStatus(object):
     NotTracked='Nottracked'
 
 
-class PotentialSimulationFile(models.Model):
+class UntrackedSimFile(models.Model):
 
     class Meta():
         ordering = ['full_filename']
@@ -89,23 +89,23 @@ class PotentialSimulationFile(models.Model):
 
     @classmethod
     def create(self, filename):
-        print 'Creating PotentialSimulationFile:', filename
+        print 'Creating UntrackedSimFile:', filename
         try:
-            SimulationFile.objects.get(full_filename=filename)
+            TrackedSimFile.objects.get(full_filename=filename)
             print 'Already a simulation file'
             return
         except:
             pass
 
         try:
-            PotentialSimulationFile.objects.get( full_filename = filename)
+            UntrackedSimFile.objects.get( full_filename = filename)
             print 'Already a potential simulation file'
             return None
         except:
             pass
 
         # Create a new potential simulation file object:
-        p = PotentialSimulationFile( full_filename = filename, status = PotentialSimulationFileStatus.Unknown )
+        p = UntrackedSimFile( full_filename = filename, status = PotentialSimulationFileStatus.Unknown )
         p.save()
 
     @classmethod
@@ -125,7 +125,7 @@ class PotentialSimulationFile(models.Model):
 
         def handlefile(filename):
             print 'Checking: ', filename
-            PotentialSimulationFile.create(filename)
+            UntrackedSimFile.create(filename)
 
 
         print 'Updating potential simulation files', directory
@@ -152,7 +152,7 @@ class SimRunStatus(object):
 
 import StringIO
 
-class SimulationFile(models.Model):
+class TrackedSimFile(models.Model):
 
     class Meta():
         ordering = ['full_filename']
@@ -169,7 +169,7 @@ class SimulationFile(models.Model):
     last_read_htmlcode = models.CharField(max_length=100000, null=True)
 
     # Last simulation run:
-    last_run = models.ForeignKey('SimulationFileRun',null=True)
+    last_run = models.ForeignKey('SimFileRun',null=True)
 
 
     # Handle Caching:
@@ -228,7 +228,7 @@ class SimulationFile(models.Model):
         return os.path.split(self.full_filename)[1]
 
     def get_runs(self):
-        return SimulationFileRun.objects.filter(simulation_file=self.id).order_by('-execution_date')
+        return SimFileRun.objects.filter(simulation_file=self.id).order_by('-execution_date')
 
 
     def get_status(self):
@@ -250,14 +250,14 @@ class SimulationFile(models.Model):
 
     def getCSSQueueState(self):
         p = self.is_queued()
-        LUT = { True:'SimulationQueued',False:'SimulationNotQueued'}
+        LUT = { True:'SimQueued',False:'SimNotQueued'}
         return LUT[p]
 
 
 
 
-class SimulationFileRun(models.Model):
-    simulation_file = models.ForeignKey(SimulationFile)
+class SimFileRun(models.Model):
+    simulation_file = models.ForeignKey(TrackedSimFile)
     execution_date = models.DateTimeField('execution date')
     return_code = models.IntegerField()
     std_out = models.CharField(max_length=10000000)
@@ -298,11 +298,11 @@ class SimulationFileRun(models.Model):
             return SimRunStatus.NonZeroExitCode
         return SimRunStatus.Sucess
 
-class SimulationFileRunOutputImage(models.Model):
+class SimFileRunOutputImage(models.Model):
     original_name = models.CharField(max_length=10000)
     hash_name = models.CharField(max_length=10000)
     hash_thumbnailname = models.CharField(max_length=10000)
-    simulation = models.ForeignKey(SimulationFileRun, related_name='output_images')
+    simulation = models.ForeignKey(SimFileRun, related_name='output_images')
 
     def hash_name_short(self):
         return self.hash_name.split("/")[-1]
@@ -311,19 +311,19 @@ class SimulationFileRunOutputImage(models.Model):
 
 
 
-class SimulationQueueEntryState(models.Model):
+class SimQueueEntryState(models.Model):
     Waiting = 'Waiting'
     Executing = 'Executing'
 
-class SimulationQueueEntry(models.Model):
-    simulation_file = models.ForeignKey(SimulationFile)
+class SimQueueEntry(models.Model):
+    simulation_file = models.ForeignKey(TrackedSimFile)
     submit_time = models.DateTimeField('submission_time', default=datetime.datetime.now)
     simulation_start_time = models.DateTimeField(null=True, default=None)
-    status = models.CharField(max_length=1000, default=SimulationQueueEntryState.Waiting )
+    status = models.CharField(max_length=1000, default=SimQueueEntryState.Waiting )
 
     @classmethod
     def create(cls, sim_file):
-        queue_entry = SimulationQueueEntry( simulation_file = sim_file )
+        queue_entry = SimQueueEntry( simulation_file = sim_file )
         queue_entry.save()
 
 

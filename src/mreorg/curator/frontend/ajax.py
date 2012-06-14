@@ -29,17 +29,17 @@
 
 from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
-from mreorg.curator.frontend.models import SimulationFile
-from mreorg.curator.frontend.models import SimulationQueueEntry
+from mreorg.curator.frontend.models import TrackedSimFile
+from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimRunStatus
-from mreorg.curator.frontend.models import SimulationQueueEntryState
+from mreorg.curator.frontend.models import SimQueueEntryState
 
 
 
 @dajaxice_register
 def overview_resubmit_simfile(_request, simulation_file_id):
     try:
-        sim_file = SimulationFile.objects.get(id = simulation_file_id)
+        sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
     except:
         #raise
         return simplejson.dumps({})
@@ -47,7 +47,7 @@ def overview_resubmit_simfile(_request, simulation_file_id):
 
     # Existing simulation object
     if not sim_file.simulationqueueentry_set.count():
-        SimulationQueueEntry.create( sim_file = sim_file )
+        SimQueueEntry.create( sim_file = sim_file )
     return simplejson.dumps({})
 
 
@@ -55,7 +55,7 @@ def overview_resubmit_simfile(_request, simulation_file_id):
 def overview_resubmit_simfile_if_failure(_request, simulation_file_id):
 #def overview_set_simfile_for_resubmit_if_failure(_request, simulation_file_id):
     try:
-        sim_file = SimulationFile.objects.get(id = simulation_file_id)
+        sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
         #raise
     except:
         return simplejson.dumps({})
@@ -65,7 +65,7 @@ def overview_resubmit_simfile_if_failure(_request, simulation_file_id):
         return simplejson.dumps({})
 
     if not sim_file.simulationqueueentry_set.count():
-        SimulationQueueEntry.create( sim_file = sim_file )
+        SimQueueEntry.create( sim_file = sim_file )
     return simplejson.dumps({})
 
 
@@ -74,7 +74,7 @@ def overview_resubmit_simfile_if_failure(_request, simulation_file_id):
 def overview_toggle_simfile_for_resubmit(_request, simulation_file_id):
 
     try:
-        sim_file = SimulationFile.objects.get(id = simulation_file_id)
+        sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
         #raise
     except:
         return simplejson.dumps({})
@@ -83,7 +83,7 @@ def overview_toggle_simfile_for_resubmit(_request, simulation_file_id):
     if sim_file.simulationqueueentry_set.count():
         sim_file.simulationqueueentry_set.all().delete()
     else:
-        SimulationQueueEntry.create( sim_file = sim_file )
+        SimQueueEntry.create( sim_file = sim_file )
     return simplejson.dumps({})
 
 
@@ -91,14 +91,14 @@ def overview_toggle_simfile_for_resubmit(_request, simulation_file_id):
 def refreshsimlist(_request):
 
     states = {}
-    for simfile in SimulationFile.objects.all():
+    for simfile in TrackedSimFile.objects.all():
         states[simfile.id] = simfile.get_status()
     return simplejson.dumps({'sim_file_states':states})
 
 
 @dajaxice_register
 def overview_update_sim_gui(_request, simulation_file_id):
-    sim_file = SimulationFile.objects.get(id = simulation_file_id)
+    sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
     exec_date = ""
     if sim_file.get_latest_run():
         exec_date = sim_file.get_latest_run().execution_data_string()
@@ -117,8 +117,8 @@ def overview_update_sim_gui(_request, simulation_file_id):
 
 @dajaxice_register
 def overview_clear_sim_queue(_request):
-    SimulationQueueEntry.objects.all()\
-            .filter(status = SimulationQueueEntryState.Waiting)\
+    SimQueueEntry.objects.all()\
+            .filter(status = SimQueueEntryState.Waiting)\
             .delete()
     return simplejson.dumps({})
 
@@ -126,7 +126,7 @@ def overview_clear_sim_queue(_request):
 def overview_delete_simfile(_request, simulation_file_id ):
 
     try:
-        sim_file = SimulationFile.objects.get(id = simulation_file_id)
+        sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
         sim_file.delete()
     except:
         pass

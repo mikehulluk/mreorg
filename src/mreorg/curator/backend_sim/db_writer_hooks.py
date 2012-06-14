@@ -55,12 +55,12 @@ import mreorg
 
 
 
-class SimulationDBWriter(object):
+class SimDBWriter(object):
     @classmethod
     def write_to_database( cls, sim_run_info):
-        from mreorg.curator.frontend.models import SimulationFile
-        from mreorg.curator.frontend.models import SimulationFileRun
-        from mreorg.curator.frontend.models import SimulationFileRunOutputImage
+        from mreorg.curator.frontend.models import TrackedSimFile
+        from mreorg.curator.frontend.models import SimFileRun
+        from mreorg.curator.frontend.models import SimFileRunOutputImage
         from mreorg.curator.frontend.models import get_file_sha1hash
         output_file_dir = mreorg.MReOrgConfig.get_image_store_dir()
 
@@ -70,18 +70,18 @@ class SimulationDBWriter(object):
         if mreorg.MReOrgConfig.is_non_curated_file(sim_run_info.script_name):
             return 
 
-        # Find the previous SimulationFile object:
+        # Find the previous TrackedSimFile object:
         try:
-            simfile = SimulationFile.objects.get(
+            simfile = TrackedSimFile.objects.get(
                         full_filename=sim_run_info.script_name)
         except: # DoesNotExistError,e :
-            #print 'Creating SimulationFile obj'
-            simfile = SimulationFile(full_filename=sim_run_info.script_name)
+            #print 'Creating TrackedSimFile obj'
+            simfile = TrackedSimFile(full_filename=sim_run_info.script_name)
             simfile.save()
 
 
         # Create a simulation result object:
-        simres = SimulationFileRun(
+        simres = SimFileRun(
             simulation_file = simfile,
             execution_date = datetime.datetime.now(),
             execution_time = sim_run_info.time_taken,
@@ -113,7 +113,7 @@ class SimulationDBWriter(object):
             hashstr = mreorg.get_file_sha1hash( f_thumb)
             opfile2 = output_file_dir + '/' + hashstr + ".png"
             shutil.copyfile(f_thumb, opfile2)
-            im_obj = SimulationFileRunOutputImage(
+            im_obj = SimFileRunOutputImage(
                     original_name = image_filename,
                     hash_name = opfile1,
                     hash_thumbnailname = opfile2,
@@ -124,7 +124,7 @@ class SimulationDBWriter(object):
             im_obj.save()
 
 
-class SimulationRunInfo(object):
+class SimRunInfo(object):
     def __init__(self, script_name ):
         self.return_code = None
         self.time_taken = None
@@ -177,7 +177,7 @@ class CurationSimDecorator(object):
     @classmethod
     def exit_handler(cls, *_args, **_kwargs):
 
-        info = SimulationRunInfo( cls.script_name)
+        info = SimRunInfo( cls.script_name)
 
         # Read and restore the StdOut/Err
         info.std_out = cls.std_out.getvalue()
@@ -202,8 +202,8 @@ class CurationSimDecorator(object):
             print 'Exception details', info.exception_details
             info.return_code = -1
 
-        # Write to SimulationDataBase
-        SimulationDBWriter.write_to_database(info)
+        # Write to SimDataBase
+        SimDBWriter.write_to_database(info)
 
 
     @classmethod
@@ -230,7 +230,7 @@ class CurationSimDecorator(object):
             time_out = int( os.environ['MF_TIMEOUT'] )
 
 
-        # Filename of the Simulation script
+        # Filename of the Sim script
         cwd = os.getcwd()
         cls.script_name = os.path.join(cwd, traceback.extract_stack()[0][0])
 

@@ -36,8 +36,8 @@ import os
 import datetime
 import subprocess
 
-from mreorg.curator.frontend.models import SimulationQueueEntry
-from mreorg.curator.frontend.models import SimulationQueueEntryState
+from mreorg.curator.frontend.models import SimQueueEntry
+from mreorg.curator.frontend.models import SimQueueEntryState
 
 
 os.environ['MREORG_CURATIONRUN'] = 'TIMEOUT:1800,'
@@ -52,7 +52,7 @@ def simulate( sim_queue_entry):
 
     # Update the database to reflect
     print '   - Updating database'
-    sim_queue_entry.status = SimulationQueueEntryState.Executing
+    sim_queue_entry.status = SimQueueEntryState.Executing
     sim_queue_entry.simulation_start_time = datetime.datetime.now()
     sim_queue_entry.save(force_update=True)
 
@@ -66,7 +66,7 @@ def simulate( sim_queue_entry):
     except subprocess.CalledProcessError as exception:
         print '   - Finished Simulating [Non-zero exitcode]'
         if not sim_queue_entry.simulation_file.get_latest_run():
-            print 'Simulation not decorated! Unable to set return code'
+            print 'Sim not decorated! Unable to set return code'
         else:
             last_run = sim_queue_entry.simulation_file.get_latest_run()
             last_run.returncode = exception.returncode
@@ -82,14 +82,14 @@ def simulate( sim_queue_entry):
 def main():
     while True:
         time.sleep(5)
-        print 'Checking for Queued Simulations'
+        print 'Checking for Queued Sims'
 
-        queued_objects = SimulationQueueEntry.objects.\
-                filter( status=SimulationQueueEntryState.Waiting).\
+        queued_objects = SimQueueEntry.objects.\
+                filter( status=SimQueueEntryState.Waiting).\
                 order_by('submit_time')
 
         if not queued_objects:
-            print ' - No Simulations found'
+            print ' - No Sims found'
         else:
             simulate( queued_objects[0] )
 
