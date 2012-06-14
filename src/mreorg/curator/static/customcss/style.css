@@ -238,7 +238,7 @@ tr {
     margin: 2px;
 }
 */
-.SimulationQueued td.Toggle {
+.SimQueued td.Toggle {
     /*background-color: #AAAAAA;*/
 	border-top: 3px solid #aaaaaa;
 	border-bottom: 3px solid #aaaaaa;

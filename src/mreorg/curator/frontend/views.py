@@ -37,7 +37,7 @@ from models import SimFileRun
 from models import SimQueueEntry
 from models import SimQueueEntryState
 from models import UntrackedSimFile
-from models import PotentialSimulationDirectory
+from models import SourceSimDir
 from mreorg import MReOrgConfig
 from django.template import RequestContext
 
@@ -120,7 +120,7 @@ def viewpotentialsimulationfiles(request,):
 
 
     potential_files = UntrackedSimFile.objects.all()
-    potential_directories = PotentialSimulationDirectory.objects.all().\
+    potential_directories = SourceSimDir.objects.all().\
                                 order_by('directory_name')
     c = {   'potentialsimulationfiles': potential_files,
             'potential_directories':potential_directories,
@@ -143,13 +143,13 @@ def doaddpotentialsimulationlocation(request):
     if request.method!='POST':
         return HttpResponseRedirect('/viewpotentialsimulationfiles')
 
-    PotentialSimulationDirectory.create(directory_name=request.POST['location'])
+    SourceSimDir.create(directory_name=request.POST['location'])
     return HttpResponseRedirect('/viewpotentialsimulationfiles')
 
 
 def doupdatepotentialsimulationfiles(request,):
 
-    for potential_location in PotentialSimulationDirectory.objects.all():
+    for potential_location in SourceSimDir.objects.all():
         UntrackedSimFile.update_all_db( potential_location.directory_name)
     return HttpResponseRedirect('/viewpotentialsimulationfiles')
 
@@ -299,11 +299,11 @@ def mh_adddefault_locations(self=None):
         if l[-1] != '*':
             UntrackedSimFile.create(filename = l)
         elif l.endswith('**'):
-            PotentialSimulationDirectory.create(directory_name=l[:-2], should_recurse = True)
+            SourceSimDir.create(directory_name=l[:-2], should_recurse = True)
         elif l.endswith('*'):
-            PotentialSimulationDirectory.create(directory_name=l[:-1], should_recurse = False)
+            SourceSimDir.create(directory_name=l[:-1], should_recurse = False)
         else:
-            PotentialSimulationDirectory.create(directory_name=l[:-2], should_recurse = False)
+            SourceSimDir.create(directory_name=l[:-2], should_recurse = False)
 
 
 
@@ -342,5 +342,5 @@ def get_image_file(request, filename):
     #
     #            ]
     #for loc in locations:
-    #  PotentialSimulationDirectory.add_location(location=loc)
+    #  SourceSimDir.add_location(location=loc)
     #return HttpResponseRedirect('/')

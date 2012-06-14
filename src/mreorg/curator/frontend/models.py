@@ -26,12 +26,11 @@
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
-from django.db import models
 import os
-
-#import hashlib
 import datetime
+import StringIO
 
+from django.db import models
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
@@ -54,7 +53,7 @@ class Options(object):
 
 
 
-class PotentialSimulationDirectory(models.Model):
+class SourceSimDir(models.Model):
     directory_name = models.CharField(max_length=1000)
     should_recurse = models.BooleanField()
 
@@ -63,16 +62,16 @@ class PotentialSimulationDirectory(models.Model):
 
     @classmethod
     def create(cls, directory_name, should_recurse=True):
-        if PotentialSimulationDirectory.objects.filter(directory_name = directory_name).count() !=0:
+        if SourceSimDir.objects.filter(directory_name = directory_name).count() !=0:
             return
 
         # Create and save
-        p = PotentialSimulationDirectory(directory_name=directory_name, should_recurse=should_recurse)
+        p = SourceSimDir(directory_name=directory_name, should_recurse=should_recurse)
         p.save()
 
 
 
-class PotentialSimulationFileStatus(object):
+class TrackingStatus(object):
     Tracked='Tracked'
     Unknown='Unknown'
     NotTracked='Nottracked'
@@ -105,7 +104,7 @@ class UntrackedSimFile(models.Model):
             pass
 
         # Create a new potential simulation file object:
-        p = UntrackedSimFile( full_filename = filename, status = PotentialSimulationFileStatus.Unknown )
+        p = UntrackedSimFile( full_filename = filename, status = TrackingStatus.Unknown )
         p.save()
 
     @classmethod
@@ -150,7 +149,6 @@ class SimRunStatus(object):
     FileChanged = 'FileChanged'
     NeverBeenRun = 'NeverBeenRun'
 
-import StringIO
 
 class TrackedSimFile(models.Model):
 
@@ -246,7 +244,7 @@ class TrackedSimFile(models.Model):
             return last_run.execution_time
 
     def is_queued(self):
-        return self.simulationqueueentry_set.count() != 0
+        return self.simqueueentry_set.count() != 0
 
     def getCSSQueueState(self):
         p = self.is_queued()

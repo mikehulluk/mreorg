@@ -45,9 +45,9 @@ function refresh_sim_list_view() {
 
 function setSimFileStatus(id,state, is_in_queue)
 {
-    var is_in_queue_str = "SimulationNotQueued"
+    var is_in_queue_str = "SimNotQueued"
     if(is_in_queue == true){
-        is_in_queue_str = "SimulationQueued"
+        is_in_queue_str = "SimQueued"
     }
 
 
@@ -141,7 +141,7 @@ function reloadPage()
     window.location="/";
 }
 
-function deleteSimulationFile(id)
+function deleteSimFile(id)
 {
     Dajaxice.mreorg.curator.frontend.overview_delete_simfile(reloadPage, {'simulation_file_id': id});
 }
@@ -244,7 +244,7 @@ function countdown_callback(){
 
         {% else %}
         <tr class="" id="SimFileID{{sim_file.id}}">
-            <td class="Toggle"> <a onclick='deleteSimulationFile({{sim_file.id}});'> Delete </a>  </td>
+            <td class="Toggle"> <a onclick='deleteSimFile({{sim_file.id}});'> Delete </a>  </td>
             <td class="Status"> <a>  [File does not exist] </a> </td>
             <td> <a> {{sim_file.get_short_filename }} </a> </td>
             <td> <a> </a></td>

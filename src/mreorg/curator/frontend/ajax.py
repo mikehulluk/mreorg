@@ -46,7 +46,7 @@ def overview_resubmit_simfile(_request, simulation_file_id):
 
 
     # Existing simulation object
-    if not sim_file.simulationqueueentry_set.count():
+    if not sim_file.simqueueentry_set.count():
         SimQueueEntry.create( sim_file = sim_file )
     return simplejson.dumps({})
 
@@ -64,7 +64,7 @@ def overview_resubmit_simfile_if_failure(_request, simulation_file_id):
     if sim_file.get_status() == SimRunStatus.Sucess:
         return simplejson.dumps({})
 
-    if not sim_file.simulationqueueentry_set.count():
+    if not sim_file.simqueueentry_set.count():
         SimQueueEntry.create( sim_file = sim_file )
     return simplejson.dumps({})
 
@@ -80,8 +80,8 @@ def overview_toggle_simfile_for_resubmit(_request, simulation_file_id):
         return simplejson.dumps({})
 
     # Existing simulation object
-    if sim_file.simulationqueueentry_set.count():
-        sim_file.simulationqueueentry_set.all().delete()
+    if sim_file.simqueueentry_set.count():
+        sim_file.simqueueentry_set.all().delete()
     else:
         SimQueueEntry.create( sim_file = sim_file )
     return simplejson.dumps({})
@@ -98,20 +98,21 @@ def refreshsimlist(_request):
 
 @dajaxice_register
 def overview_update_sim_gui(_request, simulation_file_id):
+    print "Dajax call recieved", simulation_file_id
     sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
     exec_date = ""
     if sim_file.get_latest_run():
         exec_date = sim_file.get_latest_run().execution_data_string()
 
     latest_run  = sim_file.get_latest_run()
-    return simplejson.dumps(
-
+    v = simplejson.dumps(
                 {'sim_id':simulation_file_id,
                  'state':sim_file.get_status(),
                  'is_queued':sim_file.is_queued(),
                  'latest_exec_id':latest_run.id if latest_run else "",
                  'latest_exec_date': exec_date,
                 } )
+    return v
 
 
 

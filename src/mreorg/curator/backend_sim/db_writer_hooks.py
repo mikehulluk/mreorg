@@ -47,6 +47,7 @@ setup_environ(settings)
 
 
 import mreorg
+from mreorg import get_file_sha1hash
 
 
 
@@ -61,7 +62,6 @@ class SimDBWriter(object):
         from mreorg.curator.frontend.models import TrackedSimFile
         from mreorg.curator.frontend.models import SimFileRun
         from mreorg.curator.frontend.models import SimFileRunOutputImage
-        from mreorg.curator.frontend.models import get_file_sha1hash
         output_file_dir = mreorg.MReOrgConfig.get_image_store_dir()
 
         print 'Saving details from script: ', sim_run_info.script_name
