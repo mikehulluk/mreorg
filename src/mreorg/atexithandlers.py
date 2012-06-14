@@ -27,4 +27,29 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 
-from db_writer_hooks import *
+
+
+
+class AtExitHandler():
+    """
+    Class that allows us to order the function calls made it 'atexit'. 
+    We need to do this to get the ordering write when writing to database.
+    """
+
+    _handlers = []
+
+    @classmethod
+    def add_handler(cls, handler, priority=100):
+        cls._handlers.append((priority,handler))
+
+    @classmethod
+    def at_exit(cls,*args, **kwargs):
+        for priority, handler in sorted( cls._handlers ):
+            handler(*args,**kwargs)
+
+
+
+# Hook in this handler into the 
+# python atexit handler:
+import atexit
+atexit.register( AtExitHandler.at_exit )

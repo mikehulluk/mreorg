@@ -27,4 +27,36 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 
-from db_writer_hooks import *
+import os
+import mreorg
+
+class MReOrgConfig(object):
+    _config_file_ns = None
+
+    rcfilename = os.path.expanduser('~/.mreorgrc')
+
+    _defaults = [
+        ('IMAGE_STORE_DIR', os.path.expanduser('~/.mreorg/cache/images/'))
+        ]
+
+    @classmethod
+    def _load_config_file(cls):
+        if cls._config_file_ns is None:
+            
+            # Copy in the defaults:
+            cls._config_file_ns = dict( cls._defaults)
+            
+            # Load the file, overriding the defaults:
+            if not os.path.exists( cls.rcfilename ):
+                return
+            execfile(cls.rcfilename, cls._config_file_ns)
+            
+    @classmethod
+    def get_ns(cls):
+        cls._load_config_file()
+        return cls._config_file_ns
+
+
+    @classmethod
+    def get_image_store_dir(cls):
+        return mreorg.ensure_directory_exists( cls.get_ns()['IMAGE_STORE_DIR'] )

@@ -1,17 +1,34 @@
-#-------------------------------------------------------------------------------
+#----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions 
+# are met:
 #
-#  - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-#  - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+#  - Redistributions of source code must retain the above copyright 
+#    notice, this list of conditions and the following disclaimer.
+#  - Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in 
+#    the documentation and/or other materials provided with the 
+#    distribution.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#-------------------------------------------------------------------------------
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+# WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+#----------------------------------------------------------------------
 from django.db import models
 import os
-#import re
+
 import hashlib
 import datetime
 
@@ -19,27 +36,8 @@ from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
+import mreorg
 
-
-
-class SimMgrConfig(object):
-    _config_file_ns = None
-
-    rcfilename = os.path.expanduser('~/.mreorgrc')
-
-    @classmethod
-    def _load_config_file(cls):
-        if cls._config_file_ns is None:
-            cls._config_file_ns = {}
-            if not os.path.exists( cls.rcfilename ):
-                return
-
-            execfile(cls.rcfilename, cls._config_file_ns)
-
-    @classmethod
-    def get_ns(cls):
-        cls._load_config_file()
-        return cls._config_file_ns
 
 
 
@@ -59,25 +57,6 @@ def get_file_md5sum(filename):
         m.update( f.read() )
     return m.hexdigest()
 
-def extract_docstring_from_fileobj(f):
-    import tokenize, token
-    #f=open(f)
-    for tok, text, (srow, scol), (erow,ecol), l in tokenize.generate_tokens(f.readline):
-        if tok in [tokenize.COMMENT, tokenize.NL]:
-            continue
-        elif tok in [ tokenize.NAME,tokenize.ENDMARKER] :
-            return None
-        elif tok == tokenize.STRING:
-            t = text.strip()
-            if t.startswith('"""'):
-                t = t[3:]
-            if t.endswith('"""'):
-                t = t[:-3]
-            return t.strip()
-        else:
-            print 'tok',tok, token.tok_name[tok]
-            assert False
-    return None
 # #################################
 
 
@@ -221,7 +200,7 @@ class SimulationFile(models.Model):
     self.last_read_sha1 = self.get_current_checksum()
     self.last_read_time = datetime.datetime.now()
     self.last_read_contents  = code
-    self.last_read_docstring = extract_docstring_from_fileobj(StringIO.StringIO( code ) )
+    self.last_read_docstring = mreorg.utils.extract_docstring_from_fileobj(StringIO.StringIO( code ) )
     self.last_read_htmlcode = highlight(code, PythonLexer(), HtmlFormatter())
 
     runs = self.get_runs()

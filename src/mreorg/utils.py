@@ -1,15 +1,15 @@
 #-------------------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.  All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #  - Redistributions of source code must retain the above copyright notice,
 #  this list of conditions and the following disclaimer.  - Redistributions in
 #  binary form must reproduce the above copyright notice, this list of
 #  conditions and the following disclaimer in the documentation and/or other
 #  materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,31 +36,31 @@ from os.path import join as Join
 
 import datetime
 class ScriptUtils(object):
-    
-    
+
+
     # We store the Full iso format of when the simulation was run, as
     # well as the shortedn
     now = datetime.datetime.now()
     datetimestringISO = now.isoformat()
     datetimestringInformal = now.strftime("[%a %d %B - %I:%M]")
     datetimestr = "%s_%s/"%( datetimestringISO, datetimestringInformal )
-    
-    
+
+
     outputStoreDir = "_output_store/"
     currentOutputLinkDir =  "_out"
-    
+
     @classmethod
     def getCallingScript(cls):
         frame = inspect.stack()
-        
+
         calleeFrame = frame[-1]
         calleeFile = calleeFrame[1]
-        return calleeFile 
-         
+        return calleeFile
+
     @classmethod
     def getCallingScriptDirectory(cls):
         return  DirName( cls.getCallingScript() )
-    
+
     @classmethod
     def getCallingScriptFile(cls, includeExt):
         fName = Basename( cls.getCallingScript() )
@@ -68,29 +68,54 @@ class ScriptUtils(object):
             return fName
         else:
             return SplitExt(fName)[0]
-        
-        
-        
-        
-        
+
+
+
+
+
     @classmethod
     def getOutputDir(cls):
         dirName = cls.outputStoreDir + cls.datetimestr
         fullDirName = Join( cls.getCallingScriptDirectory(), dirName )
         EnsureDirectoryExists(fullDirName)
-        return fullDirName 
-    
-    
+        return fullDirName
+
+
     @classmethod
     def updateLinkToOutputDir(cls):
         opDir = cls.getOutputDir()
         fullLinkName = Join( cls.getCallingScriptDirectory(), cls.currentOutputLinkDir )
         if Exists( fullLinkName ):
             os.unlink( fullLinkName )
-        
+
         os.system("""ln -s "%s" "%s" """%(opDir, fullLinkName) )
-        
-        
+
+
+
+
+
+def extract_docstring_from_fileobj(f):
+    import tokenize, token
+    for tok, text, (srow, scol), (erow,ecol), l in tokenize.generate_tokens(f.readline):
+        if tok in [tokenize.COMMENT, tokenize.NL]:
+            continue
+        elif tok in [ tokenize.NAME,tokenize.ENDMARKER] :
+            return None
+        elif tok == tokenize.STRING:
+            t = text.strip()
+            if t.startswith('"""'):
+                t = t[3:]
+            if t.endswith('"""'):
+                t = t[:-3]
+            return t.strip()
+        else:
+            print 'tok',tok, token.tok_name[tok]
+            assert False
+    return None
+
+
+
+
 def CleanFilename(f):
     f = f.replace("__","_")
     f = f.replace("_.",".")
@@ -101,7 +126,9 @@ def EnsureDirectoryExists(fName):
     d = DirName(fName)
     if not Exists(d) and d.strip():
         os.makedirs(d)
-    
-    
-    
-    
+    return fName
+
+ensure_directory_exists = EnsureDirectoryExists
+
+
+

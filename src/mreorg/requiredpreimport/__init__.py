@@ -1,55 +1,83 @@
+#----------------------------------------------------------------------
+# Copyright (c) 2012 Michael Hull.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions 
+# are met:
+#
+#  - Redistributions of source code must retain the above copyright 
+#    notice, this list of conditions and the following disclaimer.
+#  - Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in 
+#    the documentation and/or other materials provided with the 
+#    distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+# WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+#----------------------------------------------------------------------
+
+
+
+
+
+
 import os
 
 
 
+# Lets monkey-patch matplotlib!
+# ===============================
 
+from mreorg.scriptflags import ScriptFlags
+if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
 
-# Query Settings:
-def showGUI():
-    if os.environ.get('MF_PLOT',None) == 'OFF':
-        return False
-    if os.environ.get('MF_BATCH',None):
-        return False
-    return  True
-
-
-
-
-
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if not on_rtd:
-
-    # Matplotlib:
+    # If we are running headless, then 
+    # explictly set the backend to something
+    # that won't need $DISPLAY variable:
     import matplotlib
     if not os.environ.get('DISPLAY',None):
         matplotlib.use('Agg')
 
 
-    # patch mpl.show()
+    # Monkey-Patch 'matplotlib.show()' and 'pylab.show()', allowing us
+    # to disable them, and/or to save figures to disk.
     import pylab
-    mplShow = matplotlib.pylab.show
+    orig_mpl_show = matplotlib.pylab.show
     def show(*args, **kwargs):
         import mreorg.scriptplots.plotmanager
-        mreorg.scriptplots.plotmanager.saveAllNewActiveFigures()
-        if showGUI():
-            #LogMgr.info("mpl.show() call made")
-            mplShow(*args, **kwargs)
 
-        else:
+        # Should we save all the figures?
+        if ScriptFlags.MREORG_SAVEALL:
+            mreorg.scriptplots.plotmanager.saveAllNewActiveFigures()
+
+        # Should we actually display this:
+        if ScriptFlags.MREORG_NOSHOW:
             pass
-            #LogMgr.info("mpl.show() call not made")
+        else:
+            orig_mpl_show(*args, **kwargs)
     matplotlib.pylab.show = show
     pylab.show = show
 
 
     # patch mpl.savefig
-    #  - Make sure that the directory actually exists:
+    # Monkey-Patch 'matplotlib.savefig()' and 'pylab.savefig()', allowing us
+    # to save to directories that don't exist by automatically creating them:
     mplsavefig = matplotlib.pylab.savefig
     def savefig(filename, *args, **kwargs):
-        print 'Custom Savefig:'
-        dirname = os.path.dirname(filename)
-        if dirname and not os.path.exists(dirname):
-            os.makedirs(dirname)
+        if ScriptFlags.MREORG_AUTOMAKEDIRS:
+            import mreorg
+            mreorg.ensure_directory_exists(filename)
         return mplsavefig(filename, *args, **kwargs)
     matplotlib.pylab.savefig = savefig
     pylab.savefig = savefig
@@ -68,18 +96,10 @@ if "MF_TEST_COVERAGE" in os.environ:
     coverage.process_startup()
 
 
-
-
-
-def DecorateSimulations():
-    if os.environ.get('MF_BATCH',None):
-            return True
-    return False
-
-if DecorateSimulations():
-    print 'Decorating Simulation'
-    from mreorg.curator.backend_sim.db_writer_hooks import SimulationDecorator
-    SimulationDecorator.Init()
+if ScriptFlags.MREORG_CURATIONRUN:
+    # 
+    from mreorg.curator.backend_sim.db_writer_hooks import CurationSimDecorator
+    CurationSimDecorator.Init()
 
 
 

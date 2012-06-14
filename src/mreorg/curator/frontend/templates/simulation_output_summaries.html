@@ -29,8 +29,8 @@ BLAH BLHA
 
         {% if sim_file.get_latest_run %}
             {% for i in sim_file.get_latest_run.output_images.all %}
-            <a href="/simimages/{{i.hash_name_short}}">
-                <img src="/simimages/{{i.hash_thumbnailname_short}}"/>
+            <a href="/image/{{i.hash_name_short}}">
+                <img src="/image/{{i.hash_thumbnailname_short}}"/>
             </a>
 
             {% endfor %}

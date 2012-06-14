@@ -1,19 +1,36 @@
-#-------------------------------------------------------------------------------
+#----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions 
+# are met:
 #
-#  - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-#  - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+#  - Redistributions of source code must retain the above copyright 
+#    notice, this list of conditions and the following disclaimer.
+#  - Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in 
+#    the documentation and/or other materials provided with the 
+#    distribution.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#-------------------------------------------------------------------------------
-# Create your views here.
-#from django.http import HttpResponse
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+# WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+#----------------------------------------------------------------------
+
 from django.shortcuts import render_to_response
-#from django.views.generic.simple import redirect_to
-from django.http import HttpResponseRedirect
+
+from django.http import HttpResponseRedirect,HttpResponseNotFound
+from django.http import HttpResponse
 from models import SimulationFile
 from models import SimRunStatus
 from models import SimulationFileRun
@@ -21,7 +38,7 @@ from models import SimulationQueueEntry
 from models import SimulationQueueEntryState
 from models import PotentialSimulationFile
 from models import PotentialSimulationDirectory
-from models import SimMgrConfig
+from mreorg import MReOrgConfig
 from django.template import RequestContext
 
 
@@ -29,7 +46,9 @@ import os
 import re,string
 from urlparse import urlsplit
 
-
+import os.path
+import mimetypes
+mimetypes.init()
 
 
 
@@ -127,7 +146,7 @@ def doaddpotentialsimulationlocation(request):
     if request.method!='POST':
       return HttpResponseRedirect('/viewpotentialsimulationfiles')
 
-    PotentialSimulationDirectory.create(location=request.POST['location'])
+    PotentialSimulationDirectory.create(directory_name=request.POST['location'])
     return HttpResponseRedirect('/viewpotentialsimulationfiles')
 
 
@@ -243,8 +262,8 @@ def doeditsimulationfile(request, simulationfile_id):
   cwd = os.getcwd()
   os.chdir( os.path.split(sim.full_filename)[0])
   data_dict = {'full_filename':sim.full_filename}
-  cmds = ['xterm &','gvim "${full_filename}"']
-  cmds = SimMgrConfig.get_ns().get('drop_into_editor_cmds',['xterm &'])#['xterm &','gvim "${full_filename}"']
+  #cmds = ['xterm &','gvim "${full_filename}"']
+  cmds = MReOrgConfig.get_ns().get('drop_into_editor_cmds',['xterm &'])#['xterm &','gvim "${full_filename}"']
   for c in cmds:
       t = string.Template(c).substitute(**data_dict)
       os.system(t)
@@ -271,7 +290,7 @@ def doeditsimulationfile(request, simulationfile_id):
 
 
 def mh_adddefault_locations(self=None):
-    default_simulations =  SimMgrConfig.get_ns().get('default_simulations',None)
+    default_simulations =  MReOrgConfig.get_ns().get('default_simulations',None)
 
     if not default_simulations:
         return HttpResponseRedirect('/')
@@ -289,6 +308,31 @@ def mh_adddefault_locations(self=None):
         else:
             PotentialSimulationDirectory.create(directory_name=l[:-2], should_recurse = False)
 
+
+
+def get_image_file(request, filename):
+    print filename
+    
+    im_dir = MReOrgConfig.get_image_store_dir()
+    
+    expected_filename = os.path.join( im_dir, filename)
+    
+    if os.path.exists(expected_filename):
+    
+        fsock = open(expected_filename,"r")
+        file_path = expected_filename
+        file_name = os.path.basename(file_path)
+        file_size = os.path.getsize(file_path)
+        print "file size is: " + str(file_size)
+        mime_type_guess = mimetypes.guess_type(file_name)
+        if mime_type_guess is not None:
+            response = HttpResponse(fsock, mimetype=mime_type_guess[0])
+        response['Content-Disposition'] = 'attachment; filename=' + file_name 
+        return response
+    else:
+        return HttpResponseNotFound('<h1>Image not found</h1>')
+    assert False
+    
 
     #return HttpResponseRedirect('/')
 
