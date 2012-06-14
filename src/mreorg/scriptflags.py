@@ -50,9 +50,9 @@ class ScriptFlags(object):
     class attributes.
     """
 
-    ENVVAR_MREORG_NOSHOW  = os.environ.get('MREORG_NOSHOW',False)
-    ENVVAR_MREORG_SAVEALL =  os.environ.get('MREORG_SAVEALL',False)
-    ENVVAR_MREORG_CURATIONRUN =  os.environ.get('MREORG_CURATIONRUN',False)
+    ENVVAR_MREORG_NOSHOW  = os.environ.get('MREORG_NOSHOW', False)
+    ENVVAR_MREORG_SAVEALL =  os.environ.get('MREORG_SAVEALL', False)
+    ENVVAR_MREORG_CURATIONRUN =  os.environ.get('MREORG_CURATIONRUN', False)
 
 
     # Don't call pylab.show() if ...

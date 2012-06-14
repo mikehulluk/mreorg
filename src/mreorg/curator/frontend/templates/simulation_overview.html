@@ -7,7 +7,7 @@
 {% block postbody %}
 
     <script type="text/javascript">
-    <!-- 
+    <!--
     function pageInit(){
         countdown_callback()
     }
@@ -25,7 +25,7 @@
 
 {% block additional_header %}
 <script type="text/javascript">
-<!-- 
+<!--
 
 // Dajax callback functions:
 function pass(data){
@@ -49,12 +49,12 @@ function setSimFileStatus(id,state, is_in_queue)
     if(is_in_queue == true){
         is_in_queue_str = "SimulationQueued"
     }
-        
+
 
     // Set the class, for coloring:
     document.getElementById('SimFileID'+id).className = state + " " + is_in_queue_str;
     document.getElementById( "SimFileTDStatus"+id ).innerHTML = state
-    
+
     var textTD = document.getElementById('SimFileID'+id).getElementsByTagName('a')[0];
     if( is_in_queue )
     {
@@ -73,13 +73,13 @@ function clearSimQueueCallback()
 }
 
 function clearSimQueue()
-{    
-    Dajaxice.mreorg.curator.frontend.clearSimQueue(clearSimQueueCallback); 
+{
+    Dajaxice.mreorg.curator.frontend.overview_clear_sim_queue(clearSimQueueCallback);
 }
 
 function toggleSimForResubmit(id)
 {
-    Dajaxice.mreorg.curator.frontend.toggleSimulationFileForResubmit(pass, {'simulation_file_id':id}); 
+    Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simulation_file_id':id});
 }
 
 
@@ -89,12 +89,12 @@ function resubmitAllSims()
 
     {% for sim_file in simulation_files %}
     {%if sim_file.does_file_exist %}
-    Dajaxice.mreorg.curator.frontend.setSimulationFileForResubmit(pass, {'simulation_file_id':{{sim_file.id}} }); 
+    Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile(pass, {'simulation_file_id':{{sim_file.id}} });
     updateSimGUI({{sim_file.id}})
     {% endif %}
     {% endfor %}
 
-    
+
 }
 
 function resubmitAllFailures()
@@ -102,7 +102,7 @@ function resubmitAllFailures()
 
     {% for sim_file in simulation_files %}
     {%if sim_file.does_file_exist %}
-        Dajaxice.mreorg.curator.frontend.setSimulationFileForResubmitIfFailure(pass, {'simulation_file_id':{{sim_file.id}} }); 
+        Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile_if_failure(pass, {'simulation_file_id':{{sim_file.id}} });
         updateSimGUI({{sim_file.id}})
     {%endif %}
     {% endfor %}
@@ -124,7 +124,7 @@ function updateSimGUICallback(data)
 
 function updateSimGUI(sim_id)
 {
-    Dajaxice.mreorg.curator.frontend.updateSimGui(updateSimGUICallback, {'simulation_file_id':sim_id}); 
+    Dajaxice.mreorg.curator.frontend.overview_update_sim_gui(updateSimGUICallback, {'simulation_file_id':sim_id});
 }
 
 
@@ -143,7 +143,7 @@ function reloadPage()
 
 function deleteSimulationFile(id)
 {
-    Dajaxice.mreorg.curator.frontend.deleteSimulationFile(reloadPage, {'simulation_file_id': id}); 
+    Dajaxice.mreorg.curator.frontend.overview_delete_simfile(reloadPage, {'simulation_file_id': id});
 }
 
 
@@ -151,10 +151,10 @@ function deleteNonExistantFiles()
 {
     {% for sim_file in simulation_files %}
     {%if not sim_file.does_file_exist %}
-    Dajaxice.mreorg.curator.frontend.deleteSimulationFile(pass, {'simulation_file_id': {{sim_file.id}} } ); 
+    Dajaxice.mreorg.curator.frontend.overview_delete_simfile(pass, {'simulation_file_id': {{sim_file.id}} } );
     {% endif %}
     {% endfor %}
-    
+
     reloadPage();
 
 }
@@ -163,9 +163,9 @@ function deleteNonExistantFiles()
 var timeOut = 60;
 var time = 0;
 function countdown_callback(){
-    
-    document.getElementById( "idUpdateBox" ).innerHTML = "Updating in " 
-    
+
+    document.getElementById( "idUpdateBox" ).innerHTML = "Updating in "
+
     if(time ==0){
         time = timeOut;
         refresh_sim_list_view();
@@ -186,7 +186,7 @@ function countdown_callback(){
 
 
 
-{% block additional_sidebarcontents %} 
+{% block additional_sidebarcontents %}
     <h2> Submission Control:</h2>
         <div class='sidebarblock interactive'>
         <ul>
@@ -201,7 +201,7 @@ function countdown_callback(){
             <li><a onclick="refresh_sim_list_view()" id='idUpdateBox' > Update</a> </li>
         </ul>
     </div>
-{% endblock %} 
+{% endblock %}
 
 
 {% block contents %}

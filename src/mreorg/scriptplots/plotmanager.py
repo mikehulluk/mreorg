@@ -26,8 +26,9 @@
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
-from mreorg.utils import CleanFilename, EnsureDirectoryExists, ScriptUtils
+from mreorg.utils import  ScriptUtils
 import os
+import mreorg
 
 class FigTypes:
     EPS = "eps"
@@ -74,7 +75,7 @@ class PlotManager():
         f.subplots_adjust(bottom=0.15)
 
         # Find the module this function was called from:
-        modulename = ScriptUtils.getCallingScriptFile(includeExt=False)
+        modulename = ScriptUtils.get_calling_script_file(include_ext=False)
 
 
         #For each filetype:
@@ -87,8 +88,8 @@ class PlotManager():
             fName=fName.replace(":","=")
             assert not ":" in fName, 'For windows compatibility'
 
-            fName = CleanFilename(fName)
-            EnsureDirectoryExists(fName)
+            #fName = mreorg.clean_filename(fName)
+            mreorg.ensure_directory_exists(fName)
 
 
             # Save the figure:

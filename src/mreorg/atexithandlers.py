@@ -40,12 +40,12 @@ class AtExitHandler():
 
     @classmethod
     def add_handler(cls, handler, priority=100):
-        cls._handlers.append((priority,handler))
+        cls._handlers.append((priority, handler))
 
     @classmethod
-    def at_exit(cls,*args, **kwargs):
-        for priority, handler in sorted( cls._handlers ):
-            handler(*args,**kwargs)
+    def at_exit(cls, *args, **kwargs):
+        for _priority, handler in sorted(cls._handlers):
+            handler(*args, **kwargs)
 
 
 

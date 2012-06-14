@@ -99,7 +99,7 @@ if "MF_TEST_COVERAGE" in os.environ:
 if ScriptFlags.MREORG_CURATIONRUN:
     # 
     from mreorg.curator.backend_sim.db_writer_hooks import CurationSimDecorator
-    CurationSimDecorator.Init()
+    CurationSimDecorator.activate()
 
 
 
