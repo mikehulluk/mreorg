@@ -27,6 +27,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 
+import sys
+print sys.argv
 
 from django.core.management import execute_manager
 try:

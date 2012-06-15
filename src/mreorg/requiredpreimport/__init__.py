@@ -39,7 +39,7 @@ import os
 # Lets monkey-patch matplotlib!
 # ===============================
 
-from mreorg.scriptflags import ScriptFlags
+from mreorg import ScriptFlags, PlotManager
 if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
 
     # If we are running headless, then 
@@ -55,11 +55,10 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     import pylab
     orig_mpl_show = matplotlib.pylab.show
     def show(*args, **kwargs):
-        import mreorg.scriptplots.plotmanager
 
         # Should we save all the figures?
         if ScriptFlags.MREORG_SAVEALL:
-            mreorg.scriptplots.plotmanager.saveAllNewActiveFigures()
+            PlotManager.save_active_figures()
 
         # Should we actually display this:
         if ScriptFlags.MREORG_NOSHOW:
@@ -70,7 +69,6 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     pylab.show = show
 
 
-    # patch mpl.savefig
     # Monkey-Patch 'matplotlib.savefig()' and 'pylab.savefig()', allowing us
     # to save to directories that don't exist by automatically creating them:
     mplsavefig = matplotlib.pylab.savefig

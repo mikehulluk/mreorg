@@ -8,22 +8,21 @@
 
 {% block contents %}
 
-BLAH BLHA
 
 
 {% for loc, sim_files in simulation_files %}
 
+<div class="section">
 
-<div class="SummaryFileGroup">
-  <h2>{{loc}}</h2>
-  {% for sim_file in sim_files %}
+    <div class='sectionheader'> <h2>{{loc}}/</h2> </div>
 
-    <div class="SummaryFile">
+    {% for sim_file in sim_files %}
+
+    <div class="subsection">
         <h3> {{loc}} : <a href="/simulationfiles/{{sim_file.id}}">{{sim_file.get_short_filename}}</a> </h3>
+
         <div class="SummaryFileDescription">
-            <pre>
-{{sim_file.get_docstring}}
-            </pre>
+            <pre> {{sim_file.get_docstring}} </pre>
         </div>
 
 

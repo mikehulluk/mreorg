@@ -79,9 +79,8 @@ def simulate( sim_queue_entry):
 
 
 
-def main():
+def run_backend():
     while True:
-        time.sleep(5)
         print 'Checking for Queued Sims'
 
         queued_objects = SimQueueEntry.objects.\
@@ -92,5 +91,7 @@ def main():
             print ' - No Sims found'
         else:
             simulate( queued_objects[0] )
+        time.sleep(2)
 
-main()
+if __name__ == "__main__":
+    run_backend()

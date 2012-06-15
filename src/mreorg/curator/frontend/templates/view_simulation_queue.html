@@ -4,15 +4,14 @@
 <META HTTP-EQUIV="REFRESH" CONTENT="10">
 
 <div class="section">
-<h1> Latest Runs</h1>
 
+<div class='sectionheader'> 
+    <h2><a>Recently Completed Runs</a></h2> </div>
 
-<table>
-
+<table class='std'>
 
 
 <tr>
-  <th/>
   <th> File </th>
   <th> Last Run </th>
   <th> Result </th>
@@ -35,14 +34,13 @@
 
 
 
-<h1> Simulation Queue </h1>
-<!-- <a href="/do/update_potential_simulation_files">Update Potential Simulation Files</a> -->
 
 
 
 <div class="section">
-<h2> Active </h2>
-<table >
+<div class='sectionheader'> 
+    <h2><a>Simulations Currently Running</a></h2> </div>
+<table class='std'>
   <tr>
     <th>  </th>
     <th> Filename </th>
@@ -65,13 +63,14 @@
 
 
 <div class="section">
-<h2> Waiting </h2>
 
+<div class='sectionheader'> 
+    <h2><a>Simulations in Queue</a></h2> </div>
 
 <form action="/do/removesimulationsfromqueue" method="post">
 {% csrf_token %}
 
-<table >
+<table class='std'>
   <tr>
     <th>  </th>
     <th> Filename </th>

@@ -25,7 +25,6 @@
 
 {% block additional_header %}
 <script type="text/javascript">
-<!--
 
 // Dajax callback functions:
 function pass(data){
@@ -37,13 +36,13 @@ function pass(data){
 function refresh_sim_list_view() {
     {% for sim_file in simulation_files %}
     {%if sim_file.does_file_exist %}
-    updateSimGUI({{sim_file.id}})
+    update_sim_gui({{sim_file.id}})
     {% endif %}
     {% endfor %}
 }
 
 
-function setSimFileStatus(id,state, is_in_queue)
+function set_sim_file_status(id,state, is_in_queue)
 {
     var is_in_queue_str = "SimNotQueued"
     if(is_in_queue == true){
@@ -72,49 +71,49 @@ function clearSimQueueCallback()
     refresh_sim_list_view();
 }
 
-function clearSimQueue()
+function clear_sim_queue()
 {
     Dajaxice.mreorg.curator.frontend.overview_clear_sim_queue(clearSimQueueCallback);
 }
 
-function toggleSimForResubmit(id)
+function toggle_sim_for_resubmit(id)
 {
     Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simulation_file_id':id});
 }
 
 
 
-function resubmitAllSims()
+function resubmit_all_sims()
 {
 
     {% for sim_file in simulation_files %}
     {%if sim_file.does_file_exist %}
     Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile(pass, {'simulation_file_id':{{sim_file.id}} });
-    updateSimGUI({{sim_file.id}})
+    update_sim_gui({{sim_file.id}})
     {% endif %}
     {% endfor %}
 
 
 }
 
-function resubmitAllFailures()
+function resubmit_all_failures()
 {
 
     {% for sim_file in simulation_files %}
     {%if sim_file.does_file_exist %}
         Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile_if_failure(pass, {'simulation_file_id':{{sim_file.id}} });
-        updateSimGUI({{sim_file.id}})
+        update_sim_gui({{sim_file.id}})
     {%endif %}
     {% endfor %}
 }
 
-function updateSimGUICallback(data)
+function update_sim_gui_callback(data)
 {
     var id = data.sim_id;
     var state = data.state
     var queued = data.is_queued
 
-    setSimFileStatus(id, state, queued)
+    set_sim_file_status(id, state, queued)
 
     // Update the Last Run Info and hrefs:
     var node = document.getElementById("SimFileLatestRun"+id)
@@ -122,17 +121,17 @@ function updateSimGUICallback(data)
     node.href =  "simulationfileruns/" + data.latest_exec_id
 }
 
-function updateSimGUI(sim_id)
+function update_sim_gui(sim_id)
 {
-    Dajaxice.mreorg.curator.frontend.overview_update_sim_gui(updateSimGUICallback, {'simulation_file_id':sim_id});
+    Dajaxice.mreorg.curator.frontend.overview_update_sim_gui(update_sim_gui_callback, {'simulation_file_id':sim_id});
 }
 
 
 
 function clickResubmitButton( sim_id )
 {
-    toggleSimForResubmit(sim_id);
-    updateSimGUI(sim_id);
+    toggle_sim_for_resubmit(sim_id);
+    update_sim_gui(sim_id);
 }
 
 
@@ -172,7 +171,7 @@ function countdown_callback(){
     }
     else{
         time = time -1;
-        document.getElementById( "idUpdateBox" ).innerHTML = "Updating in " + time
+        document.getElementById( "idUpdateBox" ).innerHTML = "Refresh("+ time +")"
     }
     setTimeout("countdown_callback()", 1000);
 }
@@ -186,42 +185,36 @@ function countdown_callback(){
 
 
 
-{% block additional_sidebarcontents %}
-    <h2> Submission Control:</h2>
-        <div class='sidebarblock interactive'>
-        <ul>
-            <li>Submit
-            <ul>
-                <li> <a onclick="resubmitAllSims()">All</a></li>
-                <li><a onclick="resubmitAllFailures()">All Failures</a></li>
-            </ul>
-            </li>
-            <li><a onclick="clearSimQueue();"  > Clear Submission Queue</a></li>
-            <li><a onclick="deleteNonExistantFiles();"  > Delete Non-existant Files</a></li>
-            <li><a onclick="refresh_sim_list_view()" id='idUpdateBox' > Update</a> </li>
-        </ul>
-    </div>
-{% endblock %}
+
+
+
+
 
 
 {% block contents %}
+<div class='section' >
+      <div class='sectionheader'>
+          <h2><a>Overview</a></h2>
+          <div class='actionbar'>
+              <div class='inner'>
+                  <ul>
+                      <li> <a onclick="resubmit_all_sims()"><span>Submit-All<span></span></a></li>
+                      <li> <a onclick="resubmit_all_failures()"><span>Submit-Failures<span></span></a></li>
+                      <li> <a onclick="clear_sim_queue();" ><span>Clear-Queue</span></a></li>
+                      <li> <a onclick="refresh_sim_list_view()" ><span id='idUpdateBox'>Refresh</span></a></li>
+                  </ul>
+              </div>
+          </div>
+      </div>
 
-
-
-
-
-
-
-
-
-<div class='simulationlist'>
-    <H2>Results</H2>
-
-    <table>
+      <div class='sectioncontents'> 
+          
+          
+    <table class='std'>
         <tbody>
 
         <tr>
-          <th> Resimulate</th>
+          <th> Queue</th>
           <th> Status </th>
           <th> File </th>
           <th> Last Run </th>

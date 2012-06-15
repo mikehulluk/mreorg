@@ -3,7 +3,7 @@
 
 
 
-{% block additional_sidebarcontents %} 
+{% block additional_sidebarcontents %}
     <h2>Tracking</h2>
         <div class='sidebarblock interactive'>
         <ul>
@@ -11,100 +11,142 @@
             <li><a href="/do/track_all_simulation_files">Track all Simulations</a></li>
         </ul>
     </div>
-{% endblock %} 
+{% endblock %}
 
 
 
 {% block contents %}
 
 
-<div class="section">
 
 
+<div class='section' >
+      <div class='sectionheader'>
+          <h2><a>Tracking</a></h2>
+          <div class='actionbar'>
+              <div class='inner'>
+                  <ul>
+                        <li><a href="/do/update_potential_simulation_files"><span>Rescan Filesystem</span></a></li>
+                        <li><a href="/do/track_all_simulation_files">Track all Simulations</a></li>
+                  </ul>
+              </div>
+          </div>
+      </div>
 
-<h1>Watched Directories</h1>
-<div class="section">
+      <div class='sectioncontents'>
+
+    <table class='std'>
+    <tr>
+        <th>Directory</th>
+        <th>Exists?</th>
+        <th>Recurse Over Directory?</th>
+    </tr>
+
+    {% for src_directory in potential_directories %}
+    <tr>
+        <td> {{src_directory.directory_name }} </td>
+        <td> {{src_directory.does_exist }} </td>
+        <td> {{src_directory.should_recurse }} </td>
+    </tr>
+    {% endfor %}
+    </table>
+
+    <form action="/do/addpotentialsimulationlocation" method="post">
+    <div class='centerform'>
+    {% csrf_token %}
+    <input type="text" size=100 name="location" />
+    <input type="submit" value="Add" />
+    </div>
+    </form>
 
 
-    <!-- <h2> Tracking </h2> -->
-<table>
-  <tr>
-    <th>Location</th>
-    <th>Exists?</th>
-    <th>Recurse Over Directory?</th>
-  </tr>
-
-  {% for potential_directory in potential_directories %}
-  <tr>
-    <td> {{potential_directory.directory_name }} </td>
-    <td> {{potential_directory.does_exist }} </td>
-    <td> {{potential_directory.should_recurse }} </td>
-  </tr>
-  {% endfor %}
-</table>
-
-<form action="/do/addpotentialsimulationlocation" method="post">
-  {% csrf_token %}
-  <input type="text" name="location" />
-  <input type="submit" value="Add" />
-</form>
-</div>
-</div>
-
-
-
-<div class="section">
-<h1> Untracked Simulation Files </h1>
-
-
-
-<form action="/do/potential_to_actual_simulation" method="post">
-{% csrf_token %}
-
-<table >
-  <tr>
-    <th>  </th>
-    <th> Filename </th>
-  </tr>
-
-  {% for potentialfile in potentialsimulationfiles %}
-  <tr>
-    <td> <input type="checkbox" name="potentialsimid_{{potentialfile.id}}"> </td>
-    <td> {{potentialfile.full_filename}} </td>
-  </tr>
-  {%endfor %}
-</table>
-<input type="submit" value="Track Files"/>
-</form>
+      </div>
 </div>
 
 
 
 
-<div class="section">
-<h1> Tracked Simulation Files </h1>
 
-<form action="/do/actual_to_potential_simulation" method="post">
-{% csrf_token %}
 
-<table >
-  <tr>
-    <th>  </th>
-    <th> Filename </th>
-  </tr>
+<div class='section' >
+      <div class='sectionheader'>
+          <h2><a>Untracked Simulations</a></h2>
+          <div class='actionbar'>
+              <div class='inner'>
+                  <ul>
+                        <li><a href="/do/track_all_simulation_files">Track all Simulations</a></li>
+                  </ul>
+              </div>
+          </div>
+      </div>
 
-  {% for simfile in simulationfiles %}
-  <tr>
-    <td> <input type="checkbox" name="simid_{{simfile.id}}"> </td>
-    <td> {{simfile.full_filename}} </td>
-  </tr>
-  {%endfor %}
-</table>
-<input type="submit" value="Untrack Files"/>
-</form>
+      <div class='sectioncontents'>
+
+         <form action="/do/potential_to_actual_simulation" method="post">
+        {% csrf_token %}
+
+        <table class='std'>
+        <tr>
+            <th>  </th>
+            <th> Filename </th>
+        </tr>
+
+        {% for potentialfile in potentialsimulationfiles %}
+        <tr>
+            <td> <input type="checkbox" name="potentialsimid_{{potentialfile.id}}"> </td>
+            <td> {{potentialfile.full_filename}} </td>
+        </tr>
+        {%endfor %}
+        </table>
+        <input type="submit" value="Track Files"/>
+        </form>
+
+      </div>
 </div>
 
 
+
+
+
+
+
+
+<div class='section' >
+      <div class='sectionheader'>
+          <h2><a>Tracked Simulations</a></h2>
+          <div class='actionbar'>
+              <div class='inner'>
+                  <ul>
+                        <li><a href="/do/untrack_all_simulation_files">Untrack all Simulations</a></li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+
+      <div class='sectioncontents'>
+
+            <form action="/do/actual_to_potential_simulation" method="post">
+            {% csrf_token %}
+
+            <table class='std' >
+            <tr>
+                <th>  </th>
+                <th> Filename </th>
+            </tr>
+
+            {% for simfile in simulationfiles %}
+            <tr>
+                <td> <input type="checkbox" name="simid_{{simfile.id}}"> </td>
+                <td> {{simfile.full_filename}} </td>
+            </tr>
+            {%endfor %}
+            </table>
+            <input type="submit" value="Untrack Files"/>
+            </form>
+
+
+      </div>
+</div>
 
 
 {% endblock %}

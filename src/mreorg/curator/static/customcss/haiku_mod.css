@@ -1,0 +1,465 @@
+/*
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *    FranÃ§ois Revol <revol@free.fr>
+ *    Stephan AÃŸmus <superstippi@gmx.de>
+ *    Braden Ewing <brewin@gmail.com>
+ *    Humdinger <humdingerb@gmail.com>
+ */
+
+
+/*
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		FranÃ§ois Revol <revol@free.fr>
+ *		Stephan AÃŸmus <superstippi@gmx.de>
+ *		Braden Ewing <brewin@gmail.com>
+ *		Humdinger <humdingerb@gmail.com>
+ *		Vincent Duvert <vincent.duvert@free.fr>
+ */
+
+html {
+	margin: 0;
+	padding: 0;
+	background: #FFF;
+}
+
+body {
+	color: #333333;
+	line-height: 1.5;
+	margin: 0;
+	padding: 0;
+	font-family: "DejaVu Sans", Arial, Helvetica, sans-serif;
+}
+
+/* link colors and text decoration */
+
+a:link { 
+	font-weight: bold; 
+	text-decoration: none; 
+	color: #dc3c01;
+}
+a:visited { 
+	font-weight: bold; 
+	text-decoration: none; 
+	color: #892601;
+}
+a:hover, a:active { 
+	text-decoration: underline; 
+	color: #ff4500;
+}
+
+/* Some headers act as anchors, don't give them a hover effect */
+
+h2 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
+h3 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
+h4 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
+h5 a:hover, a:active {
+	text-decoration: none;
+	color: #0c3762;
+}
+
+/* heading and navigation */
+
+#banner {
+	position: relative;
+	left: 0;
+	top: 0;
+	height: 84px;
+	min-width: 59em;
+	background: #eeeeee;
+}
+
+#banner div {
+	background: transparent; /*url(images/logo.png) no-repeat scroll 10px 0;*/
+	min-width: 59em;
+	max-width: 70em;
+	height: 100%;
+	margin: 0 auto;
+}
+
+#banner span {
+	position: relative;
+	top: 26px;
+	left: 172px;
+	color: #333333;
+	text-transform: uppercase;
+	letter-spacing: 3px;
+	font-family: Myriad Pro,Myriad Web Pro Regular,Lucida Grande,Geneva,Trebuchet MS,sans-serif;
+	font-weight: normal;
+	font-size: 28px;	
+}
+
+div.nav {
+	position: relative;
+	min-width: 59em;
+	left: 0;
+	top: 0;
+	/*background: #e0e0e0;*/
+	/*background: #555555;*/
+	padding: 0;
+  width:100%;
+
+}
+
+div.nav div.inner {
+	min-width: 39em;
+	max-width: 80em;
+	height: 100%;
+	margin: 0 auto;
+	text-align: right;
+	padding: 0;
+  float:right;
+}
+
+div.nav div.inner span {
+	margin-right: 20px;
+	font-size: 0.8em;
+}
+
+div.nav div.inner span a.uplink { 
+	font-weight: normal; 
+}
+
+div.nav div.inner ul
+{
+list-style-type:none;
+margin:0;
+padding:0;
+}
+div.nav div.inner ul a span
+{
+display:block;
+width:auto;
+margin-right:5px;
+margin-left:5px;
+font-variant:small-caps;
+}
+div.nav div.inner ul li
+{
+display:inline;
+float: left;
+}
+
+
+
+
+
+
+
+/* main content */
+#content {
+	margin: 0 auto;
+  width:80%;
+}
+
+
+
+#content div {
+	font-size: 0.9em;
+}
+
+/* contents box */
+
+table.std {
+	margin: 0px 0px 30px 30px;
+	padding: 1px;
+	border-width: 1px;
+	border-style: dotted;
+	border-color: #e0e0e0;
+	float:center;
+  margin:auto;
+}
+table.std tr.heading {
+	background-color: #e0e0e0;
+	text-align: center;
+	font-weight: bold;
+	font-size: 1.1em;
+}
+table.std tr.std {
+	background-color: #eeeeee;
+}
+table.std td {
+	padding: 5px 20px;
+  text-align:center;
+}
+
+table.std a:link, table.std a:visited { 
+	font-weight: normal; 
+	text-decoration: none; 
+	color: #dc3c01;
+}
+table.std a:hover, table.std a:active { 
+	text-decoration: underline; 
+	color: #ff4500;
+}
+
+
+/* Haiku User Guide styles and layout */
+
+/* Rounded corner boxes */
+/* Common declarations */
+.box-info, .box-stop, .box-warning {
+	-webkit-border-radius: 10px;
+	-khtml-border-radius: 10px;	
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	border-style: dotted;
+	border-width: thin;
+	border-color: #dcdcdc;
+	padding: 10px 15px 10px 80px;
+	margin-bottom: 15px;
+	margin-top: 15px;
+	min-height: 42px;
+}
+.box-info {
+	background: #e4ffde url(images/alert_info_32.png) 15px 15px no-repeat;
+}
+.box-warning {
+	background: #fffbc6 url(images/alert_warning_32.png) 15px 15px no-repeat;
+}
+.box-stop {
+	background: #ffeae6 url(images/alert_stop_32.png) 15px 15px no-repeat;
+}
+
+/* More layout and styles */
+h1 {
+	font-size: 1.3em;
+	font-weight: bold;
+	color: #0c3762;
+  /*
+	border-bottom: dotted thin #e0e0e0;
+	margin-bottom: 25px;
+  */
+}
+h2 {
+	font-size: 1.3em;
+	font-weight: normal;
+	color: #0c3762;
+  /*
+	border-bottom: dotted thin #e0e0e0;
+	margin-top: 35px;
+  */
+}
+h3 {
+	font-size: 1.2em;
+	font-weight: normal;
+	color: #0c3762;
+	border-bottom: dotted thin #e0e0e0;
+	margin-top: 30px;
+}
+h4 {
+	font-size: 1.1em;
+	font-weight: normal;
+	color: #0c3762;
+	margin-top: 30px;
+}
+h5 {
+	font-size: 1.0em;
+	font-weight: normal;
+	color: #0c3762;
+	margin-top: 30px;
+}
+p {
+	text-align: justify;
+}
+ol {
+	padding-left: 20px;
+}
+ul {
+	padding-left: 14px;
+}
+li {
+	line-height: 1.3;
+}
+td {
+	vertical-align: top;
+}
+td.onelinetop {
+	vertical-align: top;
+	white-space: nowrap;
+}
+tt {
+    	background-color: #e2e2e2;
+    	font-size: 1.0em;
+    	font-family: monospace;
+}
+pre {
+	border-color: #0c3762;
+	border-style: dotted;
+	border-width: thin;
+	margin: 0em;
+	padding: 1.5em;
+	background-color: #f0f0f0;
+}
+pre.terminal {			/* Terminal output*/
+	border-color: #ffb11f;
+	border-style: dotted;
+	border-width: thin;
+	margin: 0em;
+	padding: 1.5em;
+	background-color: #3a3a3a;
+	color: #ffb11f;
+}
+.menu {				/* Menu */
+    	font-size: 1.0em;
+    	font-family: serif;
+    	font-style: italic;
+	color: #24225e;
+}
+.button {			/* Button */
+    	font-size: 1.0em;
+    	font-family: serif;
+    	font-style: italic;
+	color: #33583c;
+}
+.app {				/* GUI Application name */
+    	font-size: 1.0em;
+    	font-family: serif;
+    	font-style: italic;
+	color: #5e1c1c;
+}
+.cli {				/* Shell command or file */
+    	background-color: #e8e8e8;
+    	font-size: 0.9em;
+    	font-family: monospace;
+}
+.path {				/* File path */
+    	background-color: #e8e8e8;
+    	font-size: 0.9em;
+    	font-family: monospace;
+}
+.key {				/* Shortcut (separate with Â  */
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;	
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	border-color: #c7c7c7;
+	border-style: solid;
+	border-width: 1px;
+	padding: 0px 2px 0px 2px;
+	background-color: #e8e8e8;
+    	font-family: serif;
+   	font-variant: small-caps;
+  	font-size: 0.8em;
+}
+
+
+
+
+
+
+
+
+
+
+
+#content div.content div.section div.sectionheader h2
+{
+  padding-bottom:0px;
+  margin-bottom:0px;
+}
+
+#content div.section
+{
+margin-bottom:75px;
+}
+
+#content div.subsection
+{
+margin-bottom:100px;
+width:95%;
+float:right;
+}
+
+div.sectionheader
+{
+	border-bottom: thin dotted #e0e0e0;
+	margin-top: 75px;
+	margin-bottom: 35px;
+}
+div.sectionheader div h2 a 
+{
+  padding:0;
+  margin:0;
+}
+/*#content div.content div.section div.sectionheader */
+div.actionbar
+{
+  margin-top:0px;
+  padding:0px;
+  float:right;
+}
+
+
+
+div.actionbar div.inner ul li 
+{
+display:inline;
+float: left;
+}
+div.actionbar div.inner ul li span
+{
+display:block;
+width:auto;
+margin-right:5px;
+margin-left:5px;
+}
+
+div.sectioncontents
+{
+  clear:both;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.Sucess { background-color: #AAFFAA; }
+.FileChanged {background-color: #FFCC99; }
+.UnhandledException { background-color: #ffcfcf }
+.UnhandledException td.Status{ background-color: #ffcfcf }
+.TimeOut { background-color: #99CCCC }
+.NeverBeenRun { background-color: #FFFFCC }
+.Unknown {}
+
+.SimQueued td.Toggle {
+  	border-top: 3px solid #aaaaaa;
+  	border-bottom: 3px solid #aaaaaa;
+    margin: 0px;
+    padding: 0px;
+}
+
+
+
+div.centerform
+{
+  float:center;
+  margin:auto;
+  text-align:center;
+
+}
+

@@ -108,8 +108,8 @@ MIDDLEWARE_CLASSES = (
     #'htmlvalidationmiddleware.HTMLValidationMiddleware',
 )
 
-ROOT_URLCONF = 'mreorg.curator.frontend.urls'
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'mreorg.curator.urls'
+#ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".

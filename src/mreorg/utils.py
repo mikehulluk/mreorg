@@ -125,15 +125,10 @@ def ensure_directory_exists(filename):
         os.makedirs(dirname)
     return filename
 
-
-# Refactor to another file:
-# ############################
 def get_file_sha1hash(filename):
     hashObj = hashlib.sha1()
     with  open(filename) as f:
         hashObj.update( f.read() )
     return hashObj.hexdigest()
-
-# #################################
 
 
