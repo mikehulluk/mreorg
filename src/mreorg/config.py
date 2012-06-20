@@ -36,7 +36,9 @@ class MReOrgConfig(object):
     rcfilename = os.path.expanduser('~/.mreorgrc')
 
     _defaults = [
-        ('IMAGE_STORE_DIR', os.path.expanduser('~/.mreorg/cache/images/'))
+        ('IMAGE_STORE_DIR', os.path.expanduser('~/.mreorg/cache/images/')),
+        ('COVERAGE_CONFIG_FILE',"/home/michael/hw_to_come/morphforge/etc/.coveragerc"),
+        ('COVERAGE_OUTPUT_DIR',"/tmp/morphforge_coverage_output"),
         ]
 
     @classmethod

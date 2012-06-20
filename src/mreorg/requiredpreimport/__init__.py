@@ -27,15 +27,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 
-
-
-
-
-
 import os
-
-
-
+import mreorg
 # Lets monkey-patch matplotlib!
 # ===============================
 
@@ -46,14 +39,14 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     # explictly set the backend to something
     # that won't need $DISPLAY variable:
     import matplotlib
-    if not os.environ.get('DISPLAY',None):
+    if not os.environ.get('DISPLAY', None):
         matplotlib.use('Agg')
 
 
     # Monkey-Patch 'matplotlib.show()' and 'pylab.show()', allowing us
     # to disable them, and/or to save figures to disk.
     import pylab
-    orig_mpl_show = matplotlib.pylab.show
+    orig_mplshow = matplotlib.pylab.show
     def show(*args, **kwargs):
 
         # Should we save all the figures?
@@ -64,38 +57,38 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
         if ScriptFlags.MREORG_NOSHOW:
             pass
         else:
-            orig_mpl_show(*args, **kwargs)
+            orig_mplshow(*args, **kwargs)
     matplotlib.pylab.show = show
     pylab.show = show
 
 
     # Monkey-Patch 'matplotlib.savefig()' and 'pylab.savefig()', allowing us
     # to save to directories that don't exist by automatically creating them:
-    mplsavefig = matplotlib.pylab.savefig
+    orig_mplsavefig = matplotlib.pylab.savefig
     def savefig(filename, *args, **kwargs):
         if ScriptFlags.MREORG_AUTOMAKEDIRS:
-            import mreorg
+            #import mreorg
             mreorg.ensure_directory_exists(filename)
-        return mplsavefig(filename, *args, **kwargs)
+        return orig_mplsavefig(filename, *args, **kwargs)
     matplotlib.pylab.savefig = savefig
     pylab.savefig = savefig
 
 
 
 
+
 # Hook in the coverage
-if "MF_TEST_COVERAGE" in os.environ:
-    #assert False
-    coverage_opdir = '/tmp/morphforge_coverage_output'
+if ScriptFlags.MREORG_ENABLECOVERAGE:
+    conf = mreorg.MReOrgConfig.get_ns()
+    coverage_opdir = conf['COVERAGE_OUTPUT_DIR']
     if not os.path.exists(coverage_opdir):
         os.makedirs(coverage_opdir)
-    os.environ['COVERAGE_PROCESS_START']="/home/michael/hw_to_come/morphforge/etc/.coveragerc"
+    os.environ['COVERAGE_PROCESS_START'] = conf['COVERAGE_CONFIG_FILE']
     import coverage
     coverage.process_startup()
 
 
 if ScriptFlags.MREORG_CURATIONRUN:
-    # 
     from mreorg.curator.backend_sim.db_writer_hooks import CurationSimDecorator
     CurationSimDecorator.activate()
 

@@ -39,37 +39,43 @@ dajaxice_autodiscover()
 
 
 p = (
-    (r'^$', 'mreorg.curator.frontend.views.index'),
+    (r'^$', 'mreorg.curator.frontend.views.view_overview'),
 
-    (r'^simulationfileruns/(\d+)', 'mreorg.curator.frontend.views.simulationfilerun_details'),
-    (r'^simulationfileruns/(\d+)', 'mreorg.curator.frontend.views.simulationfile_details'),
-    (r'^viewpotentialsimulationfiles$', 'mreorg.curator.frontend.views.viewpotentialsimulationfiles'),
+
+    # Main pages:
+    (r'^overview$', 'mreorg.curator.frontend.views.view_overview'),
+    (r'^tracking$', 'mreorg.curator.frontend.views.view_tracking'),
+    (r'^viewsimulationoutputsummaries', 'mreorg.curator.frontend.views.view_sim_output_summaries'),
+    (r'^viewsimulationfailures$', 'mreorg.curator.frontend.views.view_simulation_failures'),
     (r'^viewsimulationqueue$', 'mreorg.curator.frontend.views.viewsimulationqueue'),
 
-    # Untracked/tracked Sims:
-    (r'^do/update_potential_simulation_files', 'mreorg.curator.frontend.views.doupdatepotentialsimulationfiles'),
-    (r'^do/potential_to_actual_simulation', 'mreorg.curator.frontend.views.dopotentialtoactualsimulationfiles'),
-    (r'^do/actual_to_potential_simulation', 'mreorg.curator.frontend.views.doactualtopotentialsimulationfiles'),
-    (r'^do/addpotentialsimulationlocation', 'mreorg.curator.frontend.views.doaddpotentialsimulationlocation'),
-    (r'^do/track_all_simulation_files', 'mreorg.curator.frontend.views.dotrackallsimulationfiles'),
-
-
-    (r'^do/queuesimulations', 'mreorg.curator.frontend.views.doqueuesimulations'),
-    (r'^do/removesimulationsfromqueue', 'mreorg.curator.frontend.views.doremovesimulationsfromqueue'),
-    (r'^do/editsimulationfile/(\d+)', 'mreorg.curator.frontend.views.doeditsimulationfile'),
-
-    (r'^simulationfiles/(\d+)$', 'mreorg.curator.frontend.views.simulationfile_details'),
+    # Details about specific files and runs:
+    (r'^simfiles/(\d+)$', 'mreorg.curator.frontend.views.simfile_details'),
+    (r'^simfileruns/(\d+)', 'mreorg.curator.frontend.views.simfilerun_details'),
+    (r'^simfile/(\d+)', 'mreorg.curator.frontend.views.simfile_details'),
 
 
 
-    (r'^viewsimulationoutputsummaries', 'mreorg.curator.frontend.views.view_simulation_output_summaries'),
 
-    (r'^viewsimulationfailures$', 'mreorg.curator.frontend.views.view_simulation_failures'),
+    # Tracking
+    (r'^do/track/rescan', 'mreorg.curator.frontend.views.do_track_rescanfs'),
+    (r'^do/track/track_sim', 'mreorg.curator.frontend.views.do_track_sim'),
+    (r'^do/track/untrack_sim', 'mreorg.curator.frontend.views.do_untrack_sim'),
+    (r'^do/track/add_src_dir', 'mreorg.curator.frontend.views.do_track_src_dir'),
+    (r'^do/track/track_all_sims', 'mreorg.curator.frontend.views.do_track_all'),
+    (r'^do/track/untrack_all_sims', 'mreorg.curator.frontend.views.do_untrack_all'),
 
-    # Image request
+    # Queuing:
+    (r'^do/queue/add_sims', 'mreorg.curator.frontend.views.do_queue_add_sims'),
+
+
+    (r'^do/editsimfile/(\d+)', 'mreorg.curator.frontend.views.doeditsimfile'),
+
+
+    # Handle image request
     (r'^image/([\w.]*)$', 'mreorg.curator.frontend.views.get_image_file'),
 
-    # Ajax requests:
+    # Handle Ajax requests:
     (r'^%s/' % settings.DAJAXICE_MEDIA_PREFIX, include('dajaxice.urls')),
 )
 

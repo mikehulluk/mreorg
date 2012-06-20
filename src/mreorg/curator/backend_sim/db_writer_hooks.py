@@ -82,7 +82,7 @@ class SimDBWriter(object):
 
         # Create a simulation result object:
         simres = SimFileRun(
-            simulation_file = simfile,
+            simfile = simfile,
             execution_date = datetime.datetime.now(),
             execution_time = sim_run_info.time_taken,
             return_code = sim_run_info.return_code,

@@ -13,32 +13,32 @@
 
 <table class="details">
 
-  <tr><th>File:</th> <td><a href="/do/editsimulationfile/{{simulationfile.id }}">{{simulationfile.full_filename }}</a></td></tr>
-<tr><th>DocString: </th> <td>{{simulationfile.get_docstring }}</td></tr>
-<tr><th>When: </th> <td>{{simulationfile.get_latest_run.execution_date }}</td></tr>
+  <tr><th>File:</th> <td><a href="/do/editsimfile/{{simfile.id }}">{{simfile.full_filename }}</a></td></tr>
+<tr><th>DocString: </th> <td>{{simfile.get_docstring }}</td></tr>
+<tr><th>When: </th> <td>{{simfile.get_latest_run.execution_date }}</td></tr>
 <tr><th>Time: </th> <td>{{simulationrun.get_latest_run.execution_time }} seconds</td></tr>
-<tr><th>Status: </th> <td>{{simulationfile.get_status }} </td></tr>
+<tr><th>Status: </th> <td>{{simfile.get_status }} </td></tr>
 </table>
 
 <table>
-<tr><th>Return Code: </th> <td>{{simulationfile.get_latest_run.return_code }}</td></tr>
-<tr><th>Exception: </th> <td>{{simulationfile.get_latest_run.exception_type }}</td></tr>
+<tr><th>Return Code: </th> <td>{{simfile.get_latest_run.return_code }}</td></tr>
+<tr><th>Exception: </th> <td>{{simfile.get_latest_run.exception_type }}</td></tr>
 </table>
 
 
 <table>
-  <tr><th>SimFile SHA1: </th> <td>{{simulationfile.get_latest_run.simulation_sha1hash }} 
-      (Now: {{simulationfile.get_current_checksum}})</td></tr>
-<tr><th>Lib SHA1: </th> <td>{{simulationfile.get_latest_run.library_sha1hash }}</td></tr>
+  <tr><th>SimFile SHA1: </th> <td>{{simfile.get_latest_run.simulation_sha1hash }} 
+      (Now: {{simfile.get_current_checksum}})</td></tr>
+<tr><th>Lib SHA1: </th> <td>{{simfile.get_latest_run.library_sha1hash }}</td></tr>
 </table>
 
 
-<a href="/simulationfileruns/{{simulationfile.get_latest_run.id}}">More details about last run...</a>
+<a href="/simfileruns/{{simfile.get_latest_run.id}}">More details about last run...</a>
 </div>
 </div>
 
 <h1> File Contents </h1>
-{{simulationfile.get_html_code|safe}}
+{{simfile.get_html_code|safe}}
 
 
 

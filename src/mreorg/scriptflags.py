@@ -39,6 +39,10 @@ if 'MF_BATCH' in os.environ.keys():
     assert False
 
 
+if "MF_TEST_COVERAGE" in os.environ.keys():
+    print 'Found MF_TEST_COVERAGE'
+    #assert False
+
 
 class ScriptFlags(object):
     """Control the behaviour of matplotlib within scripts using environmental
@@ -50,9 +54,13 @@ class ScriptFlags(object):
     class attributes.
     """
 
-    ENVVAR_MREORG_NOSHOW  = os.environ.get('MREORG_NOSHOW', False)
-    ENVVAR_MREORG_SAVEALL =  os.environ.get('MREORG_SAVEALL', False)
-    ENVVAR_MREORG_CURATIONRUN =  os.environ.get('MREORG_CURATIONRUN', False)
+    osenv = os.environ
+    ENVVAR_MREORG_NOSHOW  = osenv.get('MREORG_NOSHOW', False)
+    ENVVAR_MREORG_SAVEALL =  osenv.get('MREORG_SAVEALL', False)
+    ENVVAR_MREORG_CURATIONRUN =  osenv.get('MREORG_CURATIONRUN', False)
+    ENVVAR_MREORG_ENABLECOVERAGE =  osenv.get('MREORG_ENABLECOVERAGE', False)\
+            or osenv.get('MF_TEST_COVERAGE', False)
+
 
 
     # Don't call pylab.show() if ...
@@ -73,3 +81,6 @@ class ScriptFlags(object):
     # Default, lets automatically create directories when they don't exist:
     MREORG_AUTOMAKEDIRS = True
 
+
+    # Should we enable coverage:
+    MREORG_ENABLECOVERAGE = ENVVAR_MREORG_ENABLECOVERAGE

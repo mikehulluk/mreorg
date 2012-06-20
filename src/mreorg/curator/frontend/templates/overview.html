@@ -34,7 +34,7 @@ function pass(data){
 
 // Scripts local to this page:
 function refresh_sim_list_view() {
-    {% for sim_file in simulation_files %}
+    {% for sim_file in simfiles %}
     {%if sim_file.does_file_exist %}
     update_sim_gui({{sim_file.id}})
     {% endif %}
@@ -78,7 +78,7 @@ function clear_sim_queue()
 
 function toggle_sim_for_resubmit(id)
 {
-    Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simulation_file_id':id});
+    Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simfile_id':id});
 }
 
 
@@ -86,9 +86,9 @@ function toggle_sim_for_resubmit(id)
 function resubmit_all_sims()
 {
 
-    {% for sim_file in simulation_files %}
+    {% for sim_file in simfiles %}
     {%if sim_file.does_file_exist %}
-    Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile(pass, {'simulation_file_id':{{sim_file.id}} });
+    Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile(pass, {'simfile_id':{{sim_file.id}} });
     update_sim_gui({{sim_file.id}})
     {% endif %}
     {% endfor %}
@@ -99,9 +99,9 @@ function resubmit_all_sims()
 function resubmit_all_failures()
 {
 
-    {% for sim_file in simulation_files %}
+    {% for sim_file in simfiles %}
     {%if sim_file.does_file_exist %}
-        Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile_if_failure(pass, {'simulation_file_id':{{sim_file.id}} });
+        Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile_if_failure(pass, {'simfile_id':{{sim_file.id}} });
         update_sim_gui({{sim_file.id}})
     {%endif %}
     {% endfor %}
@@ -118,12 +118,12 @@ function update_sim_gui_callback(data)
     // Update the Last Run Info and hrefs:
     var node = document.getElementById("SimFileLatestRun"+id)
     node.innerHTML =  data.latest_exec_date
-    node.href =  "simulationfileruns/" + data.latest_exec_id
+    node.href =  "simfileruns/" + data.latest_exec_id
 }
 
 function update_sim_gui(sim_id)
 {
-    Dajaxice.mreorg.curator.frontend.overview_update_sim_gui(update_sim_gui_callback, {'simulation_file_id':sim_id});
+    Dajaxice.mreorg.curator.frontend.overview_update_sim_gui(update_sim_gui_callback, {'simfile_id':sim_id});
 }
 
 
@@ -142,15 +142,15 @@ function reloadPage()
 
 function deleteSimFile(id)
 {
-    Dajaxice.mreorg.curator.frontend.overview_delete_simfile(reloadPage, {'simulation_file_id': id});
+    Dajaxice.mreorg.curator.frontend.overview_delete_simfile(reloadPage, {'simfile_id': id});
 }
 
 
 function deleteNonExistantFiles()
 {
-    {% for sim_file in simulation_files %}
+    {% for sim_file in simfiles %}
     {%if not sim_file.does_file_exist %}
-    Dajaxice.mreorg.curator.frontend.overview_delete_simfile(pass, {'simulation_file_id': {{sim_file.id}} } );
+    Dajaxice.mreorg.curator.frontend.overview_delete_simfile(pass, {'simfile_id': {{sim_file.id}} } );
     {% endif %}
     {% endfor %}
 
@@ -223,14 +223,14 @@ function countdown_callback(){
         </tr>
 
 
-        {% for sim_file in simulation_files %}
+        {% for sim_file in simfiles %}
 
         {% if sim_file.does_file_exist %}
         <tr class="" id="SimFileID{{sim_file.id}}">
             <td class="Toggle interactive"> <a onclick="clickResubmitButton({{sim_file.id}})" > -- </a>  </td>
             <td class="Status" id="SimFileTDStatus{{sim_file.id}}"> {{ sim_file.get_status }} </td>
-            <td> <a href="/simulationfiles/{{sim_file.id}}"> {{sim_file.get_short_filename }} </a> </td>
-            <td> <a id="SimFileLatestRun{{sim_file.id}}" href="/simulationfileruns/{{sim_file.get_latest_run.id}}">{{sim_file.get_latest_run.execution_date|timesince}} A </a></td>
+            <td> <a href="/simfiles/{{sim_file.id}}"> {{sim_file.get_short_filename }} </a> </td>
+            <td> <a id="SimFileLatestRun{{sim_file.id}}" href="/simfileruns/{{sim_file.get_latest_run.id}}">{{sim_file.get_latest_run.execution_date|timesince}} A </a></td>
             <td> <a id="SimFileLatestRun{{sim_file.id}}">{{sim_file.get_latest_run.execution_time}} s</a></td>
             <td> {{sim_file.get_docstring}} </td>
         </tr>

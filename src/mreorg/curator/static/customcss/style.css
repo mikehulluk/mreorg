@@ -220,33 +220,9 @@ width: 100%;
 .highlight .k { color: #AA22FF; font-weight: bold }
 .highlight .s { color: #BB4444 }
 
-.Sucess { background-color: #AAFFAA; }
-.FileChanged {background-color: #FFCC99; }
-.UnhandledException { background-color: #ffcfcf }
-.UnhandledException td.Status{ background-color: #ffcfcf }
-.TimeOut { background-color: #99CCCC }
-.NeverBeenRun { background-color: #FFFFCC }
-.Unknown { 
-    /*background-color: #AAAAAA;*/
-	/*border: 2px solid #aaaaaa;
-    margin: 1px;
-    padding: 1px;*/
-	/*border: 2px solid #111111;*/
-}
-/*
-tr {
-    margin: 2px;
-}
-*/
-.SimQueued td.Toggle {
-    /*background-color: #AAAAAA;*/
-	border-top: 3px solid #aaaaaa;
-	border-bottom: 3px solid #aaaaaa;
-    margin: 0px;
-    padding: 0px;
-    /*filter: alpha(opacity=50); 
-    opacity: 0.5;*/
-}
+
+
+
 
 /*
 .SimulationNotQueued td{

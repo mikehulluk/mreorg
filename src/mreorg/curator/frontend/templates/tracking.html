@@ -3,15 +3,6 @@
 
 
 
-{% block additional_sidebarcontents %}
-    <h2>Tracking</h2>
-        <div class='sidebarblock interactive'>
-        <ul>
-            <li><a href="/do/update_potential_simulation_files">Rescan Filesystem</a></li>
-            <li><a href="/do/track_all_simulation_files">Track all Simulations</a></li>
-        </ul>
-    </div>
-{% endblock %}
 
 
 
@@ -26,8 +17,8 @@
           <div class='actionbar'>
               <div class='inner'>
                   <ul>
-                        <li><a href="/do/update_potential_simulation_files"><span>Rescan Filesystem</span></a></li>
-                        <li><a href="/do/track_all_simulation_files">Track all Simulations</a></li>
+                        <li><a href="/do/track/rescan/"><span>Rescan Filesystem</span></a></li>
+                        <li><a href="/do/track/track_all_sims">Track all Simulations</a></li>
                   </ul>
               </div>
           </div>
@@ -42,7 +33,7 @@
         <th>Recurse Over Directory?</th>
     </tr>
 
-    {% for src_directory in potential_directories %}
+    {% for src_directory in src_directories %}
     <tr>
         <td> {{src_directory.directory_name }} </td>
         <td> {{src_directory.does_exist }} </td>
@@ -51,7 +42,7 @@
     {% endfor %}
     </table>
 
-    <form action="/do/addpotentialsimulationlocation" method="post">
+    <form action="/do/tracking/add_src_dir" method="post">
     <div class='centerform'>
     {% csrf_token %}
     <input type="text" size=100 name="location" />
@@ -74,7 +65,7 @@
           <div class='actionbar'>
               <div class='inner'>
                   <ul>
-                        <li><a href="/do/track_all_simulation_files">Track all Simulations</a></li>
+                        <li><a href="/do/track/track_all_sims">Track all Simulations</a></li>
                   </ul>
               </div>
           </div>
@@ -82,7 +73,7 @@
 
       <div class='sectioncontents'>
 
-         <form action="/do/potential_to_actual_simulation" method="post">
+         <form action="/do/track/track_sim" method="post">
         {% csrf_token %}
 
         <table class='std'>
@@ -91,10 +82,10 @@
             <th> Filename </th>
         </tr>
 
-        {% for potentialfile in potentialsimulationfiles %}
+        {% for untracked_file in untracked_simfiles %}
         <tr>
-            <td> <input type="checkbox" name="potentialsimid_{{potentialfile.id}}"> </td>
-            <td> {{potentialfile.full_filename}} </td>
+            <td> <input type="checkbox" name="untracked_sim_id_{{untracked_file.id}}"> </td>
+            <td> {{untracked_file.full_filename}} </td>
         </tr>
         {%endfor %}
         </table>
@@ -117,7 +108,7 @@
           <div class='actionbar'>
               <div class='inner'>
                   <ul>
-                        <li><a href="/do/untrack_all_simulation_files">Untrack all Simulations</a></li>
+                        <li><a href="/do/track/untrack_all_sims">Untrack all Simulations</a></li>
                   </ul>
               </div>
           </div>
@@ -125,7 +116,7 @@
 
       <div class='sectioncontents'>
 
-            <form action="/do/actual_to_potential_simulation" method="post">
+            <form action="/do/track/untrack_sim" method="post">
             {% csrf_token %}
 
             <table class='std' >
@@ -134,7 +125,7 @@
                 <th> Filename </th>
             </tr>
 
-            {% for simfile in simulationfiles %}
+            {% for simfile in simfiles %}
             <tr>
                 <td> <input type="checkbox" name="simid_{{simfile.id}}"> </td>
                 <td> {{simfile.full_filename}} </td>

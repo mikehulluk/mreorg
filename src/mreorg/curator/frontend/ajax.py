@@ -37,9 +37,9 @@ from mreorg.curator.frontend.models import SimQueueEntryState
 
 
 @dajaxice_register
-def overview_resubmit_simfile(_request, simulation_file_id):
+def overview_resubmit_simfile(_request, simfile_id):
     try:
-        sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
+        sim_file = TrackedSimFile.objects.get(id = simfile_id)
     except:
         #raise
         return simplejson.dumps({})
@@ -52,10 +52,10 @@ def overview_resubmit_simfile(_request, simulation_file_id):
 
 
 @dajaxice_register
-def overview_resubmit_simfile_if_failure(_request, simulation_file_id):
-#def overview_set_simfile_for_resubmit_if_failure(_request, simulation_file_id):
+def overview_resubmit_simfile_if_failure(_request, simfile_id):
+#def overview_set_simfile_for_resubmit_if_failure(_request, simfile_id):
     try:
-        sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
+        sim_file = TrackedSimFile.objects.get(id = simfile_id)
         #raise
     except:
         return simplejson.dumps({})
@@ -71,10 +71,10 @@ def overview_resubmit_simfile_if_failure(_request, simulation_file_id):
 
 
 @dajaxice_register
-def overview_toggle_simfile_for_resubmit(_request, simulation_file_id):
+def overview_toggle_simfile_for_resubmit(_request, simfile_id):
 
     try:
-        sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
+        sim_file = TrackedSimFile.objects.get(id = simfile_id)
         #raise
     except:
         return simplejson.dumps({})
@@ -97,16 +97,16 @@ def refreshsimlist(_request):
 
 
 @dajaxice_register
-def overview_update_sim_gui(_request, simulation_file_id):
-    print "Dajax call recieved", simulation_file_id
-    sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
+def overview_update_sim_gui(_request, simfile_id):
+    print "Dajax call recieved", simfile_id
+    sim_file = TrackedSimFile.objects.get(id = simfile_id)
     exec_date = ""
     if sim_file.get_latest_run():
         exec_date = sim_file.get_latest_run().execution_data_string()
 
     latest_run  = sim_file.get_latest_run()
     v = simplejson.dumps(
-                {'sim_id':simulation_file_id,
+                {'sim_id':simfile_id,
                  'state':sim_file.get_status(),
                  'is_queued':sim_file.is_queued(),
                  'latest_exec_id':latest_run.id if latest_run else "",
@@ -124,10 +124,10 @@ def overview_clear_sim_queue(_request):
     return simplejson.dumps({})
 
 @dajaxice_register
-def overview_delete_simfile(_request, simulation_file_id ):
+def overview_delete_simfile(_request, simfile_id ):
 
     try:
-        sim_file = TrackedSimFile.objects.get(id = simulation_file_id)
+        sim_file = TrackedSimFile.objects.get(id = simfile_id)
         sim_file.delete()
     except:
         pass

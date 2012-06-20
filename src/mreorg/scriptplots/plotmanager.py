@@ -43,22 +43,24 @@ class FigFormat:
 
 
 
-class SavedFigures(object):
-    nums = set()
+#class SavedFigures(object):
+#    nums = set()
 
 class PlotManager:
 
     fig_num = 0
     figures_saved = []
+    figures_saved_nums =      []              # This is the numbers
     figures_saved_filenames = []
 
-    autosave_default_image_filename_tmpl = \
-        """_output/figures/{modulename}/{figtype}/fig{fignum:03d}_{figname}.{figtype}"""
+    _fig_loc =  """_output/figures/{modulename}/{figtype}/"""
+    _fig_name = """fig{fignum:03d}_{figname}.{figtype}"""
+    autosave_default_image_filename_tmpl = _fig_loc + _fig_loc
     autosave_image_formats = [FigFormat.EPS, FigFormat.PDF,
                               FigFormat.PNG, FigFormat.SVG]
 
     @classmethod
-    def SaveFigure(
+    def save_figure(
         cls,
         figname='',
         figure=None,
@@ -78,11 +80,11 @@ class PlotManager:
         assert isinstance(figtypes, list)
 
         # Get the figure:
-        f = (figure if figure else pylab.gcf())
+        fig = (figure if figure else pylab.gcf())
 
-        assert f.number == cls.fig_num
+        #assert f.number == cls.fig_num
         # Some small changes:
-        f.subplots_adjust(bottom=0.15)
+        fig.subplots_adjust(bottom=0.15)
 
         # Find the module this function was called from:
 
@@ -107,15 +109,15 @@ class PlotManager:
 
             # Save the figure:
             mreorg.ensure_directory_exists(filename)
-            f.savefig(filename)
-            PlotManager.figures_saved.append(f.number)
-            pwd = os.getcwd()
-            PlotManager.figures_saved_filenames.append(os.path.join(pwd, filename))
+            fig.savefig(filename)
+            full_filename = os.path.join(os.getcwd(), filename)
+            PlotManager.figures_saved.append(fig)
+            PlotManager.figures_saved_nums.append(fig.number)
+            PlotManager.figures_saved_filenames.append(full_filename)
             print 'Saving File', filename
 
 
         # Increment the fignum:
-
         PlotManager.fig_num = PlotManager.fig_num + 1
 
 
@@ -125,26 +127,18 @@ class PlotManager:
 
         active_figures = [manager.canvas.figure for manager in
                         matplotlib._pylab_helpers.Gcf.get_all_fig_managers()]
-        active_new_figures = [a for a in active_figures if not a.number
-                            in SavedFigures.nums]
+        active_figures_new = [a for a in active_figures if not a.number
+                            in cls.figures_saved_nums]
 
         # Add to the list of saved figures
-
-        [SavedFigures.nums.add(a.number) for a in active_figures]
+        #[SavedFigures.figures_saved_nums.add(a.number) for a in active_figures]
 
         # Save the new figures:
-
-        for a in active_new_figures:
-            if a.number in PlotManager.figures_saved:
+        for fig in active_figures_new:
+            if fig in PlotManager.figures_saved:
                 continue
 
-            PlotManager.SaveFigure(figname='AutoSaveFigure_%d' % a.number,
-                                figure=a)
-            #saveAllNewActiveFigures()
-
-
-
-
-#def saveAllNewActiveFigures():
+            PlotManager.save_figure(figname='Autosave_figure_%d' % fig.number,
+                                figure=fig)
 
 

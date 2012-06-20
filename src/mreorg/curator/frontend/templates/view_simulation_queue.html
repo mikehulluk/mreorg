@@ -18,11 +18,11 @@
   <th> DocString </th>
 </tr>
 {% for latest_run in latest_runs %}
-<tr class="{{ latest_run.simulation_file.get_status}}">
-    <td> <a href="/simulationfiles/{{latest_run.simulation_file.id}}"> {{latest_run.simulation_file.get_short_filename }} </a> </td>
-    <td> <a href="/simulationfileruns/{{latest_run.simulation_file.get_latest_run.id}}">{{latest_run.simulation_file.get_latest_run.execution_date}} </td>
-    <td> {{latest_run.simulation_file.get_latest_run.get_status}} </td>
-    <td> {{latest_run.simulation_file.get_docstring}} </td>
+<tr class="{{ latest_run.simfile.get_status}}">
+    <td> <a href="/simfiles/{{latest_run.simfile.id}}"> {{latest_run.simfile.get_short_filename }} </a> </td>
+    <td> <a href="/simfileruns/{{latest_run.simfile.get_latest_run.id}}">{{latest_run.simfile.get_latest_run.execution_date}} </td>
+    <td> {{latest_run.simfile.get_latest_run.get_status}} </td>
+    <td> {{latest_run.simfile.get_docstring}} </td>
 </tr>
 
 {% endfor %}
@@ -49,8 +49,8 @@
 
   {% for queuedsim in simulation_queue_executing %}
   <tr>
-    <td> {{queuedsim.simulation_file.get_last_executiontime }} </td>
-    <td> {{queuedsim.simulation_file.get_short_filename}} </td>
+    <td> {{queuedsim.simfile.get_last_executiontime }} </td>
+    <td> {{queuedsim.simfile.get_short_filename}} </td>
     <td> {{queuedsim.get_simulation_time}} </td>
   </tr>
   {%endfor %}
@@ -79,8 +79,8 @@
   {% for queuedsim in simulation_queue %}
   <tr>
     <td> <input type="checkbox" name="queuedsimid_{{queuedsim.id}}"> </td>
-    <td> {{queuedsim.simulation_file.get_last_executiontime }} </td>
-    <td> {{queuedsim.simulation_file.get_short_filename}} </td>
+    <td> {{queuedsim.simfile.get_last_executiontime }} </td>
+    <td> {{queuedsim.simfile.get_short_filename}} </td>
   </tr>
   {%endfor %}
 </table>

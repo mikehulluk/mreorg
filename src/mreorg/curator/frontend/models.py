@@ -54,6 +54,9 @@ class Options(object):
 
 
 class SourceSimDir(models.Model):
+    class Meta():
+        ordering = ['directory_name']
+
     directory_name = models.CharField(max_length=1000)
     should_recurse = models.BooleanField()
 
@@ -73,18 +76,34 @@ class SourceSimDir(models.Model):
 
 class TrackingStatus(object):
     Tracked='Tracked'
-    Unknown='Unknown'
+    #Unknown='Unknown'
     NotTracked='Nottracked'
 
 
-class UntrackedSimFile(models.Model):
 
+
+
+
+
+
+
+
+
+
+class SimFile(models.Model):
     class Meta():
         ordering = ['full_filename']
-
     full_filename = models.CharField(max_length=1000)
-    status = models.CharField( max_length=1000)
+    tracking_status = models.CharField(max_length=1000,default=TrackingStatus.NotTracked)
 
+
+
+
+
+
+class UntrackedSimFile(SimFile):
+
+    status = models.CharField( max_length=1000)
 
     @classmethod
     def create(self, filename):
@@ -98,13 +117,13 @@ class UntrackedSimFile(models.Model):
 
         try:
             UntrackedSimFile.objects.get( full_filename = filename)
-            print 'Already a potential simulation file'
+            print 'Already a tracked simulation file'
             return None
         except:
             pass
 
-        # Create a new potential simulation file object:
-        p = UntrackedSimFile( full_filename = filename, status = TrackingStatus.Unknown )
+        # Create a new untracked simulation file object:
+        p = UntrackedSimFile( full_filename = filename, status = TrackingStatus.NotTracked )
         p.save()
 
     @classmethod
@@ -127,7 +146,7 @@ class UntrackedSimFile(models.Model):
             UntrackedSimFile.create(filename)
 
 
-        print 'Updating potential simulation files', directory
+        print 'Updating untracked simulation files', directory
         for (dirpath, dirnames, filenames) in os.walk( directory ):
             for filename in filenames:
                 if accept_file(filename):
@@ -140,23 +159,9 @@ class UntrackedSimFile(models.Model):
 
 
 
-class SimRunStatus(object):
-    Sucess = 'Sucess'
-    UnhandledException = 'UnhandledException'
-    TimeOut = 'Timeout'
-    NonZeroExitCode = 'NonZeroExitCode'
-
-    FileChanged = 'FileChanged'
-    NeverBeenRun = 'NeverBeenRun'
 
 
-class TrackedSimFile(models.Model):
-
-    class Meta():
-        ordering = ['full_filename']
-
-
-    full_filename = models.CharField(max_length=1000)
+class TrackedSimFile(SimFile):
 
 
     # We cache the docstring, the code, code rendered as HTML:
@@ -226,7 +231,9 @@ class TrackedSimFile(models.Model):
         return os.path.split(self.full_filename)[1]
 
     def get_runs(self):
-        return SimFileRun.objects.filter(simulation_file=self.id).order_by('-execution_date')
+        return SimFileRun.objects. \
+                    filter(simfile=self.id). \
+                    order_by('-execution_date')
 
 
     def get_status(self):
@@ -252,10 +259,18 @@ class TrackedSimFile(models.Model):
         return LUT[p]
 
 
+class SimRunStatus(object):
+    Sucess = 'Sucess'
+    UnhandledException = 'UnhandledException'
+    TimeOut = 'Timeout'
+    NonZeroExitCode = 'NonZeroExitCode'
+
+    FileChanged = 'FileChanged'
+    NeverBeenRun = 'NeverBeenRun'
 
 
 class SimFileRun(models.Model):
-    simulation_file = models.ForeignKey(TrackedSimFile)
+    simfile = models.ForeignKey(TrackedSimFile)
     execution_date = models.DateTimeField('execution date')
     return_code = models.IntegerField()
     std_out = models.CharField(max_length=10000000)
@@ -278,12 +293,12 @@ class SimFileRun(models.Model):
         return s
 
     def is_script_uptodate(self):
-        res = str(self.simulation_sha1hash) == str(self.simulation_file.get_current_checksum())
+        res = str(self.simulation_sha1hash) == str(self.simfile.get_current_checksum())
         return res
 
     def get_status(self):
 
-        if self.simulation_sha1hash != self.simulation_file.get_current_checksum():
+        if self.simulation_sha1hash != self.simfile.get_current_checksum():
             return SimRunStatus.FileChanged
         if self.execution_time is None:
             return SimRunStatus.TimeOut
@@ -314,14 +329,14 @@ class SimQueueEntryState(models.Model):
     Executing = 'Executing'
 
 class SimQueueEntry(models.Model):
-    simulation_file = models.ForeignKey(TrackedSimFile)
+    simfile = models.ForeignKey(TrackedSimFile)
     submit_time = models.DateTimeField('submission_time', default=datetime.datetime.now)
     simulation_start_time = models.DateTimeField(null=True, default=None)
     status = models.CharField(max_length=1000, default=SimQueueEntryState.Waiting )
 
     @classmethod
     def create(cls, sim_file):
-        queue_entry = SimQueueEntry( simulation_file = sim_file )
+        queue_entry = SimQueueEntry( simfile = sim_file )
         queue_entry.save()
 
 

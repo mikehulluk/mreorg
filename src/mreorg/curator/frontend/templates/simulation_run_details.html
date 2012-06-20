@@ -19,7 +19,7 @@ function pass(data){
 
 
 {%block title %}
-Simulation Run Details: {{simulationrun.simulation_file.get_short_filename }}
+Simulation Run Details: {{simulationrun.simfile.get_short_filename }}
 {% endblock %}
 
 {% block contents %}
@@ -27,15 +27,15 @@ Simulation Run Details: {{simulationrun.simulation_file.get_short_filename }}
 
 <div class='menu'>
 <ul>
-<li><a onclick="Dajaxice.sm1.setSimulationFileForResubmit(pass, {'simulation_file_id':{{simulationrun.simulation_file.id}} });">Queue for Resim</a> </li>
+<li><a onclick="Dajaxice.sm1.setSimulationFileForResubmit(pass, {'simfile_id':{{simulationrun.simfile.id}} });">Queue for Resim</a> </li>
 </ul>
 
 <div class="section">
 <h2>Overview </h2>
 
 <table class="details">
-<tr><th>File:</th> <td><a href="/do/editsimulationfile/{{simulationrun.simulation_file.id }}">{{simulationrun.simulation_file.full_filename }}</a></td></tr>
-<tr><th>DocString: </th> <td>{{simulationrun.simulation_file.get_docstring }}</td></tr>
+<tr><th>File:</th> <td><a href="/do/editsimfile/{{simulationrun.simfile.id }}">{{simulationrun.simfile.full_filename }}</a></td></tr>
+<tr><th>DocString: </th> <td>{{simulationrun.simfile.get_docstring }}</td></tr>
 <tr><th>When: </th> <td>{{simulationrun.execution_date }}</td></tr>
 <tr><th>Time: </th> <td>{{simulationrun.execution_time }} seconds</td></tr>
 </table>
@@ -64,7 +64,7 @@ Simulation Run Details: {{simulationrun.simulation_file.get_short_filename }}
     <div>
 <table>
   <tr><th>SimFile SHA1: </th> <td>{{simulationrun.simulation_sha1hash }}
-      (Now: {{simulationrun.simulation_file.get_current_checksum}})</td></tr>
+      (Now: {{simulationrun.simfile.get_current_checksum}})</td></tr>
 <tr><th>Lib SHA1: </th> <td>{{simulationrun.library_sha1hash }}</td></tr>
 </table>
     </div></div>
@@ -83,7 +83,7 @@ Simulation Run Details: {{simulationrun.simulation_file.get_short_filename }}
 
     <div class="filecontents" id="id_CodeBlock" style="display:none">
         <div>
-        {{simulationrun.simulation_file.get_html_code|safe }}
+        {{simulationrun.simfile.get_html_code|safe }}
         </div>
     </div>
 </div>

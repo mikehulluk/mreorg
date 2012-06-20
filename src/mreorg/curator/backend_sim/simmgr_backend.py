@@ -46,7 +46,7 @@ os.environ['MF_TEST_COVERAGE'] = ''
 
 
 def simulate( sim_queue_entry):
-    filename = sim_queue_entry.simulation_file.full_filename
+    filename = sim_queue_entry.simfile.full_filename
     print ' - Simulating: ', filename
     dname, fname = os.path.split(filename)
 
@@ -65,17 +65,17 @@ def simulate( sim_queue_entry):
         print '   - Finished Simulating [Exit OK]'
     except subprocess.CalledProcessError as exception:
         print '   - Finished Simulating [Non-zero exitcode]'
-        if not sim_queue_entry.simulation_file.get_latest_run():
+        if not sim_queue_entry.simfile.get_latest_run():
             print 'Sim not decorated! Unable to set return code'
         else:
-            last_run = sim_queue_entry.simulation_file.get_latest_run()
+            last_run = sim_queue_entry.simfile.get_latest_run()
             last_run.returncode = exception.returncode
             last_run.save(force_update=True)
 
 
     # Remove the sim_queue_entry:
     sim_queue_entry.delete()
-    sim_queue_entry.simulation_file.recache_from_filesystem()
+    sim_queue_entry.simfile.recache_from_filesystem()
 
 
 

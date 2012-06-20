@@ -29,6 +29,7 @@
 
 
 from mreorg.scriptplots import PlotManager, PM
+from mreorg.scriptplots import FigFormat
 from mreorg.scriptflags import ScriptFlags
 from mreorg.utils import ensure_directory_exists
 from mreorg.config import MReOrgConfig
@@ -40,11 +41,10 @@ __all__ = [
     MReOrgConfig,
     ScriptFlags,
 
-
     PlotManager,
     PM,
+    FigFormat,
 
     ensure_directory_exists,
     get_file_sha1hash
-
 ]

@@ -26,13 +26,14 @@
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
-from plotmanager import PlotManager, FigFormat
+from mreorg.scriptplots.plotmanager import PlotManager, FigFormat
 PM = PlotManager
 
+__all__ = [
+    PlotManager,
+    PM,
+    FigFormat
+]
 
 
-#from os.path import basename as Basename
-#from os.path import splitext as SplitExt
-#from os.path import dirname as DirName
-#from os.path import exists as Exists
 

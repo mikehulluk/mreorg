@@ -57,45 +57,6 @@ class ScriptUtils(object):
             return os.path.splitext(filename)[0]
 
 
-
-
-
-    ## Deprecated:
-    ## ##################################
-    #outputStoreDir = "_output_store/"
-    #currentOutputLinkDir =  "_out"
-    ## We store the Full iso format of when the simulation was run, as
-    ## well as the shortedn
-    #now = datetime.datetime.now()
-    #datetimestringISO = now.isoformat()
-    #datetimestringInformal = now.strftime("[%a %d %B - %I:%M]")
-    #datetimestr = "%s_%s/"%( datetimestringISO, datetimestringInformal )
-
-    #@classmethod
-    #def getOutputDir(cls):
-    #    assert False, "To be removed June 2012"
-    #    dirName = cls.outputStoreDir + cls.datetimestr
-    #    fullDirName = join( cls.get_calling_script_directory(), dirName )
-    #    ensure_directory_exists(fullDirName)
-    #    return fullDirName
-
-
-    #@classmethod
-    #def updateLinkToOutputDir(cls):
-    #    assert False, "To be removed June 2012"
-    #    opDir = cls.getOutputDir()
-    #    fullLinkName = os.path.join( 
-    #            cls.get_calling_script_directory(), 
-    #            cls.currentOutputLinkDir )
-    #    if exists( fullLinkName ):
-    #        os.unlink( fullLinkName )
-
-    #    os.system("""ln -s "%s" "%s" """%(opDir, fullLinkName) )
-
-
-
-
-
 def extract_docstring_from_fileobj(fileobj):
     for token_data in tokenize.generate_tokens(fileobj.readline):
         tok = token_data[0]
@@ -117,8 +78,6 @@ def extract_docstring_from_fileobj(fileobj):
     return None
 
 
-
-
 def ensure_directory_exists(filename):
     dirname = os.path.dirname(filename)
     if not os.path.exists(dirname) and dirname.strip():
@@ -126,9 +85,9 @@ def ensure_directory_exists(filename):
     return filename
 
 def get_file_sha1hash(filename):
-    hashObj = hashlib.sha1()
-    with  open(filename) as f:
-        hashObj.update( f.read() )
-    return hashObj.hexdigest()
+    hash_obj = hashlib.sha1()
+    with  open(filename) as fileobj:
+        hash_obj.update( fileobj.read() )
+    return hash_obj.hexdigest()
 
 
