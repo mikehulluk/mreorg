@@ -52,6 +52,7 @@ import os.path
 import mimetypes
 mimetypes.init()
 
+from django.db import transaction
 
 
 
@@ -125,6 +126,8 @@ def view_tracking(request):
 
 # Tracking Commands
 # ====================
+
+@transaction.commit_on_success
 def do_track_all(request):
     for pot_sim in SimFile.get_untracked_sims(): 
         sim = SimFile.create(full_filename=pot_sim.full_filename, tracked=True)
@@ -133,6 +136,7 @@ def do_track_all(request):
 
     return HttpResponseRedirect('/tracking')
 
+@transaction.commit_on_success
 def do_untrack_all(request):
     for sim in SimFile.get_tracked_sims():
         untr_sim = SimFile.create(full_filename=sim.full_filename, tracked=False)
@@ -155,6 +159,7 @@ def do_track_rescanfs(request):
     return HttpResponseRedirect('/tracking')
 
 
+@transaction.commit_on_success
 def do_track_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')
@@ -177,6 +182,7 @@ def do_track_sim(request):
     return HttpResponseRedirect('/tracking')
 
 
+@transaction.commit_on_success
 def do_untrack_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')

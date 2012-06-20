@@ -36,7 +36,7 @@ from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
 import mreorg
-
+from django.db import transaction
 
 
 
@@ -93,36 +93,52 @@ class SimFile(models.Model):
     class Meta():
         ordering = ['full_filename']
     full_filename = models.CharField(max_length=1000)
-    tracking_status = models.CharField(max_length=1000,default=TrackingStatus.NotTracked)
+    tracking_status = models.CharField(
+            max_length=1000,
+            default=TrackingStatus.NotTracked, 
+            choices= [ 
+                (TrackingStatus.Tracked,TrackingStatus.Tracked),
+                (TrackingStatus.NotTracked,TrackingStatus.NotTracked),
+                ] )
+
+    # We cache the docstring, the code, code rendered as HTML:
+    last_read_sha1 = models.CharField(max_length=100000, null=True)
+    last_read_time = models.DateTimeField(null=True)
+    last_read_contents = models.CharField(max_length=100000, null=True)
+    last_read_docstring = models.CharField(max_length=100000, null=True)
+    last_read_htmlcode = models.CharField(max_length=100000, null=True)
+
+
+    # Last simulation run:
+    last_run = models.ForeignKey('SimFileRun',null=True, related_name='+')
 
     @classmethod
     def get_tracked_sims(cls, **kwargs):
         if kwargs:
-            return TrackedSimFile.objects.get(**kwargs)
-        #if id is not None:
-        #    return TrackedSimFile.objects.get(id=id)
-        return TrackedSimFile.objects.all()
+            return SimFile.objects.get(tracking_status=TrackingStatus.Tracked, **kwargs)
+        return SimFile.objects.filter(tracking_status=TrackingStatus.Tracked)
 
     @classmethod
     def get_untracked_sims(cls,**kwargs):
         if kwargs:
-            return UntrackedSimFile.objects.get(**kwargs)
-        return UntrackedSimFile.objects.all()
+            return SimFile.objects.get(tracking_status=TrackingStatus.NotTracked, **kwargs)
+        #return SimFile.objects.all()
+        return SimFile.objects.filter(tracking_status=TrackingStatus.NotTracked)
 
     @classmethod
     def create(cls, full_filename, tracked):
         if tracked:
-            simfile = TrackedSimFile(full_filename = full_filename)
+            simfile = SimFile(full_filename = full_filename, tracking_status = TrackingStatus.Tracked)
         else:
-            simfile = UntrackedSimFile(full_filename = full_filename)
+            simfile = SimFile(full_filename = full_filename, tracking_status = TrackingStatus.NotTracked)
         simfile.save()
         return simfile
 
 
 
 
-    # THIS IS HIGHLY OPTIMISIABLE!:
     @classmethod
+    @transaction.commit_on_success
     def update_all_db(cls, directory):
         excludes = ('py.py','__init__.py' )
 
@@ -142,7 +158,7 @@ class SimFile(models.Model):
             try:
                 SimFile.objects.get(full_filename=filename)
             except:
-                UntrackedSimFile.create(full_file = filename, tracked=False)
+                SimFile.create(full_filename = filename, tracked=False)
 
 
         print 'Updating untracked simulation files', directory
@@ -152,27 +168,10 @@ class SimFile(models.Model):
                     handlefile( os.path.join( dirpath, filename ) )
 
 
-class UntrackedSimFile(SimFile):
-    pass
-    #status = models.CharField( max_length=1000)
 
 
 
 
-
-
-class TrackedSimFile(SimFile):
-
-
-    # We cache the docstring, the code, code rendered as HTML:
-    last_read_sha1 = models.CharField(max_length=100000, null=True)
-    last_read_time = models.DateTimeField(null=True)
-    last_read_contents = models.CharField(max_length=100000, null=True)
-    last_read_docstring = models.CharField(max_length=100000, null=True)
-    last_read_htmlcode = models.CharField(max_length=100000, null=True)
-
-    # Last simulation run:
-    last_run = models.ForeignKey('SimFileRun',null=True)
 
 
     # Handle Caching:
@@ -258,19 +257,27 @@ class TrackedSimFile(SimFile):
         LUT = { True:'SimQueued',False:'SimNotQueued'}
         return LUT[p]
 
+#class UntrackedSimFile(SimFile):
+#    pass
+#class TrackedSimFile(SimFile):
+#    pass
+
+
+
+
+
 
 class SimRunStatus(object):
     Sucess = 'Sucess'
     UnhandledException = 'UnhandledException'
     TimeOut = 'Timeout'
     NonZeroExitCode = 'NonZeroExitCode'
-
     FileChanged = 'FileChanged'
     NeverBeenRun = 'NeverBeenRun'
 
 
 class SimFileRun(models.Model):
-    simfile = models.ForeignKey(TrackedSimFile)
+    simfile = models.ForeignKey(SimFile)
     execution_date = models.DateTimeField('execution date')
     return_code = models.IntegerField()
     std_out = models.CharField(max_length=10000000)
@@ -329,7 +336,7 @@ class SimQueueEntryState(models.Model):
     Executing = 'Executing'
 
 class SimQueueEntry(models.Model):
-    simfile = models.ForeignKey(TrackedSimFile)
+    simfile = models.ForeignKey(SimFile)
     submit_time = models.DateTimeField('submission_time', default=datetime.datetime.now)
     simulation_start_time = models.DateTimeField(null=True, default=None)
     status = models.CharField(max_length=1000, default=SimQueueEntryState.Waiting )
