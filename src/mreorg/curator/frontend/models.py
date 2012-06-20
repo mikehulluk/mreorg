@@ -76,7 +76,6 @@ class SourceSimDir(models.Model):
 
 class TrackingStatus(object):
     Tracked='Tracked'
-    #Unknown='Unknown'
     NotTracked='Nottracked'
 
 
@@ -96,36 +95,33 @@ class SimFile(models.Model):
     full_filename = models.CharField(max_length=1000)
     tracking_status = models.CharField(max_length=1000,default=TrackingStatus.NotTracked)
 
-
-
-
-
-
-class UntrackedSimFile(SimFile):
-
-    status = models.CharField( max_length=1000)
+    @classmethod
+    def get_tracked_sims(cls, **kwargs):
+        if kwargs:
+            return TrackedSimFile.objects.get(**kwargs)
+        #if id is not None:
+        #    return TrackedSimFile.objects.get(id=id)
+        return TrackedSimFile.objects.all()
 
     @classmethod
-    def create(self, filename):
-        print 'Creating UntrackedSimFile:', filename
-        try:
-            TrackedSimFile.objects.get(full_filename=filename)
-            print 'Already a simulation file'
-            return
-        except:
-            pass
+    def get_untracked_sims(cls,**kwargs):
+        if kwargs:
+            return UntrackedSimFile.objects.get(**kwargs)
+        return UntrackedSimFile.objects.all()
 
-        try:
-            UntrackedSimFile.objects.get( full_filename = filename)
-            print 'Already a tracked simulation file'
-            return None
-        except:
-            pass
+    @classmethod
+    def create(cls, full_filename, tracked):
+        if tracked:
+            simfile = TrackedSimFile(full_filename = full_filename)
+        else:
+            simfile = UntrackedSimFile(full_filename = full_filename)
+        simfile.save()
+        return simfile
 
-        # Create a new untracked simulation file object:
-        p = UntrackedSimFile( full_filename = filename, status = TrackingStatus.NotTracked )
-        p.save()
 
+
+
+    # THIS IS HIGHLY OPTIMISIABLE!:
     @classmethod
     def update_all_db(cls, directory):
         excludes = ('py.py','__init__.py' )
@@ -143,7 +139,10 @@ class UntrackedSimFile(SimFile):
 
         def handlefile(filename):
             print 'Checking: ', filename
-            UntrackedSimFile.create(filename)
+            try:
+                SimFile.objects.get(full_filename=filename)
+            except:
+                UntrackedSimFile.create(full_file = filename, tracked=False)
 
 
         print 'Updating untracked simulation files', directory
@@ -153,8 +152,9 @@ class UntrackedSimFile(SimFile):
                     handlefile( os.path.join( dirpath, filename ) )
 
 
-
-
+class UntrackedSimFile(SimFile):
+    pass
+    #status = models.CharField( max_length=1000)
 
 
 

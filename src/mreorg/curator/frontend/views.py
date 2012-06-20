@@ -33,12 +33,11 @@ from django.shortcuts import render_to_response
 
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.http import HttpResponse
-from mreorg.curator.frontend.models import TrackedSimFile
+from mreorg.curator.frontend.models import SimFile
 from mreorg.curator.frontend.models import SimRunStatus
 from mreorg.curator.frontend.models import SimFileRun
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
-from mreorg.curator.frontend.models import UntrackedSimFile
 from mreorg.curator.frontend.models import SourceSimDir
 from mreorg import MReOrgConfig
 from django.template import RequestContext
@@ -60,12 +59,12 @@ def view_overview(request):
     return render_to_response(
             'overview.html',
             RequestContext(request, 
-                {'simfiles': TrackedSimFile.objects.all()})
+                {'simfiles': SimFile.get_tracked_sims() })
             )
 
 
 def view_sim_output_summaries(request):
-    sims = TrackedSimFile.objects.all()
+    sims = SimFile.get_tracked_sims()
     sim_and_dir = [(s, os.path.dirname(s.full_filename)) for s in sims]
     sim_and_dir.sort()
 
@@ -95,8 +94,8 @@ def simfilerun_details(request, run_id):
 
 
 def simfile_details(request, simfile_id):
-    sim = TrackedSimFile.objects.get(id=simfile_id)
-    cxt_data = {'simfile': sim}
+    sim_file = SimFile.get_tracked_sims(id = simfile_id)
+    cxt_data = {'simfile': sim_file}
     csrf_context = RequestContext(request, cxt_data)
     return render_to_response('simfile_details.html',
                               csrf_context)
@@ -115,9 +114,10 @@ def view_tracking(request):
         mh_adddefault_locations()
         _have_run_update_tracking_locations = True
 
-    cxt_data = {'untracked_simfiles':UntrackedSimFile.objects.all(),
+    cxt_data = {
                 'src_directories': SourceSimDir.objects.all(), 
-                'simfiles': TrackedSimFile.objects.all()}
+                'untracked_simfiles':SimFile.get_untracked_sims(),
+                'simfiles': SimFile.get_tracked_sims()}
     csrf_context = RequestContext(request, cxt_data)
     return render_to_response('tracking.html',
                               csrf_context)
@@ -126,16 +126,16 @@ def view_tracking(request):
 # Tracking Commands
 # ====================
 def do_track_all(request):
-    for pot_sim in UntrackedSimFile.objects.all():
-        sim = TrackedSimFile(full_filename=pot_sim.full_filename)
+    for pot_sim in SimFile.get_untracked_sims(): 
+        sim = SimFile.create(full_filename=pot_sim.full_filename, tracked=True)
         sim.save()
         pot_sim.delete()
 
     return HttpResponseRedirect('/tracking')
 
 def do_untrack_all(request):
-    for sim in TrackedSimFile.objects.all():
-        untr_sim = UntrackedSimFile(full_filename=sim.full_filename)
+    for sim in SimFile.get_tracked_sims():
+        untr_sim = SimFile.create(full_filename=sim.full_filename, tracked=False)
         untr_sim.save()
         sim.delete()
 
@@ -151,7 +151,7 @@ def do_track_src_dir(request):
 
 def do_track_rescanfs(request):
     for src_dir in SourceSimDir.objects.all():
-        UntrackedSimFile.update_all_db(src_dir.directory_name)
+        SimFile.update_all_db(src_dir.directory_name)
     return HttpResponseRedirect('/tracking')
 
 
@@ -167,9 +167,9 @@ def do_track_sim(request):
     pot_sim_ids = [int(m.groupdict()['id']) for m in pot_sim_id_matches if m]
 
     for pot_sim_id in pot_sim_ids:
-        pot_sim = UntrackedSimFile.objects.get(id=pot_sim_id)
+        pot_sim = SimFile.get_untracked_sims(id=pot_sim_id)
 
-        sim = TrackedSimFile(full_filename=pot_sim.full_filename)
+        sim = SimFile.create(full_filename=pot_sim.full_filename, tracked=True)
 
         sim.save()
         pot_sim.delete()
@@ -194,12 +194,11 @@ def do_untrack_sim(request):
 
     for pot_sim_id in pot_sim_ids:
         print 'Deleting', pot_sim_id
-        sim = TrackedSimFile.objects.get(id=pot_sim_id)
-        sim.delete()
+        sim_file = SimFile.get_tracked_sims(id = pot_sim_id)
+        sim_file.delete()
 
     # Update the list of untracked files:
     return do_track_rescanfs(request)
-    #return HttpResponseRedirect('/tracking')
 
 # ====================
 
@@ -220,7 +219,7 @@ def viewsimulationqueue(request):
 
 
 def view_simulation_failures(request):
-    fileObjs = TrackedSimFile.objects.all()
+    fileObjs = SimFile.get_tracked_sims()
 
     cxt_data = {
         'failed_simulations': [fo for fo in fileObjs if fo.get_status()
@@ -257,10 +256,10 @@ def do_queue_add_sims(request):
     sim_id_matches = [r.match(k) for k in request.POST]
     sim_ids = [int(m.groupdict()['id']) for m in sim_id_matches if m]
 
-    for sim_id in sim_ids:
-        sim = TrackedSimFile.objects.get(id=sim_id)
+    for simfile_id in sim_ids:
+        sim_file = SimFile.get_tracked_sims(id = simfile_id)
 
-        qe = SimQueueEntry(simfile=sim)
+        qe = SimQueueEntry(simfile=sim_file)
         qe.save()
 
         # Avoid Duplication
@@ -275,11 +274,11 @@ def do_queue_add_sims(request):
 def doeditsimfile(request, simfile_id):
 
     #Open up the file in an editor:
-    sim = TrackedSimFile.objects.get(id=simfile_id)
+    sim_file = SimFile.get_tracked_sims(id = simfile_id)
 
     cwd = os.getcwd()
-    os.chdir( os.path.split(sim.full_filename)[0])
-    data_dict = {'full_filename':sim.full_filename}
+    os.chdir( os.path.split(sim_file.full_filename)[0])
+    data_dict = {'full_filename':sim_file.full_filename}
     cmds = MReOrgConfig.get_ns().get('drop_into_editor_cmds',['xterm &'])
     for cxt_data in cmds:
         t = string.Template(cxt_data).substitute(**data_dict)
@@ -312,7 +311,7 @@ def mh_adddefault_locations(self=None):
         if not l:
             continue
         if l[-1] != '*':
-            UntrackedSimFile.create(filename=l)
+            SimFile.create(full_filename=l, tracked=False)
         elif l.endswith('**'):
             SourceSimDir.create(directory_name=l[:-2],
                                 should_recurse=True)

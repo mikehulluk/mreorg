@@ -29,7 +29,7 @@
 
 from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
-from mreorg.curator.frontend.models import TrackedSimFile
+from mreorg.curator.frontend.models import SimFile
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimRunStatus
 from mreorg.curator.frontend.models import SimQueueEntryState
@@ -39,9 +39,8 @@ from mreorg.curator.frontend.models import SimQueueEntryState
 @dajaxice_register
 def overview_resubmit_simfile(_request, simfile_id):
     try:
-        sim_file = TrackedSimFile.objects.get(id = simfile_id)
+        sim_file = SimFile.get_tracked_sims(id = simfile_id)
     except:
-        #raise
         return simplejson.dumps({})
 
 
@@ -53,10 +52,8 @@ def overview_resubmit_simfile(_request, simfile_id):
 
 @dajaxice_register
 def overview_resubmit_simfile_if_failure(_request, simfile_id):
-#def overview_set_simfile_for_resubmit_if_failure(_request, simfile_id):
     try:
-        sim_file = TrackedSimFile.objects.get(id = simfile_id)
-        #raise
+        sim_file = SimFile.get_tracked_sims(id = simfile_id)
     except:
         return simplejson.dumps({})
 
@@ -74,8 +71,7 @@ def overview_resubmit_simfile_if_failure(_request, simfile_id):
 def overview_toggle_simfile_for_resubmit(_request, simfile_id):
 
     try:
-        sim_file = TrackedSimFile.objects.get(id = simfile_id)
-        #raise
+        sim_file = SimFile.get_tracked_sims(id = simfile_id)
     except:
         return simplejson.dumps({})
 
@@ -91,7 +87,7 @@ def overview_toggle_simfile_for_resubmit(_request, simfile_id):
 def refreshsimlist(_request):
 
     states = {}
-    for simfile in TrackedSimFile.objects.all():
+    for simfile in SimFile.get_tracked_sims():
         states[simfile.id] = simfile.get_status()
     return simplejson.dumps({'sim_file_states':states})
 
@@ -99,7 +95,7 @@ def refreshsimlist(_request):
 @dajaxice_register
 def overview_update_sim_gui(_request, simfile_id):
     print "Dajax call recieved", simfile_id
-    sim_file = TrackedSimFile.objects.get(id = simfile_id)
+    sim_file = SimFile.get_tracked_sims(id = simfile_id)
     exec_date = ""
     if sim_file.get_latest_run():
         exec_date = sim_file.get_latest_run().execution_data_string()
@@ -127,9 +123,8 @@ def overview_clear_sim_queue(_request):
 def overview_delete_simfile(_request, simfile_id ):
 
     try:
-        sim_file = TrackedSimFile.objects.get(id = simfile_id)
+        sim_file = SimFile.get_tracked_sims(id = simfile_id)
         sim_file.delete()
     except:
         pass
-        #raise
     return simplejson.dumps({})

@@ -35,12 +35,11 @@ import time
 import traceback
 import datetime
 import signal
-from mreorg.scriptplots.plotmanager import PlotManager
 import hashlib
 import shutil
 import pipes
 
-
+# Setup django:
 from django.core.management import setup_environ
 import mreorg.curator.settings as settings
 setup_environ(settings)
@@ -48,7 +47,9 @@ setup_environ(settings)
 
 import mreorg
 from mreorg import get_file_sha1hash
-
+from mreorg.curator.frontend.models import SimFileRun
+from mreorg.curator.frontend.models import SimFile
+from mreorg.curator.frontend.models import SimFileRunOutputImage
 
 
 
@@ -59,9 +60,6 @@ from mreorg import get_file_sha1hash
 class SimDBWriter(object):
     @classmethod
     def write_to_database( cls, sim_run_info):
-        from mreorg.curator.frontend.models import TrackedSimFile
-        from mreorg.curator.frontend.models import SimFileRun
-        from mreorg.curator.frontend.models import SimFileRunOutputImage
         output_file_dir = mreorg.MReOrgConfig.get_image_store_dir()
 
         print 'Saving details from script: ', sim_run_info.script_name
@@ -70,13 +68,10 @@ class SimDBWriter(object):
         if mreorg.MReOrgConfig.is_non_curated_file(sim_run_info.script_name):
             return 
 
-        # Find the previous TrackedSimFile object:
         try:
-            simfile = TrackedSimFile.objects.get(
-                        full_filename=sim_run_info.script_name)
+            simfile = SimFile.get_tracked_sims( full_filename=sim_run_info.script_name)
         except: # DoesNotExistError,e :
-            #print 'Creating TrackedSimFile obj'
-            simfile = TrackedSimFile(full_filename=sim_run_info.script_name)
+            simfile = SimFile.create( full_filename=sim_run_info.script_name, tracked=True)
             simfile.save()
 
 
@@ -187,8 +182,8 @@ class CurationSimDecorator(object):
 
 
         # Pick-up any saved images:
-        PlotManager.save_active_figures()
-        info.output_images = PlotManager.figures_saved_filenames
+        mreorg.PlotManager.save_active_figures()
+        info.output_images = mreorg.PlotManager.figures_saved_filenames
 
         # Get the return value:
         info.return_code = 0
