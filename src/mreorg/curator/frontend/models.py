@@ -122,7 +122,6 @@ class SimFile(models.Model):
     def get_untracked_sims(cls,**kwargs):
         if kwargs:
             return SimFile.objects.get(tracking_status=TrackingStatus.NotTracked, **kwargs)
-        #return SimFile.objects.all()
         return SimFile.objects.filter(tracking_status=TrackingStatus.NotTracked)
 
     @classmethod
@@ -180,7 +179,7 @@ class SimFile(models.Model):
         if not self.last_read_time:
             return False
         # We only maximally recalculate the hash every so often:
-        if self.last_read_sha1 - datetime.datetime.now() < Options.MinimumFileCheckInterval:
+        if self.last_read_time - datetime.datetime.now() < Options.MinimumFileCheckInterval:
             return True
         if self.get_current_checksum() == self.last_read_sha1:
             return True
@@ -236,18 +235,18 @@ class SimFile(models.Model):
 
 
     def get_status(self):
-        last_run = self.get_latest_run()
-        if not last_run:
+        #'last_run = self.get_latest_run()
+        if not self.last_run:
             return SimRunStatus.NeverBeenRun
         else:
-            return last_run.get_status()
+            return self.last_run.get_status()
 
     def get_last_executiontime(self):
-        last_run = self.get_latest_run()
-        if not last_run:
+        #last_run = self.get_latest_run()
+        if not self.last_run:
             return 'Unknown'
         else:
-            return last_run.execution_time
+            return self.last_run.execution_time
 
     def is_queued(self):
         return self.simqueueentry_set.count() != 0

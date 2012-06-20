@@ -33,7 +33,10 @@
 </table>
 
 
-<a href="/simfileruns/{{simfile.get_latest_run.id}}">More details about last run...</a>
+{% if simfile.last_run %}
+<a href="/simfileruns/{{simfile.last_run.id}}">More details about last run...</a>
+{% endif %}
+
 </div>
 </div>
 
