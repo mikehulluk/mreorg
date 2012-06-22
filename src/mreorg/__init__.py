@@ -37,14 +37,11 @@ from mreorg.config import MReOrgConfig
 from mreorg.utils import get_file_sha1hash
 
 __all__ = [
-
-    MReOrgConfig,
-    ScriptFlags,
-
-    PlotManager,
-    PM,
-    FigFormat,
-
-    ensure_directory_exists,
-    get_file_sha1hash
+    "MReOrgConfig",
+    "ScriptFlags",
+    "PlotManager",
+    "PM",
+    "FigFormat",
+    "ensure_directory_exists",
+    "get_file_sha1hash",
 ]

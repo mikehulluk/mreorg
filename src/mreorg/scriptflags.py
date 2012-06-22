@@ -61,6 +61,8 @@ class ScriptFlags(object):
     ENVVAR_MREORG_ENABLECOVERAGE =  osenv.get('MREORG_ENABLECOVERAGE', False)\
             or osenv.get('MF_TEST_COVERAGE', False)
 
+    # Temp Hack: lets turn coverage off!
+    ENVVAR_MREORG_ENABLECOVERAGE =  False
 
 
     # Don't call pylab.show() if ...

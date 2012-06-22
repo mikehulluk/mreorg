@@ -30,7 +30,10 @@
         <tr class="{{ sim_file.get_status}}">
             <td> <input type="checkbox" name="simid_{{sim_file.id}}"/> </td>
             <td> <a href="/simfiles/{{sim_file.id}}"> {{sim_file.get_short_filename }} </a> </td>
-            <td> <a href="/simfileruns/{{sim_file.get_latest_run.id}}">{{sim_file.get_latest_run.execution_date}} </td> <td> {{sim_file.get_latest_run.get_status}} </td>
+            <td> <a href="/simfileruns/{{sim_file.get_latest_run.id}}">{{sim_file.get_latest_run.execution_date}} </td>
+            <td> {{sim_file.get_latest_run.get_status}} </td>
+            <td> {{sim_file.get_latest_run.exception_type}} </td>
+            <td> <pre>{{sim_file.get_latest_run.exception_traceback}} </pre></td>
             <td> {{sim_file.get_docstring}} </td>
         </tr>
         {% endfor %}

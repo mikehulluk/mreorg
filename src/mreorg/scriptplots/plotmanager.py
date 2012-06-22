@@ -43,8 +43,6 @@ class FigFormat:
 
 
 
-#class SavedFigures(object):
-#    nums = set()
 
 class PlotManager:
 
@@ -55,7 +53,7 @@ class PlotManager:
 
     _fig_loc =  """_output/figures/{modulename}/{figtype}/"""
     _fig_name = """fig{fignum:03d}_{figname}.{figtype}"""
-    autosave_default_image_filename_tmpl = _fig_loc + _fig_loc
+    autosave_default_image_filename_tmpl = _fig_loc + _fig_name
     autosave_image_formats = [FigFormat.EPS, FigFormat.PDF,
                               FigFormat.PNG, FigFormat.SVG]
 

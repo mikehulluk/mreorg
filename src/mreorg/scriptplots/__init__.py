@@ -30,9 +30,9 @@ from mreorg.scriptplots.plotmanager import PlotManager, FigFormat
 PM = PlotManager
 
 __all__ = [
-    PlotManager,
-    PM,
-    FigFormat
+    "PlotManager",
+    "PM",
+    "FigFormat",
 ]
 
 
