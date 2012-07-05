@@ -59,7 +59,7 @@ from django.db import transaction
 def view_overview(request):
     return render_to_response(
             'overview.html',
-            RequestContext(request, 
+            RequestContext(request,
                 {'simfiles': SimFile.get_tracked_sims() })
             )
 
@@ -89,7 +89,7 @@ def view_sim_output_summaries(request):
 def simfilerun_details(request, run_id):
     return render_to_response(
             'simulation_run_details.html',
-            RequestContext(request, 
+            RequestContext(request,
                 {'simulationrun': SimFileRun.objects.get(id=run_id) } ) )
 
 
@@ -116,7 +116,7 @@ def view_tracking(request):
         _have_run_update_tracking_locations = True
 
     cxt_data = {
-                'src_directories': SourceSimDir.objects.all(), 
+                'src_directories': SourceSimDir.objects.all(),
                 'untracked_simfiles':SimFile.get_untracked_sims(),
                 'simfiles': SimFile.get_tracked_sims()}
     csrf_context = RequestContext(request, cxt_data)
@@ -129,7 +129,7 @@ def view_tracking(request):
 
 @transaction.commit_on_success
 def do_track_all(request):
-    for pot_sim in SimFile.get_untracked_sims(): 
+    for pot_sim in SimFile.get_untracked_sims():
         sim = SimFile.create(full_filename=pot_sim.full_filename, tracked=True)
         sim.save()
         pot_sim.delete()

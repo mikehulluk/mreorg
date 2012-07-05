@@ -66,7 +66,7 @@ class SimDBWriter(object):
 
         # We don't neeed to update this file every time:
         if mreorg.MReOrgConfig.is_non_curated_file(sim_run_info.script_name):
-            return 
+            return
 
         try:
             simfile = SimFile.get_tracked_sims( full_filename=sim_run_info.script_name)

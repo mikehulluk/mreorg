@@ -197,6 +197,8 @@ table.std tr.std {
 table.std td {
 	padding: 5px 20px;
   /*text-align:center; */
+
+	font-size: 0.80em;
 }
 
 table.std a:link, table.std a:visited { 
@@ -357,7 +359,9 @@ div.section
   	border-top: 3px solid #aaaaaa;
   	border-bottom: 3px solid #aaaaaa;
     margin: 0px;
-    padding: 0px;
+    /*padding: 0px;*/
+    text-align:center;
+	  padding: 5px 20px;
 }
 
 

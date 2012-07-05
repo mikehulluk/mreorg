@@ -95,8 +95,8 @@ class SimFile(models.Model):
     full_filename = models.CharField(max_length=1000)
     tracking_status = models.CharField(
             max_length=1000,
-            default=TrackingStatus.NotTracked, 
-            choices= [ 
+            default=TrackingStatus.NotTracked,
+            choices= [
                 (TrackingStatus.Tracked,TrackingStatus.Tracked),
                 (TrackingStatus.NotTracked,TrackingStatus.NotTracked),
                 ] )
@@ -139,32 +139,23 @@ class SimFile(models.Model):
     @classmethod
     @transaction.commit_on_success
     def update_all_db(cls, directory):
-        excludes = ('py.py','__init__.py' )
-
-        def accept_file( filename ):
-            if not filename.endswith('.py'):
-                return False
-            if filename.startswith("__"):
-                return False
-
-            dirname, fname = os.path.split(filename)
-            if fname in excludes:
-                return False
-            return True
-
-        def handlefile(filename):
-            print 'Checking: ', filename
-            try:
-                SimFile.objects.get(full_filename=filename)
-            except:
-                SimFile.create(full_filename = filename, tracked=False)
-
 
         print 'Updating untracked simulation files', directory
         for (dirpath, dirnames, filenames) in os.walk( directory ):
             for filename in filenames:
-                if accept_file(filename):
-                    handlefile( os.path.join( dirpath, filename ) )
+                if not filename.endswith(".py"):
+                    continue
+                full_filename = os.path.join( dirpath, filename ) 
+                if mreorg.MReOrgConfig.is_non_curated_file(filename):
+                    continue
+                if mreorg.MReOrgConfig.is_non_curated_file(full_filename):
+                    continue
+
+                try:
+                    SimFile.objects.get(full_filename=filename)
+                except:
+                    SimFile.create(full_filename = filename, tracked=False)
+
 
 
 

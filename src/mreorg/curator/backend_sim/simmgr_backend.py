@@ -42,7 +42,6 @@ from mreorg.curator.frontend.models import SimQueueEntryState
 
 os.environ['MREORG_CURATIONRUN'] = 'TIMEOUT:1800,'
 os.environ['MF_TIMEOUT'] = '1800'
-os.environ['MF_TEST_COVERAGE'] = ''
 
 
 def simulate( sim_queue_entry):

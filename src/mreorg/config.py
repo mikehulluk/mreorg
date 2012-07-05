@@ -28,29 +28,33 @@
 #----------------------------------------------------------------------
 
 import os
+import fnmatch
 import mreorg
+
+from os.path import expanduser
 
 class MReOrgConfig(object):
     _config_file_ns = None
 
-    rcfilename = os.path.expanduser('~/.mreorgrc')
+    rcfilename = expanduser('~/.mreorgrc')
 
     _defaults = [
-        ('IMAGE_STORE_DIR', os.path.expanduser('~/.mreorg/cache/images/')),
+        ('SIMULATION_SQLLITE_FILENAME',expanduser("~/.mreorg/mreorg.sqlite")),
+        ('SIMULATION_IMAGE_STOREDIR',  expanduser('~/.mreorg/cache/images/')),
+        ('FILENAME_EXCLUDES',[] ),
         ('COVERAGE_CONFIG_FILE',"/home/michael/hw_to_come/morphforge/etc/.coveragerc"),
         ('COVERAGE_OUTPUT_DIR',"/tmp/morphforge_coverage_output"),
         ]
 
     @classmethod
     def _load_config_file(cls):
-        if cls._config_file_ns is None:
+        if cls._config_file_ns is not None:
+            return
 
-            # Copy in the defaults:
-            cls._config_file_ns = dict( cls._defaults)
-
-            # Load the file, overriding the defaults:
-            if not os.path.exists( cls.rcfilename ):
-                return
+        # Start with a dictionary of defaults, then load in the rc-file
+        # file to override, if it exists:
+        cls._config_file_ns = dict( cls._defaults)
+        if os.path.exists( cls.rcfilename ):
             execfile(cls.rcfilename, cls._config_file_ns)
 
     @classmethod
@@ -58,14 +62,18 @@ class MReOrgConfig(object):
         cls._load_config_file()
         return cls._config_file_ns
 
-
     @classmethod
     def get_image_store_dir(cls):
-        return mreorg.ensure_directory_exists( cls.get_ns()['IMAGE_STORE_DIR'] )
+        return mreorg.ensure_directory_exists( cls.get_ns()['SIMULATION_IMAGE_STOREDIR'] )
 
+    @classmethod
+    def get_simulation_sqllite_filename(cls):
+        return mreorg.ensure_directory_exists( cls.get_ns()['SIMULATION_SQLLITE_FILENAME'] )
 
     @classmethod
     def is_non_curated_file(cls, filename):
-        noncurated_files = ['/home/michael/hw_to_come/morphforge/src/bin/SimulateBundle.py']
-        return filename in noncurated_files
+        for pattern in cls.get_ns()['FILENAME_EXCLUDES']:
+            if fnmatch.fnmatch(filename, pattern):
+                return True
+        return False
 
