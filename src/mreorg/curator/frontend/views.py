@@ -305,7 +305,7 @@ def doeditsimfile(request, simfile_id):
 
 
 
-def mh_adddefault_locations(self=None):
+def mh_adddefault_locations():
     default_simulations = \
         MReOrgConfig.get_ns().get('default_simulations', None)
 

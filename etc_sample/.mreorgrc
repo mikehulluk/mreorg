@@ -1,0 +1,35 @@
+
+
+
+
+# Where shall we track by default. Adding entries here makes it easier to wipe
+# the results database and restart.
+
+default_simulations = [
+    "/home/michael/hw_to_come/morphforge/src/morphforgeexamples/singlecell_simulation/*",
+    "/home/michael/hw_to_come/morphforge/src/morphforgeexamples/multicell_simulation/**",
+    "/home/michael/hw_to_come/hw-results/src/March 2011/s0001/s0001 - Sautois dIN.py",
+    "/home/michael/hw_to_come/hw-results/src/**",
+]
+
+FILENAME_EXCLUDES = [
+    "py.py",
+    "__*.py",
+    "*parsetab*",
+    '/home/michael/hw_to_come/morphforge/src/bin/SimulateBundle.py',
+    "*/analysis_dins.py",
+    "*/dINFiles.py",
+    "preload_files.py",
+]
+
+
+SIMULATION_SQLLITE_FILENAME = '/home/michael/old_home/simmgr.sqlite'
+SIMULATION_IMAGE_STOREDIR = '/home/michael/old_home/.mreorg/images/'
+
+drop_into_editor_cmds = [
+    'gnome-terminal &',
+    'gvim "${full_filename}"',
+]
+
+
+COVERAGE_CONFIG_FILE ="/home/michael/hw_to_come/morphforge/etc/.coveragerc"

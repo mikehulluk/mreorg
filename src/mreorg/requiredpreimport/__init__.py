@@ -42,7 +42,6 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     if not os.environ.get('DISPLAY', None):
         matplotlib.use('Agg')
 
-
     # Monkey-Patch 'matplotlib.show()' and 'pylab.show()', allowing us
     # to disable them, and/or to save figures to disk.
     import pylab

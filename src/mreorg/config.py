@@ -42,8 +42,7 @@ class MReOrgConfig(object):
         ('SIMULATION_SQLLITE_FILENAME',expanduser("~/.mreorg/mreorg.sqlite")),
         ('SIMULATION_IMAGE_STOREDIR',  expanduser('~/.mreorg/cache/images/')),
         ('FILENAME_EXCLUDES',[] ),
-        ('COVERAGE_CONFIG_FILE',"/home/michael/hw_to_come/morphforge/etc/.coveragerc"),
-        ('COVERAGE_OUTPUT_DIR',"/tmp/morphforge_coverage_output"),
+        ('COVERAGE_OUTPUT_DIR',expanduser("~/.mreorg/coverage")),
         ]
 
     @classmethod
@@ -63,12 +62,20 @@ class MReOrgConfig(object):
         return cls._config_file_ns
 
     @classmethod
+    def _get_path(cls, key, ensure_dir_exists=True):
+        path = cls.get_ns()[key]
+        if ensure_dir_exists:
+            mreorg.ensure_directory_exists(path)
+        return path
+
+
+    @classmethod
     def get_image_store_dir(cls):
-        return mreorg.ensure_directory_exists( cls.get_ns()['SIMULATION_IMAGE_STOREDIR'] )
+        return cls._get_path('SIMULATION_IMAGE_STOREDIR')
 
     @classmethod
     def get_simulation_sqllite_filename(cls):
-        return mreorg.ensure_directory_exists( cls.get_ns()['SIMULATION_SQLLITE_FILENAME'] )
+        return cls._get_path('SIMULATION_SQLLITE_FILENAME')
 
     @classmethod
     def is_non_curated_file(cls, filename):
