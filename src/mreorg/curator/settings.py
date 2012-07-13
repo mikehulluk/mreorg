@@ -28,7 +28,7 @@
 #----------------------------------------------------------------------
 
 import os
-import mreorg 
+import mreorg.config
 this_dir = os.path.dirname(__file__)
 MREORG_ROOTDIR = os.path.join( this_dir,'../../../') #'/home/michael/hw_to_come/libs/mreorg/'
 
@@ -44,7 +44,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-db_filename = mreorg.MReOrgConfig.get_simulation_sqllite_filename()
+db_filename = mreorg.config.MReOrgConfig.get_simulation_sqllite_filename()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

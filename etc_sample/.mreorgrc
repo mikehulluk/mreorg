@@ -33,3 +33,4 @@ drop_into_editor_cmds = [
 
 
 COVERAGE_CONFIG_FILE ="/home/michael/hw_to_come/morphforge/etc/.coveragerc"
+COVERAGE_OUTPUT_DIR = "/tmp/morphforge_coverage_output"

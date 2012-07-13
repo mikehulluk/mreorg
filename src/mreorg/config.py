@@ -65,7 +65,7 @@ class MReOrgConfig(object):
     def _get_path(cls, key, ensure_dir_exists=True):
         path = cls.get_ns()[key]
         if ensure_dir_exists:
-            mreorg.ensure_directory_exists(path)
+            mreorg.utils.ensure_directory_exists(path)
         return path
 
 

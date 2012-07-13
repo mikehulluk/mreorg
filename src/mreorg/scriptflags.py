@@ -42,6 +42,9 @@ if "MF_TEST_COVERAGE" in os.environ.keys():
     print 'Found MF_TEST_COVERAGE'
     assert False
 
+#print #sorted(os.environ.keys())
+#assert False
+
 
 class ScriptFlags(object):
     """Control the behaviour of matplotlib within scripts using environmental
@@ -59,7 +62,7 @@ class ScriptFlags(object):
 
     # 'Meta-options' that enable other options:
     ENVVAR_MREORG_CURATIONRUN =  osenv.get('MREORG_CURATIONRUN', False)
-    ENVVAR_MREORG_BATCHRUN =  osenv.get('MREORG_BATCHNRUN', False)
+    ENVVAR_MREORG_BATCHRUN =  osenv.get('MREORG_BATCHRUN', False)
 
     ENVVAR_MREORG_ENABLECOVERAGE =  osenv.get('MREORG_ENABLECOVERAGE', False)\
             or osenv.get('MF_TEST_COVERAGE', False)
@@ -93,3 +96,6 @@ class ScriptFlags(object):
 
     # Should we enable coverage:
     MREORG_ENABLECOVERAGE = ENVVAR_MREORG_ENABLECOVERAGE
+
+
+

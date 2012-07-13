@@ -32,7 +32,9 @@ import mreorg
 # Lets monkey-patch matplotlib!
 # ===============================
 
-from mreorg import ScriptFlags, PlotManager
+from mreorg.scriptflags import ScriptFlags
+from mreorg.scriptplots import PlotManager
+
 if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
 
     # If we are running headless, then
@@ -47,7 +49,6 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     import pylab
     orig_mplshow = matplotlib.pylab.show
     def show(*args, **kwargs):
-
         # Should we save all the figures?
         if ScriptFlags.MREORG_SAVEALL:
             PlotManager.save_active_figures()

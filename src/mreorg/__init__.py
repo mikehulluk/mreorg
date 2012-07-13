@@ -27,6 +27,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 
+# Ensure our monkey patching takes place first:
+import mreorg.requiredpreimport
 
 from mreorg.scriptplots import PlotManager, PM
 from mreorg.scriptplots import FigFormat

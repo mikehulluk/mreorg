@@ -152,9 +152,9 @@ class SimFile(models.Model):
                     continue
 
                 try:
-                    SimFile.objects.get(full_filename=filename)
+                    SimFile.objects.get(full_filename=full_filename)
                 except:
-                    SimFile.create(full_filename = filename, tracked=False)
+                    SimFile.create(full_filename=full_filename, tracked=False)
 
 
 

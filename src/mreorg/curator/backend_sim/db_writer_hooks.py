@@ -46,7 +46,7 @@ setup_environ(settings)
 
 
 import mreorg
-from mreorg import get_file_sha1hash
+from mreorg.utils import get_file_sha1hash
 from mreorg.curator.frontend.models import SimFileRun
 from mreorg.curator.frontend.models import SimFile
 from mreorg.curator.frontend.models import SimFileRunOutputImage
