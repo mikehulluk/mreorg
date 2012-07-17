@@ -57,15 +57,15 @@ class ScriptFlags(object):
     """
 
     osenv = os.environ
-    ENVVAR_MREORG_NOSHOW  = osenv.get('MREORG_NOSHOW', False)
-    ENVVAR_MREORG_SAVEALL =  osenv.get('MREORG_SAVEALL', False)
+    ENVVAR_MREORG_NOSHOW  =  'MREORG_NOSHOW' in osenv
+    ENVVAR_MREORG_SAVEALL =  'MREORG_SAVEALL' in osenv
 
     # 'Meta-options' that enable other options:
-    ENVVAR_MREORG_CURATIONRUN =  osenv.get('MREORG_CURATIONRUN', False)
-    ENVVAR_MREORG_BATCHRUN =  osenv.get('MREORG_BATCHRUN', False)
+    ENVVAR_MREORG_CURATIONRUN = 'MREORG_CURATIONRUN' in osenv
+    ENVVAR_MREORG_BATCHRUN =    'MREORG_BATCHRUN' in osenv
 
-    ENVVAR_MREORG_ENABLECOVERAGE =  osenv.get('MREORG_ENABLECOVERAGE', False)\
-            or osenv.get('MF_TEST_COVERAGE', False)
+    ENVVAR_MREORG_ENABLECOVERAGE =  'MREORG_ENABLECOVERAGE' in osenv or \
+                                    'MF_TEST_COVERAGE' in osenv
 
     # Temp Hack: lets turn coverage off!
     ENVVAR_MREORG_ENABLECOVERAGE =  False
@@ -88,7 +88,7 @@ class ScriptFlags(object):
 
 
     # If we are building on read-the-docs, we can't import matplotlib:
-    MREORG_DONTIMPORTMATPLOTLIB =  os.environ.get('READTHEDOCS', False)
+    MREORG_DONTIMPORTMATPLOTLIB =  'READTHEDOCS' in os.environ
 
     # Default, lets automatically create directories when they don't exist:
     MREORG_AUTOMAKEDIRS = True

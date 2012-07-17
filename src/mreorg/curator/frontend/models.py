@@ -65,6 +65,7 @@ class SourceSimDir(models.Model):
 
     @classmethod
     def create(cls, directory_name, should_recurse=True):
+	directory_name = os.path.normpath(directory_name)
         if SourceSimDir.objects.filter(directory_name = directory_name).count() !=0:
             return
 

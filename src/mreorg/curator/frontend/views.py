@@ -149,9 +149,16 @@ def do_track_src_dir(request):
     if request.method != 'POST':
         return HttpResponseRedirect('/tracking')
 
-    SourceSimDir.create(directory_name=request.POST['location'])
+    SourceSimDir.create(directory_name=request.POST['location'],
+			should_recurse='recurse' in request.POST)
     return HttpResponseRedirect('/tracking')
 
+def do_untrack_src_dir(request, srcdir_id):
+    o = SourceSimDir.objects.get(id=srcdir_id)
+    o.delete()
+    return HttpResponseRedirect('/tracking')
+
+	
 
 def do_track_rescanfs(request):
     for src_dir in SourceSimDir.objects.all():

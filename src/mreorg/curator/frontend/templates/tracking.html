@@ -13,7 +13,7 @@
 
 <div class='section' >
       <div class='sectionheader'>
-          <h2><a>Tracking</a></h2>
+          <h2><a>Monitored Directories</a></h2>
           <div class='actionbar'>
               <div class='inner'>
                   <ul>
@@ -30,7 +30,7 @@
     <tr>
         <th>Directory</th>
         <th>Exists?</th>
-        <th>Recurse Over Directory?</th>
+        <th>Monitor Recursively?</th>
     </tr>
 
     {% for src_directory in src_directories %}
@@ -38,6 +38,7 @@
         <td> {{src_directory.directory_name }} </td>
         <td> {{src_directory.does_exist }} </td>
         <td> {{src_directory.should_recurse }} </td>
+	<td> <a href='/do/track/untrack_src_dir/{{src_directory.id}}'> (Stop Monitoring) </a> </td>
     </tr>
     {% endfor %}
     </table>
@@ -46,7 +47,8 @@
     <div class='centerform'>
     {% csrf_token %}
     <input type="text" size=100 name="location" />
-    <input type="submit" value="Add" />
+    <input type="checkbox" name="recurse" value="recurse" /> Monitor Directory Recursively<br />
+    <input type="submit" value="Monitor Directory" />
     </div>
     </form>
 

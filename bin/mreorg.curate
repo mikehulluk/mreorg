@@ -2,6 +2,12 @@
 import argparse
 import sys,os
 from django.core.management import execute_from_command_line
+
+# Never curate the infrastructure classes:
+if 'MREORG_CURATIONRUN' in os.environ:
+	del os.environ['MREORG_CURATIONRUN']
+
+
 import mreorg
 import mreorg.curator.backend_sim.simmgr_backend
 

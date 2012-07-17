@@ -38,38 +38,35 @@ dajaxice_autodiscover()
 
 
 
-p = (
+views_mod='mreorg.curator.frontend.views'
+url_patterns = (
     (r'^$', 'mreorg.curator.frontend.views.view_overview'),
 
 
     # Main pages:
-    (r'^overview$', 'mreorg.curator.frontend.views.view_overview'),
-    (r'^tracking$', 'mreorg.curator.frontend.views.view_tracking'),
-    (r'^viewsimulationoutputsummaries', 'mreorg.curator.frontend.views.view_sim_output_summaries'),
-    (r'^viewsimulationfailures$', 'mreorg.curator.frontend.views.view_simulation_failures'),
-    (r'^viewsimulationqueue$', 'mreorg.curator.frontend.views.viewsimulationqueue'),
+    (r'^overview$', views_mod + '.view_overview'),
+    (r'^tracking$', views_mod + '.view_tracking'),
+    (r'^viewsimulationoutputsummaries', views_mod+'.view_sim_output_summaries'),
+    (r'^viewsimulationfailures$', views_mod+ '.view_simulation_failures'),
+    (r'^viewsimulationqueue$', views_mod+'.viewsimulationqueue'),
 
     # Details about specific files and runs:
-    (r'^simfiles/(\d+)$', 'mreorg.curator.frontend.views.simfile_details'),
-    (r'^simfileruns/(\d+)', 'mreorg.curator.frontend.views.simfilerun_details'),
-    (r'^simfile/(\d+)', 'mreorg.curator.frontend.views.simfile_details'),
-
-
-
+    (r'^simfiles/(\d+)$', views_mod+'.simfile_details'),
+    (r'^simfileruns/(\d+)', views_mod+'.simfilerun_details'),
+    (r'^simfile/(\d+)', views_mod+'.simfile_details'),
 
     # Tracking
-    (r'^do/track/rescan', 'mreorg.curator.frontend.views.do_track_rescanfs'),
-    (r'^do/track/track_sim', 'mreorg.curator.frontend.views.do_track_sim'),
-    (r'^do/track/untrack_sim', 'mreorg.curator.frontend.views.do_untrack_sim'),
-    (r'^do/track/add_src_dir', 'mreorg.curator.frontend.views.do_track_src_dir'),
-    (r'^do/track/track_all_sims', 'mreorg.curator.frontend.views.do_track_all'),
-    (r'^do/track/untrack_all_sims', 'mreorg.curator.frontend.views.do_untrack_all'),
+    (r'^do/track/rescan', views_mod+'.do_track_rescanfs'),
+    (r'^do/track/track_sim', views_mod+'.do_track_sim'),
+    (r'^do/track/untrack_sim', views_mod+'.do_untrack_sim'),
+    (r'^do/track/untrack_src_dir/(\d+)', views_mod+'.do_untrack_src_dir'),
+    (r'^do/track/add_src_dir', views_mod+'.do_track_src_dir'),
+    (r'^do/track/track_all_sims', views_mod+'.do_track_all'),
+    (r'^do/track/untrack_all_sims', views_mod+'.do_untrack_all'),
 
     # Queuing:
-    (r'^do/queue/add_sims', 'mreorg.curator.frontend.views.do_queue_add_sims'),
-
-
-    (r'^do/editsimfile/(\d+)', 'mreorg.curator.frontend.views.doeditsimfile'),
+    (r'^do/queue/add_sims', views_mod+'.do_queue_add_sims'),
+    (r'^do/editsimfile/(\d+)', views_mod+'.doeditsimfile'),
 
 
     # Handle image request
@@ -83,11 +80,11 @@ p = (
 this_dir = os.path.dirname(__file__)
 
 
-p = p + (
+url_patterns = url_patterns + (
     # Static files:
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.join(this_dir,'static/')}),
     (r'^site_media/javascript/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.join(this_dir, 'static/javascript/')}),
     )
 
 
-urlpatterns = patterns('', *p)
+urlpatterns = patterns('',*url_patterns)
