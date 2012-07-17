@@ -41,9 +41,9 @@ Installation
 
 .. note::
 
-	(mrerg has only been tested on Linux; it should work on mac with some
+	(mreorg has only been tested on Linux; it should work on mac with some
 	adjustment; if you are simulating with python on windows you may have 
-	larger problems than what |mreorg| can cope with :)  )
+	larger problems than what |mreorg| can help you with :)  )
 
 To install |mreorg| locally (in the home directory):
 
@@ -52,8 +52,8 @@ To install |mreorg| locally (in the home directory):
 	$ cd ~
 	$ git clone git://github.com/mikehulluk/mreorg.git
 
- 2. Add to |mreorg| binary and python searchpaths, by editting
-    login scripts ( normally `~/.bashrc`). Add the following lines
+ 2. Add |mreorg| binaries and python files to shell-paths, by editing
+    login scripts (normally `~/.bashrc`). Add the following lines
     to the end of this file::
 	
 	export PYTHONPATH='$PYTHONPATH:/home/YOURUSERNAME/mreorg/src/'
@@ -368,5 +368,10 @@ MREORG_CURATIONRUN            Sets both `MREORG_NOSHOW` and `MREORG_SAVEALL` (an
    :language: python
 
 
+Contact Information
+--------------------
+ 
+ * Email me: ?ike?ulluk@googlemail.com where ?s can be found at the top of the page!
+ * GitHub: https://github.com/mikehulluk/mreorg
 
 
