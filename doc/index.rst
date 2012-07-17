@@ -3,8 +3,8 @@
 .. |mreorg.curate| replace:: *mreorg.curate*
 
 
-mreorg - Managing Workflows in Python
-======================================
+Managing Workflows in Python
+============================
 
 .. contents::
    
