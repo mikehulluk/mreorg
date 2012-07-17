@@ -5,3 +5,5 @@ src/mreorg/curator/frontend/data/*
 src/mreorg/curator/frontend/data/images/*
 doc/_build/*
 out.html
+
+examples/_output/
