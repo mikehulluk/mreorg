@@ -4,3 +4,4 @@ lint:
 
 clean:
 	find . -name "*.pyc" -exec rm {} \;
+	find . -name "*.py.new" -exec rm {} \;
