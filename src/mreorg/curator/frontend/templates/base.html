@@ -34,18 +34,54 @@
 <!-- The top menu -->
 <div class='nav'>
   <div class='outer'>
-  <div class='inner'>
-    <ul>
-        <li> <a href="/overview"><span>Overview<span></span></a></li>
-        <li> <a href="/viewsimulationoutputsummaries"><span>Output<span></span></a></li>
-        <li> <a href="/tracking"><span>Tracking</span></a></li>
-        <li> <a href="/viewsimulationqueue"><span>Queue</span></a></li>
-        <li> <a href="/viewsimulationfailures"><span>Failures</span></a></li>
-   </ul>
-  </div>
-  </div>
-</div>
+      <div class='inner'>
+         <ul>
+            <li> <a href="/overview"><span>Overview<span></span></a></li>
+            <li> <a href="/viewsimulationoutputsummaries"><span>Output<span></span></a></li>
+            <li> <a href="/tracking"><span>Tracking</span></a></li>
+            <li> <a href="/viewsimulationqueue"><span>Queue</span></a></li>
+            <li> <a href="/viewsimulationfailures"><span>Failures</span></a></li>
+            <li> <a href="" onclick="Effect.toggle('config', 'blind',{ duration: 0.3 }); return false;"><span>Config</span></a></li>
+        </ul>
+      </div>
 
+      <div class='inner'>
+      <div id='config' style="display: none">
+            <ul>
+            <li>
+                    <form action="switch_config" method="POST">
+                    <span>
+                        Config:
+                        <select name="configuration"> 
+                            <option value=''>{{current_config.name}}</option> 
+                            {% for config in configs %} 
+                            {% if config.id != current_config.id%}
+                                <option value=''>{{config.name}}</option> 
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </span>
+
+                </form>
+            </li>
+            <li>
+                <form action="switch_filegroup" method="POST">
+                    <span>Group <select name="group1"> 
+                            <option value=''>{{current_filegroup.name}}</option> 
+                            {% for filegroup in filegroups %} 
+                            {% if filegroup.id != current_filegroup.id%}
+                                <option value=''>{{filegroup.name}}</option> 
+                            {% endif %}
+                            {% endfor %}
+                    </select> </span>
+                </form>
+            </li>
+            <ul>
+    </div >
+    </div >
+
+  </div>
+</div >
 
 <!-- the main content block -->
 <div id='content'>

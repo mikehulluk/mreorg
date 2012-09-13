@@ -59,13 +59,25 @@ class ScriptFlags(object):
     osenv = os.environ
     ENVVAR_MREORG_NOSHOW  =  'MREORG_NOSHOW' in osenv
     ENVVAR_MREORG_SAVEALL =  'MREORG_SAVEALL' in osenv
+    ENVVAR_MREORG_SAVEFIGADDINFO =  'MREORG_SAVEFIGADDINFO' in osenv
 
     # 'Meta-options' that enable other options:
     ENVVAR_MREORG_CURATIONRUN = 'MREORG_CURATIONRUN' in osenv
     ENVVAR_MREORG_BATCHRUN =    'MREORG_BATCHRUN' in osenv
 
-    ENVVAR_MREORG_ENABLECOVERAGE =  'MREORG_ENABLECOVERAGE' in osenv or \
-                                    'MF_TEST_COVERAGE' in osenv
+    ENVVAR_MREORG_ENABLECOVERAGE =  'MREORG_ENABLECOVERAGE' in osenv
+
+    _expected_options = (
+        'MREORG_NOSHOW',
+        'MREORG_SAVEALL',
+        'MREORG_SAVEFIGADDINFO',
+        'MREORG_CURATIONRUN',
+        'MREORG_BATCHRUN',
+        'MREORG_ENABLECOVERAGE', 
+        'MREORG_CURATION_REENTRYFLAG',
+        )
+
+
 
     # Temp Hack: lets turn coverage off!
     ENVVAR_MREORG_ENABLECOVERAGE =  False
@@ -97,5 +109,11 @@ class ScriptFlags(object):
     # Should we enable coverage:
     MREORG_ENABLECOVERAGE = ENVVAR_MREORG_ENABLECOVERAGE
 
+    MREORG_SAVEFIGADDINFO =  ENVVAR_MREORG_SAVEFIGADDINFO
 
 
+
+# Look out for unexpected flags:
+for key in os.environ:
+    if key.startswith('MREORG'):
+        assert key in ScriptFlags._expected_options, 'MREORG config option not recognised: %s' % key

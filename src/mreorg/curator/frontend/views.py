@@ -39,6 +39,8 @@ from mreorg.curator.frontend.models import SimFileRun
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
 from mreorg.curator.frontend.models import SourceSimDir
+from mreorg.curator.frontend.models import RunConfiguration
+from mreorg.curator.frontend.models import FileGroup
 from mreorg import MReOrgConfig
 from django.template import RequestContext
 
@@ -55,12 +57,29 @@ mimetypes.init()
 from django.db import transaction
 
 
+def get_configs():
+    return RunConfiguration.objects.all()
+
+def get_filegroups():
+    return FileGroup.objects.all()
+
+def get_current_filegroup():
+    return get_filegroups()[0]
+def get_current_config():
+    return get_configs()[0]
 
 def view_overview(request):
     return render_to_response(
             'overview.html',
             RequestContext(request,
-                {'simfiles': SimFile.get_tracked_sims() })
+                {
+                    'simfiles': SimFile.get_tracked_sims(),
+                    'configs': get_configs(),
+                    'filegroups': get_filegroups(),
+                    'current_config': get_current_config(),
+                    'current_filegroup': get_current_filegroup(),
+                }
+                )
             )
 
 

@@ -68,7 +68,6 @@ class MReOrgConfig(object):
             mreorg.utils.ensure_directory_exists(path)
         return path
 
-
     @classmethod
     def get_image_store_dir(cls):
         return cls._get_path('SIMULATION_IMAGE_STOREDIR')

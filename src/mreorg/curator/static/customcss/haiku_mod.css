@@ -106,9 +106,12 @@ h5 a:hover, a:active {
 div.nav {
 	background: #e0e0e0;
 	padding: 0;
-  margin-bottom:100px;
+        margin-bottom:100px;
 	height: 36px;
+}
 
+
+#div.config {
 }
 
 div.nav div.outer {
@@ -120,6 +123,7 @@ div.nav div.outer div.inner {
 	text-align: right;
 	padding: 0;
   float:right;
+  clear: right;
 }
 
 div.nav div.inner span {
@@ -135,7 +139,7 @@ list-style-type:none;
 margin:0;
 padding:0;
 }
-div.nav div.inner ul a span
+div.nav div.inner ul span
 {
 display:block;
 width:auto;
@@ -148,6 +152,12 @@ div.nav div.inner ul li
 display:inline;
 float: left; 
 }
+
+
+
+
+
+
 
 
 

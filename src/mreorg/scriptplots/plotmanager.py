@@ -64,9 +64,12 @@ class PlotManager:
         figure=None,
         filename_tmpl=None,
         figtypes=None,
+        remap_dot_to_underscore = False
         ):
 
 
+        if remap_dot_to_underscore:
+                figname=figname.replace(".","-")
 
 #        assert False
 
@@ -106,9 +109,9 @@ class PlotManager:
 
 
             # Save the figure:
-            mreorg.ensure_directory_exists(filename)
-            fig.savefig(filename)
             full_filename = os.path.join(os.getcwd(), filename)
+            mreorg.ensure_directory_exists(full_filename)
+            fig.savefig(full_filename)
             PlotManager.figures_saved.append(fig)
             PlotManager.figures_saved_nums.append(fig.number)
             PlotManager.figures_saved_filenames.append(full_filename)

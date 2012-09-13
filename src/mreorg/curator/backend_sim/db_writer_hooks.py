@@ -97,7 +97,14 @@ class SimDBWriter(object):
                 continue
 
             # Copy the output file:
-            hashstr = mreorg.get_file_sha1hash( image_filename)
+            try:
+                hashstr = mreorg.get_file_sha1hash( image_filename)
+            except:
+                hashstr=None
+            
+            if hashstr == None:
+                continue
+
             opfile1 = output_file_dir + '/' + hashstr + '.svg'
             shutil.copyfile(image_filename, opfile1)
 
@@ -204,7 +211,7 @@ class CurationSimDecorator(object):
     @classmethod
     def top_level_exception_handler(cls, exception_type, exception, tracebackobj, *_args):
         try:
-            traceback_str = ''.join( traceback.format_tb(tracebackobj) )
+            traceback_str = str(exception)  +'\n'+ ''.join( traceback.format_tb(tracebackobj) )
 
             print ""
             print "TopLevel-Handler Caught Exception:"

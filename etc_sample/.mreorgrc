@@ -6,10 +6,11 @@
 # the results database and restart.
 
 default_simulations = [
+    #"/home/michael/hw_to_come/hw-results/src/March 2011/s0001/s0001 - Sautois dIN.py",
     "/home/michael/hw_to_come/morphforge/src/morphforgeexamples/singlecell_simulation/*",
-    "/home/michael/hw_to_come/morphforge/src/morphforgeexamples/multicell_simulation/**",
-    "/home/michael/hw_to_come/hw-results/src/March 2011/s0001/s0001 - Sautois dIN.py",
-    "/home/michael/hw_to_come/hw-results/src/**",
+    "/home/michael/hw_to_come/morphforge/src/morphforgeexamples/**",
+    "/home/michael/hw_to_come/hw-results/src/12-00/**",
+    "/home/michael/hw_to_come/hw-results/src/simulations_for_paper1/gen*.py",
 ]
 
 FILENAME_EXCLUDES = [
@@ -20,6 +21,9 @@ FILENAME_EXCLUDES = [
     "*/analysis_dins.py",
     "*/dINFiles.py",
     "preload_files.py",
+    "*old*.py",
+    "*OLD*.py",
+    "*Old*.py",
 ]
 
 

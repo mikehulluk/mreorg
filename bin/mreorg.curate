@@ -33,7 +33,6 @@ def cmd_builddb(params):
     import mreorg
     db_filename = mreorg.MReOrgConfig.get_simulation_sqllite_filename()
 
-    #db_filename = '/home/michael/simmgr.sqlite'
     os.environ['MREORG_CURATION_REENTRYFLAG'] = 'TRUE'
     if params.rebuild:
         os.unlink(db_filename)
@@ -50,10 +49,27 @@ def cmd_backup(*args, **kwargs):
 
 
 
+def cmd_reloadconfig(params):
+    os.environ['DJANGO_SETTINGS_MODULE']='mreorg.curator.settings'
+    
+    # Add the default run-configuration:
+    from mreorg.curator.frontend.models import RunConfiguration, FileGroup
+    rc = RunConfiguration(name='default', timeout=1800)
+    rc.save()
+    rc = RunConfiguration(name='quick', timeout=2)
+    rc.save()
+
+    fg = FileGroup(name='mikesubgroup1')
+    fg.save()
+
+
+
 description = "mreorg.curate is tool for managing large numbers of simulations"
 parser = argparse.ArgumentParser(description=description)
 subparsers = parser.add_subparsers(help='sub-command help')
 
+parser_reloadconfig = subparsers.add_parser('reconfig', help='Reload the configuration from the configuration file' )
+parser_reloadconfig.set_defaults(func=cmd_reloadconfig)
 
 parser_runserver = subparsers.add_parser('runserver', help='run the django backend' )
 parser_runserver.add_argument('-p', '--port', type=int, default=8000, help='the port to run django on')

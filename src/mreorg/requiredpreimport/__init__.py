@@ -65,9 +65,17 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     # Monkey-Patch 'matplotlib.savefig()' and 'pylab.savefig()', allowing us
     # to save to directories that don't exist by automatically creating them:
     orig_mplsavefig = matplotlib.pylab.savefig
+
     def savefig(filename, *args, **kwargs):
+        if ScriptFlags.MREORG_SAVEFIGADDINFO:
+            F = pylab.gcf()
+            x,y = F.get_size_inches()
+            txt = 'Size: x=%2.2f y=%2.2f (inches)' % (x,y) 
+            txt += '\n' + filename.split('/')[-1]
+            pylab.figtext(0.0, 0.5, txt, backgroundcolor='white')
+
+
         if ScriptFlags.MREORG_AUTOMAKEDIRS:
-            #import mreorg
             mreorg.ensure_directory_exists(filename)
         return orig_mplsavefig(filename, *args, **kwargs)
     matplotlib.pylab.savefig = savefig

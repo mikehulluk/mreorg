@@ -248,14 +248,25 @@ class SimFile(models.Model):
         LUT = { True:'SimQueued',False:'SimNotQueued'}
         return LUT[p]
 
-#class UntrackedSimFile(SimFile):
-#    pass
-#class TrackedSimFile(SimFile):
-#    pass
 
 
 
+class RunConfiguration(models.Model):
+    class Meta:
+        ordering = ('name',)
+    name = models.CharField(max_length=10000000)
+    timeout = models.IntegerField()
 
+class FileGroup(models.Model):
+    class Meta:
+        ordering = ('name',)
+    name = models.CharField(max_length=10000000)
+    simfiles = models.ManyToManyField(SimFile)
+
+class EnvironVar(models.Model):
+    key = models.CharField(max_length=10000)
+    value = models.CharField(max_length=10000)
+    config = models.ForeignKey(RunConfiguration)
 
 
 class SimRunStatus(object):
@@ -269,6 +280,7 @@ class SimRunStatus(object):
 
 class SimFileRun(models.Model):
     simfile = models.ForeignKey(SimFile)
+    config = models.ForeignKey(RunConfiguration)
     execution_date = models.DateTimeField('execution date')
     return_code = models.IntegerField()
     std_out = models.CharField(max_length=10000000)
@@ -280,13 +292,11 @@ class SimFileRun(models.Model):
     library_sha1hash = models.CharField(max_length=200)
     execution_time = models.IntegerField(null=True)
 
+
     def execution_data_string(self):
         import datetime
         exec_date = str(self.execution_date)
-        print exec_date
-        #2012-01-02 14:28:29.129076
         d = datetime.datetime.strptime(exec_date,'%Y-%m-%d %H:%M:%S.%f')
-        print d
         s = d.strftime('%Y-%m-%d %H:%M')
         return s
 
@@ -336,8 +346,6 @@ class SimQueueEntry(models.Model):
     def create(cls, sim_file):
         queue_entry = SimQueueEntry( simfile = sim_file )
         queue_entry.save()
-
-
 
     def get_simulation_time(self):
         return datetime.datetime.now() - self.simulation_start_time

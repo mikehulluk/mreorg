@@ -320,6 +320,10 @@ MREORG_BATCHRUN		      Sets both `MREORG_NOSHOW` and `MREORG_SAVEALL`
 MREORG_CURATIONRUN            Sets both `MREORG_NOSHOW` and `MREORG_SAVEALL` (and
 			      also records the results of this simulation in the
                               |mreorg.curate| database)
+----------------------------- ------------------------------------------------------
+MREORG_SAVEFIGADDINFO         When saving figures, adds the size of the figure,
+                              and the filename. This is useful for making papers to
+                              get all the figures the same size.
 ============================= =====================================================
 
 
