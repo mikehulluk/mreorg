@@ -20,6 +20,16 @@
   {% block additional_header %} 
   {% endblock %}
 
+
+
+<script>
+function myreloadfunction(data)
+{
+    window.location.reload()
+}
+</script>
+
+
 </head>
 
 
@@ -49,14 +59,15 @@
       <div id='config' style="display: none">
             <ul>
             <li>
-                    <form action="switch_config" method="POST">
+            
+                    <form action="switch_config" method="POST" >
                     <span>
                         Config:
-                        <select name="configuration"> 
-                            <option value=''>{{current_config.name}}</option> 
-                            {% for config in configs %} 
-                            {% if config.id != current_config.id%}
-                                <option value=''>{{config.name}}</option> 
+                            <select name="configuration" onchange="Dajaxice.mreorg.curator.frontend.base_set_runconfig(myreloadfunction, {'runconfig_id':this.options[this.selectedIndex].value}); ">  
+                                <option value={{current_runconfig.id}}>{{current_runconfig.name}}</option> 
+                            {% for config in runconfigs %} 
+                            {% if config.id != current_runconfig.id%}
+                                <option value={{config.id}}>{{config.name}}</option> 
                             {% endif %}
                             {% endfor %}
                         </select>
@@ -66,11 +77,11 @@
             </li>
             <li>
                 <form action="switch_filegroup" method="POST">
-                    <span>Group <select name="group1"> 
-                            <option value=''>{{current_filegroup.name}}</option> 
+                    <span>Group <select name="group1" onchange="Dajaxice.mreorg.curator.frontend.base_set_filegroup(myreloadfunction, {'filegroup_id':this.options[this.selectedIndex].value}); "> 
+                            <option value={{current_filegroup.id}}>{{current_filegroup.name}}</option> 
                             {% for filegroup in filegroups %} 
                             {% if filegroup.id != current_filegroup.id%}
-                                <option value=''>{{filegroup.name}}</option> 
+                            <option value={{filegroup.id}}>{{filegroup.name}}</option> 
                             {% endif %}
                             {% endfor %}
                     </select> </span>

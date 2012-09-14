@@ -1,0 +1,3 @@
+[submodule "dependances/glob2"]
+	path = dependances/glob2
+	url = https://github.com/miracle2k/python-glob2.git

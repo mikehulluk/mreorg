@@ -91,6 +91,21 @@ class TrackingStatus(object):
 
 
 class SimFile(models.Model):
+
+    @classmethod
+    def get_or_make(self, full_filename, make_kwargs=None):
+        full_filename = os.path.expanduser(full_filename)
+
+        try:
+            simfile = SimFile.objects.get(full_filename=full_filename)
+        except SimFile.DoesNotExist:
+            if make_kwargs is None:
+                make_kwargs = {}
+            simfile = SimFile(full_filename=full_filename, **make_kwargs)
+            simfile.save()
+        return simfile
+
+
     class Meta():
         ordering = ['full_filename']
     full_filename = models.CharField(max_length=1000)
@@ -252,16 +267,90 @@ class SimFile(models.Model):
 
 
 class RunConfiguration(models.Model):
+
+
+    special_configs = ['default']
+
+    @classmethod
+    def get_or_make(self, name, make_kwargs=None):
+        try:
+            runconf = RunConfiguration.objects.get(name=name)
+        except RunConfiguration.DoesNotExist:
+            if make_kwargs is None:
+                make_kwargs = {}
+            runconf = RunConfiguration(name=name, **make_kwargs)
+            runconf.save()
+        return runconf
+    
     class Meta:
         ordering = ('name',)
     name = models.CharField(max_length=10000000)
-    timeout = models.IntegerField()
+    timeout = models.IntegerField(null=True)
+
+    def is_special(self):
+        return self.name in RunConfiguration.special_configs
+
+    @classmethod
+    def build_all_specials(cls):
+        for special_name in RunConfiguration.special_configs:
+            rc = cls.get_or_make(special_name)
+            assert rc.is_special()
+            rc.save()
+
+    @classmethod
+    def get_initial(cls):
+        return cls.get_or_make(name='default')
+
+
+
 
 class FileGroup(models.Model):
+    special_groups = ['all']
+
     class Meta:
         ordering = ('name',)
     name = models.CharField(max_length=10000000)
     simfiles = models.ManyToManyField(SimFile)
+
+    @classmethod
+    def get_or_make(self, name):
+        try:
+            fg =FileGroup.objects.get(name=name)
+        except FileGroup.DoesNotExist:
+            fg = FileGroup(name=name)
+            fg.save()
+        return fg
+
+    def is_special(self):
+        return self.name in FileGroup.special_groups
+
+    def contains_simfile(self, simfile):
+        if self.name == 'all':
+            return True
+
+        assert not self.is_special(),'NotImplementedYet'
+        print 'simfile', simfile
+
+        for sf in self.simfiles.all():
+            print 'is it: %s' % sf, simfile==sf
+
+
+
+        return simfile in self.simfiles.all()
+
+    @classmethod
+    def build_all_specials(cls):
+        for special_name in FileGroup.special_groups:
+            rc = cls.get_or_make(special_name)
+            assert rc.is_special()
+            rc.save()
+    @classmethod
+    def get_initial(cls):
+        return cls.get_or_make(name='all')
+
+
+
+
 
 class EnvironVar(models.Model):
     key = models.CharField(max_length=10000)
@@ -305,7 +394,6 @@ class SimFileRun(models.Model):
         return res
 
     def get_status(self):
-
         if self.simulation_sha1hash != self.simfile.get_current_checksum():
             return SimRunStatus.FileChanged
         if self.execution_time is None:
@@ -318,6 +406,9 @@ class SimFileRun(models.Model):
         if self.return_code != 0:
             return SimRunStatus.NonZeroExitCode
         return SimRunStatus.Sucess
+
+
+
 
 class SimFileRunOutputImage(models.Model):
     original_name = models.CharField(max_length=10000)

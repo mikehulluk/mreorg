@@ -57,28 +57,33 @@ mimetypes.init()
 from django.db import transaction
 
 
-def get_configs():
-    return RunConfiguration.objects.all()
 
-def get_filegroups():
-    return FileGroup.objects.all()
+def ensure_config(request):
+    if not 'current_runconfig' in request.session:
+        request.session['current_runconfig'] = RunConfiguration.get_initial()
+    if not 'current_filegroup' in request.session:
+        request.session['current_filegroup'] = FileGroup.get_initial()
 
-def get_current_filegroup():
-    return get_filegroups()[0]
-def get_current_config():
-    return get_configs()[0]
+
+def config_processor(request):
+    ensure_config(request)
+
+    return { 'runconfigs': RunConfiguration.objects.all(),
+             'filegroups': FileGroup.objects.all(),
+             'current_runconfig': request.session['current_runconfig'],
+             'current_filegroup': request.session['current_filegroup'] }
+
 
 def view_overview(request):
+    #print 'Session', request.session
+
+    ensure_config(request)
+    sims =[sim for sim in SimFile.get_tracked_sims() if request.session['current_filegroup'].contains_simfile(sim) ]
     return render_to_response(
             'overview.html',
             RequestContext(request,
-                {
-                    'simfiles': SimFile.get_tracked_sims(),
-                    'configs': get_configs(),
-                    'filegroups': get_filegroups(),
-                    'current_config': get_current_config(),
-                    'current_filegroup': get_current_filegroup(),
-                }
+                { 'simfiles': sims },
+                [config_processor]
                 )
             )
 

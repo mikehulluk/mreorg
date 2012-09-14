@@ -27,6 +27,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 
+
+import os
+import sys
+
+
 # Ensure our monkey patching takes place first:
 import mreorg.requiredpreimport
 
@@ -38,6 +43,13 @@ from mreorg.config import MReOrgConfig
 
 from mreorg.utils import get_file_sha1hash
 
+# Setup glob2 path
+# ##################
+local_dir = os.path.dirname(__file__)
+glob2_src_dir = os.path.join(local_dir,'../../dependances/glob2/src/')
+sys.path.append(glob2_src_dir)
+import glob2
+
 __all__ = [
     "MReOrgConfig",
     "ScriptFlags",
@@ -46,4 +58,5 @@ __all__ = [
     "FigFormat",
     "ensure_directory_exists",
     "get_file_sha1hash",
+    "glob2"
 ]

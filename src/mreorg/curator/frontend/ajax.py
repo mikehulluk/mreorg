@@ -33,7 +33,35 @@ from mreorg.curator.frontend.models import SimFile
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimRunStatus
 from mreorg.curator.frontend.models import SimQueueEntryState
+from mreorg.curator.frontend.models import RunConfiguration
+from mreorg.curator.frontend.models import FileGroup
 
+
+
+
+@dajaxice_register
+def base_set_runconfig(request, runconfig_id):
+    print 'hello'
+    print 'Setting Runconfig', runconfig_id, type(runconfig_id)
+    #runconfig_id = int(runconfig_id)
+    #print 'Setting Runconfig', runconfig_id, type(runconfig_id)
+    runconfig = RunConfiguration.objects.get(id=int(runconfig_id))
+
+    request.session['current_runconfig'] = runconfig
+    print 'Runconfig set ok'
+    return simplejson.dumps({})
+
+@dajaxice_register
+def base_set_filegroup(request, filegroup_id):
+    print 'hello'
+    print 'Setting FileGroup', filegroup_id, type(filegroup_id)
+    #runconfig_id = int(runconfig_id)
+    #print 'Setting Runconfig', runconfig_id, type(runconfig_id)
+    filegroup = FileGroup.objects.get(id=int(filegroup_id))
+
+    request.session['current_filegroup'] = filegroup
+    print 'FielGroup set ok'
+    return simplejson.dumps({})
 
 
 @dajaxice_register
