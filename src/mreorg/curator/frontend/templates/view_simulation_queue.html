@@ -74,6 +74,7 @@
   <tr>
     <th>  </th>
     <th> Filename </th>
+    <th> RunConfiguration </th>
   </tr>
 
   {% for queuedsim in simulation_queue %}
@@ -81,6 +82,7 @@
     <td> <input type="checkbox" name="queuedsimid_{{queuedsim.id}}"> </td>
     <td> {{queuedsim.simfile.get_last_executiontime }} </td>
     <td> {{queuedsim.simfile.get_short_filename}} </td>
+    <td> {{queuedsim.runconfig.name}} </td>
   </tr>
   {%endfor %}
 </table>

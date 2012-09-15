@@ -138,17 +138,18 @@ def simfile_details(request, simfile_id):
 
 
 
-_have_run_update_tracking_locations = False
+#_have_run_update_tracking_locations = False
 
 
 def view_tracking(request):
-    global _have_run_update_tracking_locations
 
-    # Update the default location files from the
-    # config file:
-    if not _have_run_update_tracking_locations:
-        mh_adddefault_locations()
-        _have_run_update_tracking_locations = True
+    #global _have_run_update_tracking_locations
+
+    ## Update the default location files from the
+    ## config file:
+    #if not _have_run_update_tracking_locations:
+    #    mh_adddefault_locations()
+    #    _have_run_update_tracking_locations = True
 
     cxt_data = {
                 'src_directories': SourceSimDir.objects.all(),
@@ -347,27 +348,6 @@ def doeditsimfile(request, simfile_id):
 
 
 
-def mh_adddefault_locations():
-    default_simulations = MReOrgConfig.get_ns().get('default_simulations', None)
-
-    if not default_simulations:
-        return HttpResponseRedirect('/')
-
-
-    for l in default_simulations:
-        if not l:
-            continue
-        if l[-1] != '*':
-            SimFile.create(full_filename=l, tracked=False)
-        elif l.endswith('**'):
-            SourceSimDir.create(directory_name=l[:-2],
-                                should_recurse=True)
-        elif l.endswith('*'):
-            SourceSimDir.create(directory_name=l[:-1],
-                                should_recurse=False)
-        else:
-            SourceSimDir.create(directory_name=l[:-2],
-                                should_recurse=False)
 
 
 def get_image_file(request, filename):

@@ -203,8 +203,8 @@ class SimFile(models.Model):
         self.last_read_docstring = mreorg.utils.extract_docstring_from_fileobj(StringIO.StringIO( code ) )
         self.last_read_htmlcode = highlight(code, PythonLexer(), HtmlFormatter())
 
-        runs = self.get_runs()
-        self.last_run = runs[0] if runs else None
+        #runs = self.get_runs()
+        #self.last_run = runs[0] if runs else None
         self.save()
 
 
@@ -227,8 +227,14 @@ class SimFile(models.Model):
         self.check_and_recache()
         return self.last_read_docstring
 
-    def get_latest_run(self):
-        return self.last_run
+    def get_last_run(self, runconfig):
+        runs = self.get_runs(runconfig=runconfig)
+        if len(runs) == 0:
+            return None
+        else:
+            return self.get_runs(runconfig=runconfig)[0]
+        #assert False
+        #return self.last_run
 
     def get_current_checksum(self):
         return mreorg.get_file_sha1hash(self.full_filename)
@@ -236,28 +242,28 @@ class SimFile(models.Model):
     def get_short_filename(self):
         return os.path.split(self.full_filename)[1]
 
-    def get_runs(self):
+    def get_runs(self, runconfig):
+        #assert False
         return SimFileRun.objects. \
-                    filter(simfile=self.id). \
+                    filter(simfile=self.id, runconfig=runconfig). \
                     order_by('-execution_date')
 
 
-    def get_status(self):
-        #'last_run = self.get_latest_run()
-        if not self.last_run:
+    def get_status(self, runconfig):
+        last_run = self.get_last_run(runconfig)
+        if not last_run:
             return SimRunStatus.NeverBeenRun
         else:
-            return self.last_run.get_status()
+            return last_run.get_status()
 
-    def get_last_executiontime(self):
-        #last_run = self.get_latest_run()
-        if not self.last_run:
+    def get_last_executiontime(self, runconfig):
+        if not self.last_run(runconfig):
             return 'Unknown'
         else:
-            return self.last_run.execution_time
+            return self.last_run(runconfig).execution_time
 
-    def is_queued(self):
-        return self.simqueueentry_set.count() != 0
+    def is_queued(self, runconfig):
+        return self.simqueueentry_set.filter(runconfig=runconfig).count() != 0
 
     def getCSSQueueState(self):
         p = self.is_queued()
@@ -370,7 +376,7 @@ class SimRunStatus(object):
 
 class SimFileRun(models.Model):
     simfile = models.ForeignKey(SimFile)
-    config = models.ForeignKey(RunConfiguration)
+    runconfig = models.ForeignKey(RunConfiguration)
     execution_date = models.DateTimeField('execution date')
     return_code = models.IntegerField()
     std_out = models.CharField(max_length=10000000)
@@ -430,13 +436,14 @@ class SimQueueEntryState(models.Model):
 
 class SimQueueEntry(models.Model):
     simfile = models.ForeignKey(SimFile)
+    runconfig = models.ForeignKey(RunConfiguration)
     submit_time = models.DateTimeField('submission_time', default=datetime.datetime.now)
     simulation_start_time = models.DateTimeField(null=True, default=None)
     status = models.CharField(max_length=1000, default=SimQueueEntryState.Waiting )
 
     @classmethod
-    def create(cls, sim_file):
-        queue_entry = SimQueueEntry( simfile = sim_file )
+    def create(cls, sim_file, runconfig):
+        queue_entry = SimQueueEntry( simfile = sim_file, runconfig=runconfig )
         queue_entry.save()
 
     def get_simulation_time(self):

@@ -56,6 +56,13 @@ def simulate( sim_queue_entry):
     sim_queue_entry.save(force_update=True)
 
 
+
+    # Setup the environmental variables:
+    # Pass the RunConfiguration.id as an environmental variable
+    os.environ['_MREORG_RUNCONFIGID'] = str(sim_queue_entry.runconfig.id)
+    assert False
+
+
     # Simulate:
     print '   - Changing Directory to', dname
     os.chdir(dname)
@@ -64,10 +71,10 @@ def simulate( sim_queue_entry):
         print '   - Finished Simulating [Exit OK]'
     except subprocess.CalledProcessError as exception:
         print '   - Finished Simulating [Non-zero exitcode]'
-        if not sim_queue_entry.simfile.get_latest_run():
+        last_run = sim_queue_entry.simfile.get_latest_run(sim_queue_entry.runconfig)
+        if not last_run:
             print 'Sim not decorated! Unable to set return code'
         else:
-            last_run = sim_queue_entry.simfile.get_latest_run()
             last_run.returncode = exception.returncode
             last_run.save(force_update=True)
 

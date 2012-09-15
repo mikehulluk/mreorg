@@ -1,8 +1,9 @@
 
 
 def from_default_monitor_dirs():
-    default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
-    for fgname, fgglobs in default_filegroups.iteritems():
+    #default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
+    #for fgname, fgglobs in default_filegroups.iteritems():
+    pass
 
 
 

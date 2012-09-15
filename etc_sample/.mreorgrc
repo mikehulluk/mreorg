@@ -27,6 +27,7 @@ default_filegroups = {
     'dIN (No-EC)': ["/home/michael/hw_to_come/hw-results/src/12-00/C Multicompartmental dIN model analysis/C. Analysis of dIN model (Individual)/*.py"],
     'dIN (EC)':    ["/home/michael/hw_to_come/hw-results/src/12-00/C Multicompartmental dIN model analysis/D. Analysis of dIN model (In Electrically Coupled Network)/*.py"],
     'paper1':      ["/home/michael/hw_to_come/hw-results/src/simulations_for_paper1/gen*.py"],
+    'all-results': ["/home/michael/hw_to_come/hw-results/src/**.py"],
 }
 
 

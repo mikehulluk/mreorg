@@ -50,6 +50,7 @@ from mreorg.utils import get_file_sha1hash
 from mreorg.curator.frontend.models import SimFileRun
 from mreorg.curator.frontend.models import SimFile
 from mreorg.curator.frontend.models import SimFileRunOutputImage
+from mreorg.curator.frontend.models import RunConfiguration
 
 
 
@@ -86,7 +87,9 @@ class SimDBWriter(object):
             exception_type = sim_run_info.exception_details[0],
             exception_traceback = str(sim_run_info.exception_details[2]),
             simulation_sha1hash = get_file_sha1hash(simfile.full_filename),
-            library_sha1hash = '00000', )
+            library_sha1hash = '00000', 
+            runconfig = RunConfiguration.objects.get(id=int(os.environ['_MREORG_RUNCONFIGID'])) 
+            )
 
         simres.save()
 

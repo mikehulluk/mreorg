@@ -3,7 +3,7 @@
 
 {% extends "base.html" %}
 
-
+{#
 {% block postbody %}
 
     <script type="text/javascript">
@@ -17,6 +17,7 @@
     </script>
 
 {% endblock  %}
+#}
 
 
 
@@ -28,7 +29,6 @@
 
 // Dajax callback functions:
 function pass(data){
-    //alert(data.message);
 }
 
 
@@ -78,22 +78,19 @@ function clear_sim_queue()
 
 function toggle_sim_for_resubmit(id)
 {
-    Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simfile_id':this.selected});
+    Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simfile_id':id});
 }
 
 
 
 function resubmit_all_sims()
 {
-
     {% for sim_file in simfiles %}
-    {%if sim_file.does_file_exist %}
-    Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile(pass, {'simfile_id':{{sim_file.id}} });
-    update_sim_gui({{sim_file.id}})
-    {% endif %}
+        {%if sim_file.does_file_exist %}
+            Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile(pass, {'simfile_id':{{sim_file.id}} });
+            update_sim_gui({{sim_file.id}})
+        {% endif %}
     {% endfor %}
-
-
 }
 
 function resubmit_all_failures()
@@ -125,8 +122,6 @@ function update_sim_gui(sim_id)
 {
     Dajaxice.mreorg.curator.frontend.overview_update_sim_gui(update_sim_gui_callback, {'simfile_id':sim_id});
 }
-
-
 
 function clickResubmitButton( sim_id )
 {
@@ -179,7 +174,6 @@ function countdown_callback(){
 
 
 
--->
 </script>
 {% endblock %}
 
