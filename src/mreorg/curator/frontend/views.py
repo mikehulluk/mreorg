@@ -64,7 +64,6 @@ def ensure_config(request):
     if not 'current_filegroup' in request.session:
         request.session['current_filegroup'] = FileGroup.get_initial()
 
-
 def config_processor(request):
     ensure_config(request)
 
@@ -75,7 +74,6 @@ def config_processor(request):
 
 
 def view_overview(request):
-    #print 'Session', request.session
 
     ensure_config(request)
     sims =[sim for sim in SimFile.get_tracked_sims() if request.session['current_filegroup'].contains_simfile(sim) ]
@@ -108,6 +106,19 @@ def view_sim_output_summaries(request):
     csrf_context = RequestContext(request, cxt_data)
     return render_to_response('simulation_output_summaries.html',
                               csrf_context)
+
+
+def view_configurations(request):
+    ensure_config(request)
+    config = request.session['current_runconfig']
+    for env_var in config.environvar_set.all():
+        print env_var
+
+    cxt_data = {}
+    csrf_context = RequestContext(request, cxt_data, [config_processor])
+    return render_to_response('configurations.html',
+                              csrf_context)
+
 
 
 def simfilerun_details(request, run_id):
@@ -337,8 +348,7 @@ def doeditsimfile(request, simfile_id):
 
 
 def mh_adddefault_locations():
-    default_simulations = \
-        MReOrgConfig.get_ns().get('default_simulations', None)
+    default_simulations = MReOrgConfig.get_ns().get('default_simulations', None)
 
     if not default_simulations:
         return HttpResponseRedirect('/')
@@ -361,7 +371,6 @@ def mh_adddefault_locations():
 
 
 def get_image_file(request, filename):
-    print filename
 
     im_dir = MReOrgConfig.get_image_store_dir()
 

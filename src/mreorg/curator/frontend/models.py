@@ -63,6 +63,7 @@ class SourceSimDir(models.Model):
     def does_exist(self):
         return os.path.exists( self.directory_name)
 
+
     @classmethod
     def create(cls, directory_name, should_recurse=True):
 	directory_name = os.path.normpath(directory_name)
@@ -354,7 +355,7 @@ class FileGroup(models.Model):
 
 class EnvironVar(models.Model):
     key = models.CharField(max_length=10000)
-    value = models.CharField(max_length=10000)
+    value = models.CharField(max_length=10000, null=True)
     config = models.ForeignKey(RunConfiguration)
 
 

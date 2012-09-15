@@ -99,6 +99,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'mreorg.curator.frontend',
+    'django.contrib.humanize',
     'dajaxice',
 )
 

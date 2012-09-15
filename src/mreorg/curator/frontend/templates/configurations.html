@@ -1,0 +1,48 @@
+
+{% extends "base.html" %}
+{% block contents %}
+<div class='section' >
+      <div class='sectionheader'> <h2><a>RunConfigurations</a></h2> </div>
+
+
+      <div class='sectioncontents'>
+
+      {% for config in runconfigs %}
+      <h5 onclick="Effect.toggle('contents_{{config.id}}', 'blind',{ duration: 0.3 }); return false;"> 
+          {% if config == current_runconfig %} <span style=' font-variant: small-caps;'>Active:</span> {%endif%} '{{config.name }}' {% if config.is_special %} (Special) {%endif%}
+      </h5>
+      <div id='contents_{{config.id}}'  {% if config != current_runconfig %} style="display:none" {% endif %}>
+      <table class='std'>
+          <tbody>
+              <tr style='font-weight: bold'>
+                  <td >timeout</td>
+                  <td>{% if config.timeout != None %} {{config.timeout}}s {% else %} None {%endif%}</td>
+              </tr>
+
+              {% for env_var in config.environvar_set.all %}
+              <tr>
+                  <td>{{env_var.key}}</td>
+                  <td>{{env_var.value}}</td>
+                  <td>{% if env_var.value != None %} '{{env_var.value}}' {% else %} <None> {%endif%}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+      </div>
+
+      {% endfor %}
+
+
+    </div>
+    </div>
+
+<div class='section' >
+      <div class='sectionheader'> <h2><a>FileGroups</a></h2> </div>
+
+
+      <div class='sectioncontents'>
+</div>
+</div>
+
+
+{% endblock  %}

@@ -49,6 +49,7 @@ url_patterns = (
     (r'^viewsimulationoutputsummaries', views_mod+'.view_sim_output_summaries'),
     (r'^viewsimulationfailures$', views_mod+ '.view_simulation_failures'),
     (r'^viewsimulationqueue$', views_mod+'.viewsimulationqueue'),
+    (r'^viewconfigurations$', views_mod+'.view_configurations'),
 
     # Details about specific files and runs:
     (r'^simfiles/(\d+)$', views_mod+'.simfile_details'),

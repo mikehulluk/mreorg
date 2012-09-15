@@ -52,65 +52,8 @@ def cmd_backup(*args, **kwargs):
 def cmd_reloadconfig(params):
     os.environ['DJANGO_SETTINGS_MODULE']='mreorg.curator.settings'
 
-    import mreorg
-    from mreorg.curator.frontend.models import RunConfiguration, FileGroup, SimFile
-
-    ## Add the builtins:
-    #RunConfiguration.build_all_specials()
-    #FileGroup.build_all_specials()
-
-
-    # Update the FileGroups:
-    default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
-    for fgname, fgglobs in default_filegroups.iteritems():
-        filenames = set()
-        for fgglob in fgglobs:
-            filenames.update(mreorg.glob2.glob(fgglob) )
-
-        # Safely get the FileGroup:
-        fg = FileGroup.get_or_make(name=fgname)
-        assert not fg.is_special(), 'Trying to overwrite a builtin filegroup'
-        for filename in filenames:
-            simfile = SimFile.get_or_make(full_filename=filename)
-            if not fg.contains_simfile(simfile):
-                fg.simfiles.add(simfile)
-                fg.save()
-
-        print 'Updated FileGroup: %s' % (fgname,)
-
-
-    # Update the RunConfigurations:
-    default_runconfigs = mreorg.MReOrgConfig.get_ns().get('default_runconfigs',{})
-    for confname, confinfo in default_runconfigs.iteritems():
-        runconf = RunConfiguration.get_or_make(name=confname)
-        assert not runconf.is_special(), 'Trying to add a builtin-configuration'
-        runconf.timeout = confinfo.get('timeout',None)
-
-        for (key, value) in confinfo.get('env_var',{}).iteritems():
-            try:
-                envvar = runconf.environvar_set.get(key=key)
-                envvar.value = value
-                envvar.save()
-            except EnvironVar.DoesNotExist:
-                envvar = EnvironVar(key=key,value=value,config=runconf)
-                envvar.save()
-
-        runconf.save()
-        print 'Updated RunConfig: %s' % confname
-
-
-
-
-
-    ## Add the default run-configuration:
-    #rc = RunConfiguration(name='default', timeout=1800)
-    #rc.save()
-    #rc = RunConfiguration(name='quick', timeout=2)
-    #rc.save()
-
-    
-    #fg = FileGroup(name='mikesubgroup1')
-    #fg.save()
+    from mreorg.curator.frontend.dbdata_from_config import update_db_from_config
+    update_db_from_config()
 
 
 

@@ -42,8 +42,6 @@ if "MF_TEST_COVERAGE" in os.environ.keys():
     print 'Found MF_TEST_COVERAGE'
     assert False
 
-#print #sorted(os.environ.keys())
-#assert False
 
 
 class ScriptFlags(object):
