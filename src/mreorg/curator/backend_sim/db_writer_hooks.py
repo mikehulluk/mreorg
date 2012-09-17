@@ -266,7 +266,7 @@ class CurationSimDecorator(object):
         cls.time_out = time_out
 
         def timeout_sighandler(_signum, _frame):
-            raise TimeoutException()
+            raise TimeoutException(timeout=cls.time_out)
 
         if time_out:
             signal.signal(signal.SIGALRM, timeout_sighandler)
