@@ -36,6 +36,7 @@ import os
 import datetime
 import subprocess
 import sys
+import signal
 
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
@@ -52,6 +53,7 @@ def simulate( sim_queue_entry):
     print '   - Updating database'
     sim_queue_entry.status = SimQueueEntryState.Executing
     sim_queue_entry.simulation_start_time = datetime.datetime.now()
+    sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
     sim_queue_entry.save(force_update=True)
 
 
@@ -72,6 +74,20 @@ def simulate( sim_queue_entry):
         else:
             os.environ[key] = value
 
+
+
+    # Setup the heartbeat, to say that we are actually alive:
+    heartbeat_interval = 30
+    def handler(*args, **kwargs):
+        print 'Handler Called'
+        signal.alarm(heartbeat_interval)
+        sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
+        sim_queue_entry.save(force_update=True)
+        print 'Handler Finished'
+
+    signal.alarm(heartbeat_interval)
+    signal.signal(signal.SIGALRM, handler)
+
     # Simulate:
     print '   - Changing Directory to', dname
     os.chdir(dname)
@@ -86,6 +102,12 @@ def simulate( sim_queue_entry):
         else:
             last_run.returncode = exception.returncode
             last_run.save(force_update=True)
+
+
+    # Turn off heartbeating.
+    signal.alarm(0)
+    sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
+    sim_queue_entry.save(force_update=True)
 
     # Remove the sim_queue_entry:
     sim_queue_entry.delete()
@@ -107,6 +129,8 @@ def run_backend():
             print '\r Checking for Queued Sims: ', time.strftime('%l:%M%p (%S) on %b %d, %Y'),
             sys.stdout.flush()
         else:
+
+            
             print
             simulate( queued_objects[0] )
             print 

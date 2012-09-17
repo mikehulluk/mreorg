@@ -401,7 +401,9 @@ class SimQueueEntry(models.Model):
     runconfig = models.ForeignKey(RunConfiguration)
     submit_time = models.DateTimeField('submission_time', default=datetime.datetime.now)
     simulation_start_time = models.DateTimeField(null=True, default=None)
+    simulation_last_heartbeat = models.DateTimeField(null=True, default=None)
     status = models.CharField(max_length=1000, default=SimQueueEntryState.Waiting )
+
 
     @classmethod
     def create(cls, sim_file, runconfig):
@@ -410,3 +412,20 @@ class SimQueueEntry(models.Model):
 
     def get_simulation_time(self):
         return datetime.datetime.now() - self.simulation_start_time
+
+    def time_since_last_heartbeat_in_s(self):
+        if not self.simulation_last_heartbeat:
+            return -1
+        return (datetime.datetime.now() - self.simulation_last_heartbeat).total_seconds()
+
+    def resubmit_if_process_died(self):
+        if self.status == SimQueueEntryState.Executing:
+            if self.time_since_last_heartbeat_in_s() > 60:
+                print 'Resubmitting'
+                self.status = SimQueueEntryState.Waiting
+                self.save()
+    @classmethod 
+    def trim_dangling_jobs(cls):
+        for queue_entry in SimQueueEntry.objects.all():
+            queue_entry.resubmit_if_process_died()
+

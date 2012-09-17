@@ -248,6 +248,12 @@ def viewsimulationqueue(request):
          'latest_runs': SimFileRun.objects.order_by('-execution_date'
          )[0:10]}
 
+
+    SimQueueEntry.trim_dangling_jobs()
+    #for queue_entry in SimQueueEntry.objects.all():
+    #    queue_entry.resubmit_if_process_died()
+
+
     csrf_context = RequestContext(request, cxt_data)
     return render_to_response('view_simulation_queue.html', csrf_context)
 

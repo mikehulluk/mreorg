@@ -48,6 +48,7 @@
     <th> Filename </th>
     <th> RunConfiguration </th>
     <th> Simulation Time </th>
+    <th> Time Since last Heartbeat </th>
   </tr>
 
   {% for queuedsim in simulation_queue_executing %}
@@ -56,6 +57,7 @@
     <td> {{queuedsim.simfile.get_short_filename}} </td>
     <td>  {{queuedsim.runconfig.name}} </td>
     <td> {{queuedsim.get_simulation_time}} </td>
+    <td> {{queuedsim.time_since_last_heartbeat_in_s}} </td>
   </tr>
   {%endfor %}
 </table>
