@@ -79,11 +79,11 @@ def simulate( sim_queue_entry):
     # Setup the heartbeat, to say that we are actually alive:
     heartbeat_interval = 30
     def handler(*args, **kwargs):
-        print 'Handler Called'
+        #print 'Handler Called'
         signal.alarm(heartbeat_interval)
         sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
         sim_queue_entry.save(force_update=True)
-        print 'Handler Finished'
+        #print 'Handler Finished'
 
     signal.alarm(heartbeat_interval)
     signal.signal(signal.SIGALRM, handler)
@@ -115,27 +115,31 @@ def simulate( sim_queue_entry):
 
 
 
-def run_backend():
+def _run_backend():
     
     sleep_time = 2
 
     while True:
 
+        print '\r Checking for Queued Sims: ', time.strftime('%l:%M%p (%S) on %b %d, %Y'),
+        sys.stdout.flush()
         queued_objects = SimQueueEntry.objects.\
                 filter( status=SimQueueEntryState.Waiting).\
                 order_by('submit_time')
 
-        if not queued_objects:
-            print '\r Checking for Queued Sims: ', time.strftime('%l:%M%p (%S) on %b %d, %Y'),
-            sys.stdout.flush()
-        else:
-
-            
+        if queued_objects:
             print
             simulate( queued_objects[0] )
             print 
 
         time.sleep(sleep_time)
 
+def run_backend():
+    try:
+        _run_backend()
+    except KeyboardInterrupt:
+        print 'Stopping'
+
 if __name__ == "__main__":
     run_backend()
+
