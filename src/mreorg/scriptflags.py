@@ -31,19 +31,6 @@
 import os
 
 
-# To remove, since June 2012
-if 'MF_PLOT' in os.environ.keys():
-    print 'Found MF_PLOT'
-    assert False
-if 'MF_BATCH' in os.environ.keys():
-    print 'Found MF_BATCH'
-    assert False
-if "MF_TEST_COVERAGE" in os.environ.keys():
-    print 'Found MF_TEST_COVERAGE'
-    assert False
-
-
-
 class ScriptFlags(object):
     """Control the behaviour of matplotlib within scripts using environmental
     variables. This allows the script to act differently if its being used
@@ -73,6 +60,8 @@ class ScriptFlags(object):
         'MREORG_BATCHRUN',
         'MREORG_ENABLECOVERAGE', 
         'MREORG_CURATION_REENTRYFLAG',
+
+        'MREORG_TIMEOUT',
         )
 
 

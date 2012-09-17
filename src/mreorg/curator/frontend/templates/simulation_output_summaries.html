@@ -10,28 +10,31 @@
 
 
 
-{% for loc, sim_files in simfiles %}
+{% for filegroup, sim_data in data %}
 
 <div class="section">
 
-    <div class='sectionheader'> <h2>{{loc}}/</h2> </div>
+    <div class='sectionheader'> <h2>{{filegroup.name}}</h2> </div>
 
-    {% for sim_file in sim_files %}
+    {% for sim_file, sim_file_last_run in sim_data %}
 
     <div class="subsection">
-        <h3> {{loc}} : <a href="/simfiles/{{sim_file.id}}">{{sim_file.get_short_filename}}</a> </h3>
-
-        <div class="SummaryFileDescription">
-            <pre> {{sim_file.get_docstring}} </pre>
-        </div>
+        <h3> <a href="/simfiles/{{sim_file.id}}">{{sim_file.get_short_filename}}</a> </h3>
 
 
-        {% if sim_file.get_latest_run %}
-            {% for i in sim_file.get_latest_run.output_images.all %}
+
+        {% if sim_file_last_run != None %}
+            {% if sim_file.get_docstring %}
+            <div class="SummaryFileDescription">
+                <pre> {{sim_file.get_docstring}} </pre>
+            </div>
+            {% else %}
+            <div>(No Docstring)</div>
+            {% endif %}
+            {% for i in sim_file_last_run.output_images.all %}
             <a href="/image/{{i.hash_name_short}}">
                 <img src="/image/{{i.hash_thumbnailname_short}}"/>
             </a>
-
             {% endfor %}
         {% else %}
         [Never been run]: 

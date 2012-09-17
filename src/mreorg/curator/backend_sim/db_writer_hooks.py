@@ -162,7 +162,15 @@ class IOStreamDistributor(object):
 
 
 class TimeoutException(Exception):
-    pass
+    def __init__(self, timeout):
+        super(TimeoutException,self).__init__()
+        self.timeout = timeout
+
+    def __repr__(self):
+        return 'TImeoutException (%ds)'%self.timeout
+
+    def __str__(self):
+        return 'TImeoutException (%ds)'%self.timeout
 
 
 class CurationSimDecorator(object):
@@ -231,8 +239,8 @@ class CurationSimDecorator(object):
     def activate(cls, time_out=None):
         assert not cls.is_initialised
 
-        if 'MF_TIMEOUT' in os.environ:
-            time_out = int( os.environ['MF_TIMEOUT'] )
+        if 'MREORG_TIMEOUT' in os.environ:
+            time_out = int( os.environ['MREORG_TIMEOUT'] )
 
 
         # Filename of the Sim script

@@ -34,7 +34,7 @@ default_filegroups = {
 # An environmental variable of None means it should be unset if it exists.
 default_runconfigs ={
     'short':{
-        'timeout': 60,
+        'timeout': 10,
         'env_vars': { 'MF_QUICK':'' }
     },
     'std':{

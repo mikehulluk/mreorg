@@ -1,4 +1,8 @@
 
+import models
+from django.db import transaction
+import os
+import mreorg
 
 def from_default_monitor_dirs():
     #default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
@@ -6,6 +10,25 @@ def from_default_monitor_dirs():
     pass
 
 
+@classmethod
+@transaction.commit_on_success
+def update_all_db(cls, directory):
+
+    print 'Updating untracked simulation files', directory
+    for (dirpath, dirnames, filenames) in os.walk( directory ):
+        for filename in filenames:
+            if not filename.endswith(".py"):
+                continue
+            full_filename = os.path.join( dirpath, filename ) 
+            if mreorg.MReOrgConfig.is_non_curated_file(filename):
+                continue
+            if mreorg.MReOrgConfig.is_non_curated_file(full_filename):
+                continue
+
+            try:
+                models.SimFile.objects.get(full_filename=full_filename)
+            except models.SimFile.DoesNotExist:
+                models.SimFile.create(full_filename=full_filename, tracked=False)
 
 def update_db_from_config():
     import mreorg
@@ -50,27 +73,38 @@ def update_db_from_config():
         runconf.save()
         print 'Updated RunConfig: %s' % confname
 
+        # Add default locations:
+        mh_adddefault_locations()
+        # Rescan-filesystem:
+        rescan_filesystem()
+
+        print 'Finished Reconfiguring'
+
+
+
+
+
+def rescan_filesystem():
+    for src_dir in models.SourceSimDir.objects.all():
+        models.SimFile.update_all_db(src_dir.directory_name)
 
 
 
 def mh_adddefault_locations():
-    default_simulations = MReOrgConfig.get_ns().get('default_simulations', None)
-
-    if not default_simulations:
-        return HttpResponseRedirect('/')
-
+    import mreorg
+    default_simulations = mreorg.MReOrgConfig.get_ns().get('default_simulations', [])
 
     for l in default_simulations:
         if not l:
             continue
         if l[-1] != '*':
-            SimFile.create(full_filename=l, tracked=False)
+            models.SimFile.get_or_make(full_filename=l, make_kwargs={'tracking_status': models.TrackingStatus.Tracked} )
         elif l.endswith('**'):
-            SourceSimDir.create(directory_name=l[:-2],
+            models.SourceSimDir.create(directory_name=l[:-2],
                                 should_recurse=True)
         elif l.endswith('*'):
-            SourceSimDir.create(directory_name=l[:-1],
+            models.SourceSimDir.create(directory_name=l[:-1],
                                 should_recurse=False)
         else:
-            SourceSimDir.create(directory_name=l[:-2],
+            models.SourceSimDir.create(directory_name=l[:-2],
                                 should_recurse=False)

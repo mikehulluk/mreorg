@@ -40,8 +40,6 @@ from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
 
 
-os.environ['MREORG_CURATIONRUN'] = 'TIMEOUT:1800,'
-os.environ['MF_TIMEOUT'] = '1800'
 
 
 def simulate( sim_queue_entry):
@@ -59,8 +57,20 @@ def simulate( sim_queue_entry):
 
     # Setup the environmental variables:
     # Pass the RunConfiguration.id as an environmental variable
+    os.environ['MREORG_CURATIONRUN'] ='True'
     os.environ['_MREORG_RUNCONFIGID'] = str(sim_queue_entry.runconfig.id)
-    assert False
+    if sim_queue_entry.runconfig.timeout:
+        os.environ['MREORG_TIMEOUT'] = '%d' % sim_queue_entry.runconfig.timeout
+
+    for envvar in sim_queue_entry.runconfig.environvar_set.all():
+        key = envvar.key
+        value = envvar.value
+        if value is None:
+            if key in os.environ:
+                del os.environ[key]
+        else:
+            os.environ[key] = value
+
 
 
     # Simulate:
@@ -71,7 +81,7 @@ def simulate( sim_queue_entry):
         print '   - Finished Simulating [Exit OK]'
     except subprocess.CalledProcessError as exception:
         print '   - Finished Simulating [Non-zero exitcode]'
-        last_run = sim_queue_entry.simfile.get_latest_run(sim_queue_entry.runconfig)
+        last_run = sim_queue_entry.simfile.get_last_run(sim_queue_entry.runconfig)
         if not last_run:
             print 'Sim not decorated! Unable to set return code'
         else:

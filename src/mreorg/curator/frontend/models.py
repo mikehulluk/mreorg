@@ -36,7 +36,7 @@ from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
 import mreorg
-from django.db import transaction
+#from django.db import transaction
 
 
 
@@ -141,40 +141,12 @@ class SimFile(models.Model):
             return SimFile.objects.get(tracking_status=TrackingStatus.NotTracked, **kwargs)
         return SimFile.objects.filter(tracking_status=TrackingStatus.NotTracked)
 
-    @classmethod
-    def create(cls, full_filename, tracked):
-        if tracked:
-            simfile = SimFile(full_filename = full_filename, tracking_status = TrackingStatus.Tracked)
-        else:
-            simfile = SimFile(full_filename = full_filename, tracking_status = TrackingStatus.NotTracked)
-        simfile.save()
-        return simfile
-
-
-
 
     @classmethod
-    @transaction.commit_on_success
     def update_all_db(cls, directory):
-
-        print 'Updating untracked simulation files', directory
-        for (dirpath, dirnames, filenames) in os.walk( directory ):
-            for filename in filenames:
-                if not filename.endswith(".py"):
-                    continue
-                full_filename = os.path.join( dirpath, filename ) 
-                if mreorg.MReOrgConfig.is_non_curated_file(filename):
-                    continue
-                if mreorg.MReOrgConfig.is_non_curated_file(full_filename):
-                    continue
-
-                try:
-                    SimFile.objects.get(full_filename=full_filename)
-                except:
-                    SimFile.create(full_filename=full_filename, tracked=False)
-
-
-
+        import dbdata_from_config
+        assert False, 'Should call the method directly!'
+        return dbdata_from_config.update_all_db(directory)
 
 
 
@@ -202,9 +174,6 @@ class SimFile(models.Model):
         self.last_read_contents  = code
         self.last_read_docstring = mreorg.utils.extract_docstring_from_fileobj(StringIO.StringIO( code ) )
         self.last_read_htmlcode = highlight(code, PythonLexer(), HtmlFormatter())
-
-        #runs = self.get_runs()
-        #self.last_run = runs[0] if runs else None
         self.save()
 
 
@@ -233,8 +202,6 @@ class SimFile(models.Model):
             return None
         else:
             return self.get_runs(runconfig=runconfig)[0]
-        #assert False
-        #return self.last_run
 
     def get_current_checksum(self):
         return mreorg.get_file_sha1hash(self.full_filename)
@@ -243,7 +210,6 @@ class SimFile(models.Model):
         return os.path.split(self.full_filename)[1]
 
     def get_runs(self, runconfig):
-        #assert False
         return SimFileRun.objects. \
                     filter(simfile=self.id, runconfig=runconfig). \
                     order_by('-execution_date')
@@ -332,18 +298,22 @@ class FileGroup(models.Model):
         return self.name in FileGroup.special_groups
 
     def contains_simfile(self, simfile):
+        print 'Does', self.name, 'contain', simfile.full_filename, '?'
         if self.name == 'all':
             return True
 
         assert not self.is_special(),'NotImplementedYet'
-        print 'simfile', simfile
+        print 'simfile', simfile, simfile.full_filename
 
         for sf in self.simfiles.all():
             print 'is it: %s' % sf, simfile==sf
+            print sf.full_filename
 
 
 
-        return simfile in self.simfiles.all()
+        res = simfile in self.simfiles.all()
+        print '  -- Ans', res
+        return res
 
     @classmethod
     def build_all_specials(cls):

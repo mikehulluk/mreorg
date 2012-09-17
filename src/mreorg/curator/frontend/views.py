@@ -41,9 +41,10 @@ from mreorg.curator.frontend.models import SimQueueEntryState
 from mreorg.curator.frontend.models import SourceSimDir
 from mreorg.curator.frontend.models import RunConfiguration
 from mreorg.curator.frontend.models import FileGroup
+from mreorg.curator.frontend.models import TrackingStatus
 from mreorg import MReOrgConfig
 from django.template import RequestContext
-
+from dbdata_from_config import rescan_filesystem
 
 import os
 import re
@@ -85,39 +86,37 @@ def view_overview(request):
                 )
             )
 
-
 def view_sim_output_summaries(request):
-    sims = SimFile.get_tracked_sims()
-    sim_and_dir = [(s, os.path.dirname(s.full_filename)) for s in sims]
-    sim_and_dir.sort()
 
-    sim_dirs = sorted(set([s[1] for s in sim_and_dir]))
+    last_runs = {}
+    for simfile in SimFile.get_tracked_sims():
+        last_runs[simfile] = simfile.get_last_run(request.session['current_runconfig'])
 
-    common_prefix = os.path.commonprefix(sim_dirs)
+    print last_runs
 
-    output = []
-    for sim_dir in sim_dirs:
-        sd_short = '.../' + sim_dir.replace(common_prefix, '')
-        sims_o = sorted([s[0] for s in sim_and_dir if s[1] == sim_dir],
-                        key=lambda s: s.full_filename)
-        output.append((sd_short, sims_o))
+    runconfig = (request.session['current_runconfig'])
+    data =[]
+    for fg in FileGroup.objects.all():
+        sim_data = [ (sim, sim.get_last_run(runconfig)) for sim in fg.simfiles.all() ]
+        data.append( (fg, sim_data) )
+    #cxt_data = {'last_runs':last_runs}
+    cxt_data = {'data':data}
+    print cxt_data
 
-    cxt_data = {'simfiles': output}
-    csrf_context = RequestContext(request, cxt_data)
+    csrf_context = RequestContext(request, cxt_data, [config_processor] )
     return render_to_response('simulation_output_summaries.html',
                               csrf_context)
 
 
+
+
+
 def view_configurations(request):
     ensure_config(request)
-    config = request.session['current_runconfig']
-    for env_var in config.environvar_set.all():
-        print env_var
 
     cxt_data = {}
     csrf_context = RequestContext(request, cxt_data, [config_processor])
-    return render_to_response('configurations.html',
-                              csrf_context)
+    return render_to_response('configurations.html', csrf_context)
 
 
 
@@ -125,7 +124,8 @@ def simfilerun_details(request, run_id):
     return render_to_response(
             'simulation_run_details.html',
             RequestContext(request,
-                {'simulationrun': SimFileRun.objects.get(id=run_id) } ) )
+                {'simulationrun': SimFileRun.objects.get(id=run_id) }, 
+                [config_processor] ) )
 
 
 
@@ -138,26 +138,18 @@ def simfile_details(request, simfile_id):
 
 
 
-#_have_run_update_tracking_locations = False
-
 
 def view_tracking(request):
-
-    #global _have_run_update_tracking_locations
-
-    ## Update the default location files from the
-    ## config file:
-    #if not _have_run_update_tracking_locations:
-    #    mh_adddefault_locations()
-    #    _have_run_update_tracking_locations = True
 
     cxt_data = {
                 'src_directories': SourceSimDir.objects.all(),
                 'untracked_simfiles':SimFile.get_untracked_sims(),
                 'simfiles': SimFile.get_tracked_sims()}
-    csrf_context = RequestContext(request, cxt_data)
+    csrf_context = RequestContext(request, cxt_data , [config_processor] )
     return render_to_response('tracking.html',
-                              csrf_context)
+                              csrf_context
+                              
+                              )
 
 
 # Tracking Commands
@@ -165,19 +157,16 @@ def view_tracking(request):
 
 @transaction.commit_on_success
 def do_track_all(request):
-    for pot_sim in SimFile.get_untracked_sims():
-        sim = SimFile.create(full_filename=pot_sim.full_filename, tracked=True)
+    for sim in SimFile.get_untracked_sims():
+        sim.tracking_status = TrackingStatus.Tracked
         sim.save()
-        pot_sim.delete()
-
     return HttpResponseRedirect('/tracking')
 
 @transaction.commit_on_success
 def do_untrack_all(request):
     for sim in SimFile.get_tracked_sims():
-        untr_sim = SimFile.create(full_filename=sim.full_filename, tracked=False)
-        untr_sim.save()
-        sim.delete()
+        sim.tracking_status = TrackingStatus.NotTracked
+        sim.save()
 
     return HttpResponseRedirect('/tracking')
 
@@ -197,8 +186,9 @@ def do_untrack_src_dir(request, srcdir_id):
 	
 
 def do_track_rescanfs(request):
-    for src_dir in SourceSimDir.objects.all():
-        SimFile.update_all_db(src_dir.directory_name)
+    rescan_filesystem()
+    #for src_dir in SourceSimDir.objects.all():
+    #    SimFile.update_all_db(src_dir.directory_name)
     return HttpResponseRedirect('/tracking')
 
 
@@ -215,12 +205,9 @@ def do_track_sim(request):
     pot_sim_ids = [int(m.groupdict()['id']) for m in pot_sim_id_matches if m]
 
     for pot_sim_id in pot_sim_ids:
-        pot_sim = SimFile.get_untracked_sims(id=pot_sim_id)
-
-        sim = SimFile.create(full_filename=pot_sim.full_filename, tracked=True)
-
+        sim = SimFile.objects.get(id=pot_sim_id)
+        sim.tracking_status = TrackingStatus.Tracked
         sim.save()
-        pot_sim.delete()
 
     return HttpResponseRedirect('/tracking')
 
@@ -232,7 +219,6 @@ def do_untrack_sim(request):
 
 
     # Find all keys matching untracked_sim_id_XX, and get the XX's
-
     print request.POST.keys()
     r = re.compile(r"""simid_(?P<id>\d+)""", re.VERBOSE)
     pot_sim_id_matches = [r.match(k) for k in request.POST]
@@ -240,11 +226,10 @@ def do_untrack_sim(request):
                    if m]
 
     # Delete the old simulations:
-
     for pot_sim_id in pot_sim_ids:
-        print 'Deleting', pot_sim_id
-        sim_file = SimFile.get_tracked_sims(id = pot_sim_id)
-        sim_file.delete()
+        sim = SimFile.objects.get(id=pot_sim_id)
+        sim.tracking_status = TrackingStatus.NotTracked
+        sim.save()
 
     # Update the list of untracked files:
     return do_track_rescanfs(request)
