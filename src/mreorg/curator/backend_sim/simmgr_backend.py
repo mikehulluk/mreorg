@@ -35,6 +35,7 @@ import time
 import os
 import datetime
 import subprocess
+import sys
 
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
@@ -71,8 +72,6 @@ def simulate( sim_queue_entry):
         else:
             os.environ[key] = value
 
-
-
     # Simulate:
     print '   - Changing Directory to', dname
     os.chdir(dname)
@@ -88,7 +87,6 @@ def simulate( sim_queue_entry):
             last_run.returncode = exception.returncode
             last_run.save(force_update=True)
 
-
     # Remove the sim_queue_entry:
     sim_queue_entry.delete()
     sim_queue_entry.simfile.recache_from_filesystem()
@@ -96,18 +94,24 @@ def simulate( sim_queue_entry):
 
 
 def run_backend():
+    
+    sleep_time = 2
+
     while True:
-        print 'Checking for Queued Sims'
 
         queued_objects = SimQueueEntry.objects.\
                 filter( status=SimQueueEntryState.Waiting).\
                 order_by('submit_time')
 
         if not queued_objects:
-            print ' - No Sims found'
+            print '\r Checking for Queued Sims: ', time.strftime('%l:%M%p (%S) on %b %d, %Y'),
+            sys.stdout.flush()
         else:
+            print
             simulate( queued_objects[0] )
-        time.sleep(2)
+            print 
+
+        time.sleep(sleep_time)
 
 if __name__ == "__main__":
     run_backend()

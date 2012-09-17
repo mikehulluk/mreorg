@@ -36,19 +36,11 @@ from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
 import mreorg
-#from django.db import transaction
-
-
 
 
 
 class Options(object):
     MinimumFileCheckInterval = datetime.timedelta(minutes=5)
-
-
-
-
-
 
 
 

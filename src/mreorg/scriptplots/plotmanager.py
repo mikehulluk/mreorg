@@ -91,6 +91,17 @@ class PlotManager:
 
         modname = ScriptUtils.get_calling_script_file(include_ext=False)
 
+
+        # Print what we are saving:
+        subst_dict = {
+            'modulename': modname,
+            'fignum': PlotManager.fig_num,
+            'figname': figname,
+            'figtype': '{%s}' % ','.join(figtypes),
+            }
+        print 'PlotMnager:Saving ',  filename_tmpl.format(**subst_dict)
+
+
         # For each filetype:
         for figtype in figtypes:
 
@@ -101,8 +112,8 @@ class PlotManager:
                 'figname': figname,
                 'figtype': figtype,
                 }
-            filename = filename_tmpl.format(**subst_dict)
 
+            filename = filename_tmpl.format(**subst_dict)
             filename = filename.replace(':', '=')
             assert not ':' in filename, 'For windows compatibility'
 
@@ -115,7 +126,7 @@ class PlotManager:
             PlotManager.figures_saved.append(fig)
             PlotManager.figures_saved_nums.append(fig.number)
             PlotManager.figures_saved_filenames.append(full_filename)
-            print 'Saving File', filename
+            #print 'Saving File', filename
 
 
         # Increment the fignum:

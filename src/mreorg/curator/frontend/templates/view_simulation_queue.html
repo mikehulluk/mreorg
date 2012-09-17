@@ -13,6 +13,7 @@
 
 <tr>
   <th> File </th>
+  <th> RunConfig </th>
   <th> Last Run </th>
   <th> Result </th>
   <th> DocString </th>
@@ -20,6 +21,7 @@
 {% for latest_run in latest_runs %}
 <tr class="{{ latest_run.simfile.get_status}}">
     <td> <a href="/simfiles/{{latest_run.simfile.id}}"> {{latest_run.simfile.get_short_filename }} </a> </td>
+    <td>  {{latest_run.runconfig.name}} </td>
     <td> <a href="/simfileruns/{{latest_run.simfile.get_latest_run.id}}">{{latest_run.simfile.get_latest_run.execution_date}} </td>
     <td> {{latest_run.simfile.get_latest_run.get_status}} </td>
     <td> {{latest_run.simfile.get_docstring}} </td>
@@ -44,6 +46,7 @@
   <tr>
     <th>  </th>
     <th> Filename </th>
+    <th> RunConfiguration </th>
     <th> Simulation Time </th>
   </tr>
 
@@ -51,6 +54,7 @@
   <tr>
     <td> {{queuedsim.simfile.get_last_executiontime }} </td>
     <td> {{queuedsim.simfile.get_short_filename}} </td>
+    <td>  {{queuedsim.runconfig.name}} </td>
     <td> {{queuedsim.get_simulation_time}} </td>
   </tr>
   {%endfor %}
@@ -72,6 +76,7 @@
 
 <table class='std'>
   <tr>
+    <th>  </th>
     <th>  </th>
     <th> Filename </th>
     <th> RunConfiguration </th>
