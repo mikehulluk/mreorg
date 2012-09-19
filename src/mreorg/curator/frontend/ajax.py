@@ -37,15 +37,17 @@ from mreorg.curator.frontend.models import SimRunStatus
 from mreorg.curator.frontend.models import SimQueueEntryState
 from mreorg.curator.frontend.models import RunConfiguration
 from mreorg.curator.frontend.models import FileGroup
+#from mreorg.curator.frontend.views import ensure_config
 
-
-
+def ensure_config():
+    pass
 
 @dajaxice_register
 def base_set_runconfig(request, runconfig_id):
     runconfig = RunConfiguration.objects.get(id=int(runconfig_id))
     request.session['current_runconfig'] = runconfig
     return simplejson.dumps({})
+
 
 @dajaxice_register
 def base_set_filegroup(request, filegroup_id):
@@ -56,6 +58,7 @@ def base_set_filegroup(request, filegroup_id):
 
 @dajaxice_register
 def overview_resubmit_simfile(_request, simfile_id):
+    ensure_config()
     try:
         sim_file = SimFile.get_tracked_sims(id = simfile_id)
     except:
@@ -71,13 +74,13 @@ def overview_resubmit_simfile(_request, simfile_id):
 
 @dajaxice_register
 def overview_resubmit_simfile_if_failure(_request, simfile_id):
+    ensure_config()
     try:
         sim_file = SimFile.get_tracked_sims(id = simfile_id)
     except:
         return simplejson.dumps({})
 
-
-    if sim_file.get_status() == SimRunStatus.Sucess:
+    if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Sucess:
         return simplejson.dumps({})
 
     if not sim_file.simqueueentry_set.count():
@@ -86,9 +89,9 @@ def overview_resubmit_simfile_if_failure(_request, simfile_id):
     return simplejson.dumps({})
 
 
-
 @dajaxice_register
 def overview_toggle_simfile_for_resubmit(_request, simfile_id):
+    ensure_config()
 
     try:
         sim_file = SimFile.get_tracked_sims(id = simfile_id)
@@ -99,14 +102,15 @@ def overview_toggle_simfile_for_resubmit(_request, simfile_id):
     if sim_file.simqueueentry_set.count():
         sim_file.simqueueentry_set.all().delete()
     else:
-        SimQueueEntry.create( sim_file = sim_file, runconfig=_request.session['current_runconfig'])
+        SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
 
     return simplejson.dumps({})
 
 
 @dajaxice_register
 def refreshsimlist(_request):
-
+    ensure_config()
+    runconfig=_request.session['current_runconfig']
     states = {}
     for simfile in SimFile.get_tracked_sims():
         states[simfile.id] = simfile.get_status()
@@ -115,7 +119,8 @@ def refreshsimlist(_request):
 
 @dajaxice_register
 def overview_update_sim_gui(_request, simfile_id):
-    print "Dajax call recieved", simfile_id
+    #ensure_config()
+    print 'Dajax call recieved', simfile_id
     from views import ensure_config
     ensure_config(_request)
     print 'A'
