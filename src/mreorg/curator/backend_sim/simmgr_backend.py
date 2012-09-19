@@ -40,7 +40,7 @@ import signal
 
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
-
+import django
 
 
 
@@ -53,10 +53,24 @@ def simulate( sim_queue_entry):
     print '   - Updating database'
     sim_queue_entry.status = SimQueueEntryState.Executing
     sim_queue_entry.simulation_start_time = datetime.datetime.now()
-    sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
-    sim_queue_entry.save(force_update=True)
 
 
+
+
+
+
+    def try_heartbeat():
+        try:
+            sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
+            sim_queue_entry.save(force_update=True)
+        except django.db.utils.DatabaseError:
+            pass
+    
+    # First heartbeat:
+    try_heartbeat()
+
+
+    
 
     # Setup the environmental variables:
     # Pass the RunConfiguration.id as an environmental variable
@@ -79,11 +93,8 @@ def simulate( sim_queue_entry):
     # Setup the heartbeat, to say that we are actually alive:
     heartbeat_interval = 30
     def handler(*args, **kwargs):
-        #print 'Handler Called'
         signal.alarm(heartbeat_interval)
-        sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
-        sim_queue_entry.save(force_update=True)
-        #print 'Handler Finished'
+        try_heartbeat()
 
     signal.alarm(heartbeat_interval)
     signal.signal(signal.SIGALRM, handler)
@@ -106,8 +117,7 @@ def simulate( sim_queue_entry):
 
     # Turn off heartbeating.
     signal.alarm(0)
-    sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
-    sim_queue_entry.save(force_update=True)
+    try_heartbeat()
 
     # Remove the sim_queue_entry:
     sim_queue_entry.delete()

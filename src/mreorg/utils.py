@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -31,7 +33,8 @@ import inspect
 import os
 
 import hashlib
-import tokenize, token
+import tokenize
+import token
 
 
 class ScriptUtils(object):
@@ -74,7 +77,7 @@ def extract_docstring_from_fileobj(fileobj):
             return text.strip()
         else:
             tokenname = token.tok_name[tok]
-            raise ValueError('Unexpected token %s (%s)'%(tokenname, tok))
+            raise ValueError('Unexpected token %s (%s)' % (tokenname, tok))
     return None
 
 
@@ -83,6 +86,7 @@ def ensure_directory_exists(filename):
     if not os.path.exists(dirname) and dirname.strip():
         os.makedirs(dirname)
     return filename
+
 
 def get_file_sha1hash(filename):
     hash_obj = hashlib.sha1()

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -29,11 +31,5 @@
 from mreorg.scriptplots.plotmanager import PlotManager, FigFormat
 PM = PlotManager
 
-__all__ = [
-    "PlotManager",
-    "PM",
-    "FigFormat",
-]
-
-
+__all__ = ['PlotManager', 'PM', 'FigFormat']
 

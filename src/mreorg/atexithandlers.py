@@ -29,8 +29,8 @@
 
 
 
+class AtExitHandler(object):
 
-class AtExitHandler():
     """
     Class that allows us to order the function calls made it 'atexit'.
     We need to do this to get the ordering write when writing to database.
@@ -44,7 +44,7 @@ class AtExitHandler():
 
     @classmethod
     def at_exit(cls, *args, **kwargs):
-        for _priority, handler in sorted(cls._handlers):
+        for (_priority, handler) in sorted(cls._handlers):
             handler(*args, **kwargs)
 
 

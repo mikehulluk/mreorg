@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """ A simple simulation that plots a single figure"""
 
 import mreorg

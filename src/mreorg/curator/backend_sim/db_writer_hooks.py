@@ -53,12 +53,13 @@ from mreorg.curator.frontend.models import SimFileRunOutputImage
 from mreorg.curator.frontend.models import RunConfiguration
 
 
-
+from django.db import transaction
 
 
 
 
 class SimDBWriter(object):
+
     @classmethod
     def write_to_database( cls, sim_run_info):
         output_file_dir = mreorg.MReOrgConfig.get_image_store_dir()
@@ -71,7 +72,7 @@ class SimDBWriter(object):
 
         try:
             simfile = SimFile.get_tracked_sims( full_filename=sim_run_info.script_name)
-        except: # DoesNotExistError,e :
+        except SimFile.DoesNotExistError,e :
             simfile = SimFile.create( full_filename=sim_run_info.script_name, tracked=True)
             simfile.save()
 
@@ -87,46 +88,47 @@ class SimDBWriter(object):
             exception_type = sim_run_info.exception_details[0],
             exception_traceback = str(sim_run_info.exception_details[2]),
             simulation_sha1hash = get_file_sha1hash(simfile.full_filename),
-            library_sha1hash = '00000', 
-            runconfig = RunConfiguration.objects.get(id=int(os.environ['_MREORG_RUNCONFIGID'])) 
+            library_sha1hash = '00000',
+            runconfig = RunConfiguration.objects.get(id=int(os.environ['_MREORG_RUNCONFIGID']))
             )
 
         simres.save()
 
-        output_file_dir = mreorg.MReOrgConfig.get_image_store_dir()
-        # Create the images
-        for image_filename in sim_run_info.output_images:
-            if not image_filename.endswith('svg'):
-                continue
 
-            # Copy the output file:
-            try:
-                hashstr = mreorg.get_file_sha1hash( image_filename)
-            except:
-                hashstr=None
-            
-            if hashstr == None:
-                continue
+        with transaction.commit_on_success():
+            output_file_dir = mreorg.MReOrgConfig.get_image_store_dir()
+            # Create the images
+            for image_filename in sim_run_info.output_images:
+                if not image_filename.endswith('svg'):
+                    continue
 
-            opfile1 = output_file_dir + '/' + hashstr + '.svg'
-            shutil.copyfile(image_filename, opfile1)
+                # Copy the output file:
+                try:
+                    hashstr = mreorg.get_file_sha1hash( image_filename)
+                except:
+                    hashstr=None
 
-            f_thumb = image_filename.replace(".svg","thumb.png")
-            os.system('convert %s -resize 400x300 %s'%(
-                         pipes.quote(image_filename),pipes.quote(f_thumb)))
-            hashstr = hashlib.md5( open(f_thumb).read() ).hexdigest()
-            hashstr = mreorg.get_file_sha1hash( f_thumb)
-            opfile2 = output_file_dir + '/' + hashstr + ".png"
-            shutil.copyfile(f_thumb, opfile2)
-            im_obj = SimFileRunOutputImage(
-                    original_name = image_filename,
-                    hash_name = opfile1,
-                    hash_thumbnailname = opfile2,
-                    simulation = simres
-                    )
+                if hashstr == None:
+                    continue
 
+                opfile1 = output_file_dir + '/' + hashstr + '.svg'
+                shutil.copyfile(image_filename, opfile1)
 
-            im_obj.save()
+                f_thumb = image_filename.replace(".svg","thumb.png")
+                os.system('convert %s -resize 400x300 %s'%(
+                             pipes.quote(image_filename),pipes.quote(f_thumb)))
+                hashstr = hashlib.md5( open(f_thumb).read() ).hexdigest()
+                hashstr = mreorg.get_file_sha1hash( f_thumb)
+                opfile2 = output_file_dir + '/' + hashstr + ".png"
+                shutil.copyfile(f_thumb, opfile2)
+                im_obj = SimFileRunOutputImage(
+                        original_name = image_filename,
+                        hash_name = opfile1,
+                        hash_thumbnailname = opfile2,
+                        simulation = simres
+                        )
+
+                im_obj.save()
 
 
 class SimRunInfo(object):

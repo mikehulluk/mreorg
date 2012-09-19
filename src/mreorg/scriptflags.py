@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -27,11 +29,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 
-
 import os
 
 
 class ScriptFlags(object):
+
     """Control the behaviour of matplotlib within scripts using environmental
     variables. This allows the script to act differently if its being used
     for interactive work or for producing the figures as part of a batch run.
@@ -60,15 +62,11 @@ class ScriptFlags(object):
         'MREORG_BATCHRUN',
         'MREORG_ENABLECOVERAGE', 
         'MREORG_CURATION_REENTRYFLAG',
-
         'MREORG_TIMEOUT',
         )
 
-
-
     # Temp Hack: lets turn coverage off!
     ENVVAR_MREORG_ENABLECOVERAGE =  False
-
 
     # Don't call pylab.show() if ...
     MREORG_NOSHOW = ENVVAR_MREORG_NOSHOW or \
@@ -85,19 +83,16 @@ class ScriptFlags(object):
     # Copy, for the sake of interface consistency:
     MREORG_CURATIONRUN = ENVVAR_MREORG_CURATIONRUN
 
-
     # If we are building on read-the-docs, we can't import matplotlib:
     MREORG_DONTIMPORTMATPLOTLIB =  'READTHEDOCS' in os.environ
 
     # Default, lets automatically create directories when they don't exist:
     MREORG_AUTOMAKEDIRS = True
 
-
     # Should we enable coverage:
     MREORG_ENABLECOVERAGE = ENVVAR_MREORG_ENABLECOVERAGE
 
     MREORG_SAVEFIGADDINFO =  ENVVAR_MREORG_SAVEFIGADDINFO
-
 
 
 # Look out for unexpected flags:

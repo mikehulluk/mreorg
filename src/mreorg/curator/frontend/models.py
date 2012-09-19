@@ -38,15 +38,15 @@ from pygments.formatters import HtmlFormatter
 import mreorg
 
 
-
 class Options(object):
+
     MinimumFileCheckInterval = datetime.timedelta(minutes=5)
 
 
-
-
 class SourceSimDir(models.Model):
-    class Meta():
+
+    class Meta:
+
         ordering = ['directory_name']
 
     directory_name = models.CharField(max_length=1000)
@@ -55,11 +55,10 @@ class SourceSimDir(models.Model):
     def does_exist(self):
         return os.path.exists( self.directory_name)
 
-
     @classmethod
     def create(cls, directory_name, should_recurse=True):
 	directory_name = os.path.normpath(directory_name)
-        if SourceSimDir.objects.filter(directory_name = directory_name).count() !=0:
+        if SourceSimDir.objects.filter(directory_name=directory_name).count() !=0:
             return
 
         # Create and save
@@ -67,20 +66,10 @@ class SourceSimDir(models.Model):
         p.save()
 
 
-
 class TrackingStatus(object):
+
     Tracked='Tracked'
     NotTracked='Nottracked'
-
-
-
-
-
-
-
-
-
-
 
 
 class SimFile(models.Model):
@@ -117,7 +106,6 @@ class SimFile(models.Model):
     last_read_docstring = models.CharField(max_length=100000, null=True)
     last_read_htmlcode = models.CharField(max_length=100000, null=True)
 
-
     # Last simulation run:
     last_run = models.ForeignKey('SimFileRun',null=True, related_name='+')
 
@@ -139,6 +127,7 @@ class SimFile(models.Model):
         import dbdata_from_config
         assert False, 'Should call the method directly!'
         return dbdata_from_config.update_all_db(directory)
+
 
 
 
@@ -193,7 +182,7 @@ class SimFile(models.Model):
         if len(runs) == 0:
             return None
         else:
-            return self.get_runs(runconfig=runconfig)[0]
+            return runs[0] #self.get_runs(runconfig=runconfig)[0]
 
     def get_current_checksum(self):
         return mreorg.get_file_sha1hash(self.full_filename)
@@ -202,10 +191,10 @@ class SimFile(models.Model):
         return os.path.split(self.full_filename)[1]
 
     def get_runs(self, runconfig):
-        return SimFileRun.objects. \
-                    filter(simfile=self.id, runconfig=runconfig). \
-                    order_by('-execution_date')
-
+        if runconfig != None:
+            return SimFileRun.objects.filter(simfile=self.id, runconfig=runconfig).order_by('-execution_date')
+        else:
+            return SimFileRun.objects.filter(simfile=self.id).order_by('-execution_date')
 
     def get_status(self, runconfig):
         last_run = self.get_last_run(runconfig)
@@ -222,9 +211,11 @@ class SimFile(models.Model):
 
     def is_queued(self, runconfig):
         return self.simqueueentry_set.filter(runconfig=runconfig).count() != 0
+    def is_currently_running(self, runconfig):
+        return self.simqueueentry_set.filter(runconfig=runconfig, status=SimQueueEntryState.Executing).count() != 0
 
-    def getCSSQueueState(self):
-        p = self.is_queued()
+    def getCSSQueueState(self, runconfig):
+        p = self.is_queued(runconfig=runconfig)
         LUT = { True:'SimQueued',False:'SimNotQueued'}
         return LUT[p]
 
@@ -246,7 +237,7 @@ class RunConfiguration(models.Model):
             runconf = RunConfiguration(name=name, **make_kwargs)
             runconf.save()
         return runconf
-    
+
     class Meta:
         ordering = ('name',)
     name = models.CharField(max_length=10000000)
@@ -290,21 +281,12 @@ class FileGroup(models.Model):
         return self.name in FileGroup.special_groups
 
     def contains_simfile(self, simfile):
-        print 'Does', self.name, 'contain', simfile.full_filename, '?'
+        #print 'Does', self.name, 'contain', simfile.full_filename, '?'
         if self.name == 'all':
             return True
 
         assert not self.is_special(),'NotImplementedYet'
-        print 'simfile', simfile, simfile.full_filename
-
-        for sf in self.simfiles.all():
-            print 'is it: %s' % sf, simfile==sf
-            print sf.full_filename
-
-
-
-        res = simfile in self.simfiles.all()
-        print '  -- Ans', res
+        res = self.simfiles.filter(id=simfile.id).count() > 0
         return res
 
     @classmethod
@@ -318,6 +300,17 @@ class FileGroup(models.Model):
         return cls.get_or_make(name='all')
 
 
+    @property
+    def tracked_files(self):
+        if self.is_special():
+            if self.name == 'all':
+                srclist = SimFile.objects.all()
+            else:
+                assert False,''
+        else:
+            srclist = self.simfiles
+
+        return srclist.filter(tracking_status=TrackingStatus.Tracked)
 
 
 
@@ -424,7 +417,7 @@ class SimQueueEntry(models.Model):
                 print 'Resubmitting'
                 self.status = SimQueueEntryState.Waiting
                 self.save()
-    @classmethod 
+    @classmethod
     def trim_dangling_jobs(cls):
         for queue_entry in SimQueueEntry.objects.all():
             queue_entry.resubmit_if_process_died()

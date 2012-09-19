@@ -32,7 +32,6 @@ import mreorg.config
 this_dir = os.path.dirname(__file__)
 MREORG_ROOTDIR = os.path.join( this_dir,'../../../') #'/home/michael/hw_to_come/libs/mreorg/'
 
-
 # Django settings for simmgr project.
 
 DEBUG = True
@@ -104,15 +103,14 @@ INSTALLED_APPS = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-   "django.contrib.auth.context_processors.auth",
-   "django.core.context_processors.debug",
-   "django.core.context_processors.i18n",
-   "django.core.context_processors.media",
-   "django.core.context_processors.static",
-   "django.core.context_processors.request",
-   "django.contrib.messages.context_processors.messages"
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
    )
 
-
-DAJAXICE_MEDIA_PREFIX = "dajaxice"
+DAJAXICE_MEDIA_PREFIX = 'dajaxice'
 

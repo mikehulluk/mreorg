@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -27,10 +29,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 
-
 import os
 import sys
-
 
 # Ensure our monkey patching takes place first:
 import mreorg.requiredpreimport
@@ -51,12 +51,12 @@ sys.path.append(glob2_src_dir)
 import glob2
 
 __all__ = [
-    "MReOrgConfig",
-    "ScriptFlags",
-    "PlotManager",
-    "PM",
-    "FigFormat",
-    "ensure_directory_exists",
-    "get_file_sha1hash",
-    "glob2"
+    'MReOrgConfig',
+    'ScriptFlags',
+    'PlotManager',
+    'PM',
+    'FigFormat',
+    'ensure_directory_exists',
+    'get_file_sha1hash',
+    'glob2',
 ]

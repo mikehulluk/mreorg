@@ -34,14 +34,13 @@ import pylab
 import mreorg
 from mreorg.utils import ScriptUtils
 
+
 class FigFormat:
 
     EPS = 'eps'
     SVG = 'svg'
     PDF = 'pdf'
     PNG = 'png'
-
-
 
 
 class PlotManager:
@@ -64,12 +63,11 @@ class PlotManager:
         figure=None,
         filename_tmpl=None,
         figtypes=None,
-        remap_dot_to_underscore = False
+        remap_dot_to_underscore=False,
         ):
 
-
         if remap_dot_to_underscore:
-                figname=figname.replace(".","-")
+            figname = figname.replace('.', '-')
 
 #        assert False
 
@@ -91,7 +89,6 @@ class PlotManager:
 
         modname = ScriptUtils.get_calling_script_file(include_ext=False)
 
-
         # Print what we are saving:
         subst_dict = {
             'modulename': modname,
@@ -100,7 +97,6 @@ class PlotManager:
             'figtype': '{%s}' % ','.join(figtypes),
             }
         print 'PlotMnager:Saving ',  filename_tmpl.format(**subst_dict)
-
 
         # For each filetype:
         for figtype in figtypes:
@@ -117,8 +113,6 @@ class PlotManager:
             filename = filename.replace(':', '=')
             assert not ':' in filename, 'For windows compatibility'
 
-
-
             # Save the figure:
             full_filename = os.path.join(os.getcwd(), filename)
             mreorg.ensure_directory_exists(full_filename)
@@ -128,10 +122,8 @@ class PlotManager:
             PlotManager.figures_saved_filenames.append(full_filename)
             #print 'Saving File', filename
 
-
         # Increment the fignum:
         PlotManager.fig_num = PlotManager.fig_num + 1
-
 
     @classmethod
     def save_active_figures(cls):

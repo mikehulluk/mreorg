@@ -35,9 +35,6 @@ from django.conf.urls.defaults import include, patterns
 from dajaxice.core import dajaxice_autodiscover
 dajaxice_autodiscover()
 
-
-
-
 views_mod='mreorg.curator.frontend.views'
 url_patterns = (
     (r'^$', 'mreorg.curator.frontend.views.view_overview'),
