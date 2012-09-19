@@ -6,46 +6,58 @@
 
 
 
+
+
+
+
 {% block contents %}
 
 
 
-{% for filegroup, sim_data in data %}
 
 <div class="section">
 
-    <div class='sectionheader'> <h2>{{filegroup.name}}</h2> </div>
+    <div class='sectionheader'> <h2>{{current_filegroup.name}}</h2> </div>
 
-    {% for sim_file, sim_file_last_run in sim_data %}
+
+{% for simfile in simfiles %}
 
     <div class="subsection">
-        <h3> <a href="/simfiles/{{sim_file.id}}">{{sim_file.get_short_filename}}</a> </h3>
+        <h3> <a href="/simfiles/{{simfile.id}}">{{simfile.get_short_filename}}</a> </h3>
 
 
 
-        {% if sim_file_last_run != None %}
-            {% if sim_file.get_docstring %}
+        {% if simfile.get_last_run %}
+
+
+            {% if simfile.get_docstring %}
             <div class="SummaryFileDescription">
-                <pre> {{sim_file.get_docstring}} </pre>
+                <pre> {{simfile.get_docstring}} </pre>
             </div>
             {% else %}
             <div>(No Docstring)</div>
             {% endif %}
-            {% for i in sim_file_last_run.output_images.all %}
-            <a href="/image/{{i.hash_name_short}}">
-                <img src="/image/{{i.hash_thumbnailname_short}}"/>
-            </a>
-            {% endfor %}
+            {% if not simfile.is_queued %}
+                {% for i in simfile.get_last_run.output_images.all %}
+                <a href="/image/{{i.hash_name_short}}">
+                    <img src="/image/{{i.hash_thumbnailname_short}}"/>
+ 1               </a>
+                {% endfor %}
+            {% else %}
+             (Currently Queued to Run)
+            {% endif %}
         {% else %}
         [Never been run]: 
         {% endif %}
     </div>
-
-
-
-  {% endfor %}
-  </div>
 {% endfor %}
+  </div>
 
 {% endblock  %}
+
+
+
+
+
+
 

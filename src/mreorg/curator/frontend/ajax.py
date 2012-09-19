@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -135,16 +137,16 @@ def overview_update_sim_gui(_request, simfile_id):
     return v
 
 
-
 @dajaxice_register
 def overview_clear_sim_queue(_request):
-    SimQueueEntry.objects.all()\
-            .filter(status = SimQueueEntryState.Waiting)\
-            .delete()
+    ensure_config()
+    SimQueueEntry.objects.all().filter(status=SimQueueEntryState.Waiting).delete()
     return simplejson.dumps({})
+
 
 @dajaxice_register
 def overview_delete_simfile(_request, simfile_id ):
+    ensure_config()
 
     try:
         sim_file = SimFile.get_tracked_sims(id = simfile_id)

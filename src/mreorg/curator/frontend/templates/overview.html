@@ -224,8 +224,8 @@ function countdown_callback(){
             <td class="Toggle interactive"> <a onclick="clickResubmitButton({{sim_file.id}})" > -- </a>  </td>
             <td class="Status" id="SimFileTDStatus{{sim_file.id}}"> {{ sim_file.get_status }} </td>
             <td> <a href="/simfiles/{{sim_file.id}}"> {{sim_file.get_short_filename }} </a> </td>
-            <td> <a id="SimFileLatestRun{{sim_file.id}}" href="/simfileruns/{{sim_file.get_latest_run.id}}">{{sim_file.get_latest_run.execution_date|timesince}} A </a></td>
-            <td> <a id="SimFileLatestRun{{sim_file.id}}">{{sim_file.get_latest_run.execution_time}} s</a></td>
+            <td> <a id="SimFileLatestRun{{sim_file.id}}" href="/simfileruns/{{sim_file.get_last_run.id}}">{{sim_file.get_last_run.execution_date|timesince}} A </a></td>
+            <td> <a id="SimFileLatestRun{{sim_file.id}}">{{sim_file.get_last_run.execution_time}} s</a></td>
             <td> {{sim_file.get_docstring}} </td>
         </tr>
 

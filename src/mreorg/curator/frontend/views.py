@@ -58,26 +58,75 @@ mimetypes.init()
 from django.db import transaction
 
 
-
 def ensure_config(request):
     if not 'current_runconfig' in request.session:
         request.session['current_runconfig'] = RunConfiguration.get_initial()
     if not 'current_filegroup' in request.session:
         request.session['current_filegroup'] = FileGroup.get_initial()
 
+
 def config_processor(request):
     ensure_config(request)
 
-    return { 'runconfigs': RunConfiguration.objects.all(),
-             'filegroups': FileGroup.objects.all(),
-             'current_runconfig': request.session['current_runconfig'],
-             'current_filegroup': request.session['current_filegroup'] }
+    return {
+        'runconfigs': RunConfiguration.objects.all(),
+        'filegroups': FileGroup.objects.all(),
+        'current_runconfig': request.session['current_runconfig'],
+        'current_filegroup': request.session['current_filegroup'],
+        }
+
+
+class SimFileWithRunConfigProxy(object):
+    
+
+    def __init__(self, simfile, runconfig):
+        self.simfile = simfile
+        self.runconfig = runconfig
+
+    def does_file_exist(self):
+        return self.simfile.does_file_exist()
+    def get_docstring(self):
+        return self.simfile.get_docstring()
+    def get_short_filename(self):
+        return self.simfile.get_short_filename()
+    def get_status(self):
+        return self.simfile.get_status(runconfig=self.runconfig)
+    def get_last_executiontime(self):
+        return self.simfile.get_last_executiontime(runconfig=self.runconfig)
+    def is_queued(self):
+        return self.simfile.is_queued(runconfig=self.runconfig)
+    def getCSSQueueState(self):
+        return self.simfile.getCSSQueueState(runconfig=self.runconfig)
+    @property 
+    def full_filename(self):
+        return self.simfile.full_filename
+    @property 
+    def id(self):
+        return self.simfile.id
+    @property 
+    def tracking_status(self):
+        return self.simfile.tracking_status
+    def get_last_run(self):
+        return self.simfile.get_last_run(runconfig=self.runconfig)
+    def __getattr__(self, name):
+        print 'looking for attribute:', name
+        assert False
+
+    def is_currently_running(self):
+        return self.simfile.is_currently_running(self.runconfig)
+        return True
+
+
+def build_proxy_for_sim_files(simfiles, runconfig):
+    return [SimFileWithRunConfigProxy(sim,runconfig) for sim in simfiles]
+
+
 
 
 def view_overview(request):
-
     ensure_config(request)
-    sims =[sim for sim in SimFile.get_tracked_sims() if request.session['current_filegroup'].contains_simfile(sim) ]
+
+    sims = build_proxy_for_sim_files( request.session['current_filegroup'].tracked_files, runconfig= request.session['current_runconfig'] )
     return render_to_response(
             'overview.html',
             RequestContext(request,
@@ -87,6 +136,8 @@ def view_overview(request):
             )
 
 def view_sim_output_summaries(request):
+    ensure_config(request)
+    sims = build_proxy_for_sim_files( request.session['current_filegroup'].tracked_files, runconfig= request.session['current_runconfig'] )
 
     last_runs = {}
     for simfile in SimFile.get_tracked_sims():
@@ -94,21 +145,17 @@ def view_sim_output_summaries(request):
 
     print last_runs
 
-    runconfig = (request.session['current_runconfig'])
-    data =[]
-    for fg in FileGroup.objects.all():
-        sim_data = [ (sim, sim.get_last_run(runconfig)) for sim in fg.simfiles.all() ]
-        data.append( (fg, sim_data) )
-    #cxt_data = {'last_runs':last_runs}
-    cxt_data = {'data':data}
-    print cxt_data
+    runconfig = request.session['current_runconfig']
+    #data =[]
+    #for fg in FileGroup.objects.all():
+    #    sim_data = [ (sim, sim.get_last_run(runconfig)) for sim in fg.simfiles.all() ]
+    #    data.append( (fg, sim_data) )
+    ##cxt_data = {'last_runs':last_runs}
+    cxt_data = {'simfiles':sims}
 
     csrf_context = RequestContext(request, cxt_data, [config_processor] )
     return render_to_response('simulation_output_summaries.html',
                               csrf_context)
-
-
-
 
 
 def view_configurations(request):
@@ -119,14 +166,12 @@ def view_configurations(request):
     return render_to_response('configurations.html', csrf_context)
 
 
-
 def simfilerun_details(request, run_id):
     return render_to_response(
             'simulation_run_details.html',
             RequestContext(request,
                 {'simulationrun': SimFileRun.objects.get(id=run_id) }, 
                 [config_processor] ) )
-
 
 
 def simfile_details(request, simfile_id):
@@ -162,6 +207,7 @@ def do_track_all(request):
         sim.save()
     return HttpResponseRedirect('/tracking')
 
+
 @transaction.commit_on_success
 def do_untrack_all(request):
     for sim in SimFile.get_tracked_sims():
@@ -169,6 +215,7 @@ def do_untrack_all(request):
         sim.save()
 
     return HttpResponseRedirect('/tracking')
+
 
 def do_track_src_dir(request):
     if request.method != 'POST':
@@ -178,13 +225,13 @@ def do_track_src_dir(request):
 			should_recurse='recurse' in request.POST)
     return HttpResponseRedirect('/tracking')
 
+
 def do_untrack_src_dir(request, srcdir_id):
     o = SourceSimDir.objects.get(id=srcdir_id)
     o.delete()
     return HttpResponseRedirect('/tracking')
 
 	
-
 def do_track_rescanfs(request):
     rescan_filesystem()
     #for src_dir in SourceSimDir.objects.all():
@@ -196,7 +243,6 @@ def do_track_rescanfs(request):
 def do_track_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')
-
 
     # Find all keys matching untracked_sim_id_XX, and get the XX's
 
@@ -217,7 +263,6 @@ def do_untrack_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')
 
-
     # Find all keys matching untracked_sim_id_XX, and get the XX's
     print request.POST.keys()
     r = re.compile(r"""simid_(?P<id>\d+)""", re.VERBOSE)
@@ -234,52 +279,44 @@ def do_untrack_sim(request):
     # Update the list of untracked files:
     return do_track_rescanfs(request)
 
+
 # ====================
 
-
-
-
-
-
 def viewsimulationqueue(request):
+    ensure_config(request)
     cxt_data = \
         {'simulation_queue_executing': SimQueueEntry.objects.filter(status=SimQueueEntryState.Executing),
          'simulation_queue': SimQueueEntry.objects.filter(status=SimQueueEntryState.Waiting),
          'latest_runs': SimFileRun.objects.order_by('-execution_date'
          )[0:10]}
 
-
     SimQueueEntry.trim_dangling_jobs()
     #for queue_entry in SimQueueEntry.objects.all():
     #    queue_entry.resubmit_if_process_died()
-
 
     csrf_context = RequestContext(request, cxt_data)
     return render_to_response('view_simulation_queue.html', csrf_context)
 
 
 def view_simulation_failures(request):
-    fileObjs = SimFile.get_tracked_sims()
-
+    ensure_config(request)
+    #runconfig = request.session['current_runconfig']
+    #filegroup = request.session['current_filegroup']
+    #simfiles = [ sim for sim in SimFile.get_tracked_sims() if filegroup.contains_simfile(sim) ]
+    simfiles = build_proxy_for_sim_files( SimFile.get_tracked_sims(), runconfig= None )
     cxt_data = {
-        'failed_simulations': [fo for fo in fileObjs if fo.get_status()
-                               == SimRunStatus.UnhandledException],
-        'timeout_simulations': [fo for fo in fileObjs
-                                if fo.get_status()
-                                == SimRunStatus.TimeOut],
-        'nonzero_exitcode_simulations': [fo for fo in fileObjs
-                if fo.get_status() == SimRunStatus.NonZeroExitCode],
-        'changed_simulations': [fo for fo in fileObjs
-                                if fo.get_status()
-                                == SimRunStatus.FileChanged],
-        'notrun_simulations': [fo for fo in fileObjs if fo.get_status()
-                               == SimRunStatus.NeverBeenRun],
+        'failed_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.UnhandledException],
+        'timeout_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.TimeOut],
+        'nonzero_exitcode_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.NonZeroExitCode],
+        'changed_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.FileChanged], 
+        'notrun_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.NeverBeenRun],
         }
 
 
-    csrf_context = RequestContext(request, cxt_data)
+    csrf_context = RequestContext(request, cxt_data,  [config_processor] )
     return render_to_response('view_simulation_failures.html',
-                              csrf_context)
+                              csrf_context, )
+
 
 
 def doremovesimulationsfromqueue(request):
@@ -325,7 +362,6 @@ def doeditsimfile(request, simfile_id):
         os.system(t)
     os.chdir(cwd)
 
-
     # Return to the previous page:
     referer = request.META.get('HTTP_REFERER', None)
     if referer is None:
@@ -336,9 +372,6 @@ def doeditsimfile(request, simfile_id):
         return HttpResponseRedirect(redirect_to)
     except IndexError:
         return HttpResponseRedirect('/')
-
-
-
 
 
 def get_image_file(request, filename):
