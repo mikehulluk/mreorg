@@ -114,3 +114,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 DAJAXICE_MEDIA_PREFIX = 'dajaxice'
 
+
+import logging
+logging.basicConfig(level=logging.WARNING)

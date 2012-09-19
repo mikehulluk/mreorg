@@ -3,43 +3,53 @@
 
 {% extends "base.html" %}
 
-{#
+
 {% block postbody %}
-
-    <script type="text/javascript">
-    <!--
-    function pageInit(){
-        countdown_callback()
-    }
-
-    window.onload = pageInit
-    -->
+    <script>
+        window.onload = pageInit
     </script>
-
 {% endblock  %}
-#}
-
-
-
 
 
 
 {% block additional_header %}
 <script type="text/javascript">
 
+
+
+
 // Dajax callback functions:
 function pass(data){
 }
 
 
+function pageInit() {
+    <!--countdown_callback() -->
+     refresh_sim_list_view();
+}
+
+
+function update_sim_gui_callback_batch(results)
+{
+    for(var data_index in results){
+            data = results[data_index]
+            var id = data.sim_id;
+            var state = data.state
+            var queued = data.is_queued
+            set_sim_file_status(id, state, queued)
+
+            // Update the Last Run Info and hrefs:
+            var node = document.getElementById("SimFileLatestRun"+id);
+            node.innerHTML =  data.latest_exec_date
+            node.href =  "simfileruns/" + data.latest_exec_id
+    }
+}
 // Scripts local to this page:
 function refresh_sim_list_view() {
-    {% for sim_file in simfiles %}
-    {%if sim_file.does_file_exist %}
-    update_sim_gui({{sim_file.id}})
-    {% endif %}
-    {% endfor %}
+    ids = '{% for sim_file in simfiles %} {{sim_file.id}} {% endfor %} '
+    Dajaxice.mreorg.curator.frontend.overview_update_sim_gui_batch(update_sim_gui_callback_batch, {'simfile_ids':ids})
 }
+
 
 
 function set_sim_file_status(id,state, is_in_queue)
@@ -66,18 +76,12 @@ function set_sim_file_status(id,state, is_in_queue)
 
 }
 
-function clearSimQueueCallback()
-{
-    refresh_sim_list_view();
+
+function clear_sim_queue() {
+    Dajaxice.mreorg.curator.frontend.overview_clear_sim_queue(refresh_sim_list_view);
 }
 
-function clear_sim_queue()
-{
-    Dajaxice.mreorg.curator.frontend.overview_clear_sim_queue(clearSimQueueCallback);
-}
-
-function toggle_sim_for_resubmit(id)
-{
+function toggle_sim_for_resubmit(id) {
     Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simfile_id':id});
 }
 
@@ -118,31 +122,28 @@ function update_sim_gui_callback(data)
     node.href =  "simfileruns/" + data.latest_exec_id
 }
 
-function update_sim_gui(sim_id)
-{
+
+
+function update_sim_gui(sim_id) {
     Dajaxice.mreorg.curator.frontend.overview_update_sim_gui(update_sim_gui_callback, {'simfile_id':sim_id});
 }
 
-function clickResubmitButton( sim_id )
-{
+function clickResubmitButton( sim_id ) {
     toggle_sim_for_resubmit(sim_id);
     update_sim_gui(sim_id);
 }
 
 
-function reloadPage()
-{
+function reloadPage() {
     window.location="/";
 }
 
-function deleteSimFile(id)
-{
-    Dajaxice.mreorg.curator.frontend.overview_delete_simfile(reloadPage, {'simfile_id': id});
+function deleteSimFile(id) {
+    Dajaxice.mreorg.curator.frontend.overview_delete_simfile(reloadPage, {'simfile_id': id} );
 }
 
 
-function deleteNonExistantFiles()
-{
+function deleteNonExistantFiles() {
     {% for sim_file in simfiles %}
     {%if not sim_file.does_file_exist %}
     Dajaxice.mreorg.curator.frontend.overview_delete_simfile(pass, {'simfile_id': {{sim_file.id}} } );
@@ -150,23 +151,20 @@ function deleteNonExistantFiles()
     {% endfor %}
 
     reloadPage();
-
 }
 
 
 var timeOut = 60;
 var time = 0;
 function countdown_callback(){
-
     document.getElementById( "idUpdateBox" ).innerHTML = "Updating in "
-
     if(time ==0){
         time = timeOut;
         refresh_sim_list_view();
     }
     else{
         time = time -1;
-        document.getElementById( "idUpdateBox" ).innerHTML = "Refresh("+ time +")"
+        document.getElementById( "idUpdateBox" ).innerHTML = "Refresh("+ time +")";
     }
     setTimeout("countdown_callback()", 1000);
 }

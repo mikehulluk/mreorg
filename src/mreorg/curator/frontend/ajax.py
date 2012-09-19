@@ -117,6 +117,33 @@ def refreshsimlist(_request):
     return simplejson.dumps({'sim_file_states':states})
 
 
+
+
+@dajaxice_register
+def overview_update_sim_gui_batch(_request, simfile_ids):
+    print simfile_ids
+    simfile_ids = [int(tok) for tok in simfile_ids.split() ]
+    print simfile_ids
+    res = []
+    for simfile_id in simfile_ids:
+        sim_file = SimFile.get_tracked_sims(id = simfile_id)
+        runconfig = _request.session['current_runconfig']
+        last_run = sim_file.get_last_run(runconfig=runconfig)
+        exec_date = last_run.execution_data_string() if last_run is not None else ""
+        res.append(  {'sim_id':simfile_id,
+                     'state':sim_file.get_status(runconfig=runconfig),
+                     'is_queued':sim_file.is_queued(runconfig=runconfig),
+                     'latest_exec_id':last_run.id if last_run else "",
+                     'latest_exec_date': exec_date,
+                    } ) 
+
+    v = simplejson.dumps(res)
+    return v
+
+
+
+
+
 @dajaxice_register
 def overview_update_sim_gui(_request, simfile_id):
     #ensure_config()
