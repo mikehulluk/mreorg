@@ -24,7 +24,7 @@ function pass(data){
 
 
 function pageInit() {
-    <!--countdown_callback() -->
+    countdown_callback()
      refresh_sim_list_view();
 }
 
@@ -32,7 +32,12 @@ function pageInit() {
 function update_sim_gui_callback_batch(results)
 {
     for(var data_index in results){
-            data = results[data_index]
+         if (results.hasOwnProperty(data_index)) {
+            var data = results[data_index]
+            console.log('batch-callback: %d %s', data_index, data) 
+            console.log('\n')
+            update_sim_gui_callback(data)
+            <!--
             var id = data.sim_id;
             var state = data.state
             var queued = data.is_queued
@@ -42,6 +47,8 @@ function update_sim_gui_callback_batch(results)
             var node = document.getElementById("SimFileLatestRun"+id);
             node.innerHTML =  data.latest_exec_date
             node.href =  "simfileruns/" + data.latest_exec_id
+            -->
+         }
     }
 }
 // Scripts local to this page:
@@ -61,10 +68,17 @@ function set_sim_file_status(id,state, is_in_queue)
 
 
     // Set the class, for coloring:
+    var simfile_id_tag = 'SimFileID'+id
+    var simfile_id_obj = document.getElementById('SimFileID'+id)
+    if(!simfile_id_obj){
+        console.log('NOT FOUND! %s', simfile_id_tag)
+    }
+    
     document.getElementById('SimFileID'+id).className = state + " " + is_in_queue_str;
     document.getElementById( "SimFileTDStatus"+id ).innerHTML = state
 
     var textTD = document.getElementById('SimFileID'+id).getElementsByTagName('a')[0];
+    console.log('Setting TextID %s', simfile_id_tag)
     if( is_in_queue )
     {
         textTD.innerHTML = 'Cancel';
@@ -114,6 +128,7 @@ function update_sim_gui_callback(data)
     var state = data.state
     var queued = data.is_queued
 
+    console.log('gui_callback:: id: %s', id)
     set_sim_file_status(id, state, queued)
 
     // Update the Last Run Info and hrefs:

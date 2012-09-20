@@ -138,6 +138,7 @@ def overview_update_sim_gui_batch(_request, simfile_ids):
                     } ) 
 
     v = simplejson.dumps(res)
+    print v
     return v
 
 
