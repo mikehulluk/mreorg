@@ -56,6 +56,9 @@ def base_set_filegroup(request, filegroup_id):
     return simplejson.dumps({})
 
 
+
+
+# Called when a 
 @dajaxice_register
 def overview_resubmit_simfile(_request, simfile_id):
     ensure_config()
@@ -70,6 +73,21 @@ def overview_resubmit_simfile(_request, simfile_id):
                 sim_file=sim_file,
                 runconfig=_request.session['current_runconfig'])
     return simplejson.dumps({})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @dajaxice_register
@@ -109,6 +127,7 @@ def overview_toggle_simfile_for_resubmit(_request, simfile_id):
 
 @dajaxice_register
 def refreshsimlist(_request):
+    assert False, 'Is this used?'
     ensure_config()
     runconfig=_request.session['current_runconfig']
     states = {}
@@ -121,9 +140,12 @@ def refreshsimlist(_request):
 
 @dajaxice_register
 def overview_update_sim_gui_batch(_request, simfile_ids):
-    print simfile_ids
-    simfile_ids = [int(tok) for tok in simfile_ids.split() ]
-    print simfile_ids
+    if isinstance(simfile_ids, int):
+        simfile_ids = [simfile_ids]
+    elif isinstance(simfile_ids, basestring):
+        simfile_ids = [int(tok) for tok in simfile_ids.split() ]
+    else:
+        assert False
     res = []
     for simfile_id in simfile_ids:
         sim_file = SimFile.get_tracked_sims(id = simfile_id)
