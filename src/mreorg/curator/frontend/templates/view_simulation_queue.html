@@ -24,10 +24,13 @@
     <td>  {{latest_run.runconfig.name}} </td>
     <td> <a href="/simfileruns/{{latest_run.id}}">
             <div>{{latest_run.execution_date}}</div>
-            <div>{{latest_run.execution_date|timesince}}</div>
+            <div>({{latest_run.execution_date|timesince}} ago)</div>
         </a>
         </td>
-    <td> {{latest_run.get_status}} </td>
+        <td> 
+            <div> {{latest_run.get_status}} </div>
+            <div> in {{latest_run.execution_time}} seconds </div>
+        </td>
     <td> {{latest_run.simfile.get_docstring}} </td>
 </tr>
 

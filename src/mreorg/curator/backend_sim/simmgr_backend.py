@@ -37,6 +37,7 @@ import datetime
 import subprocess
 import sys
 import signal
+import random
 
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
@@ -53,7 +54,8 @@ def simulate( sim_queue_entry):
     print '   - Updating database'
     sim_queue_entry.status = SimQueueEntryState.Executing
     sim_queue_entry.simulation_start_time = datetime.datetime.now()
-
+    sim_queue_entry.save(force_update=True)
+    
 
 
 
@@ -142,7 +144,7 @@ def _run_backend():
             simulate( queued_objects[0] )
             print 
 
-        time.sleep(sleep_time)
+        time.sleep( random.randint(3,20) )
 
 def run_backend():
     try:

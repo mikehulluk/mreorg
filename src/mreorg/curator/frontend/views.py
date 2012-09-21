@@ -269,8 +269,7 @@ def viewsimulationqueue(request):
     cxt_data = \
         {'simulation_queue_executing': SimQueueEntry.objects.filter(status=SimQueueEntryState.Executing),
          'simulation_queue': SimQueueEntry.objects.filter(status=SimQueueEntryState.Waiting),
-         'latest_runs': SimFileRun.objects.order_by('-execution_date'
-         )[0:10]}
+         'latest_runs': SimFileRun.objects.order_by('-execution_date')[0:10]}
 
     SimQueueEntry.trim_dangling_jobs()
 

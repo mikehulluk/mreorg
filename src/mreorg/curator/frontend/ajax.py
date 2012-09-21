@@ -183,6 +183,8 @@ def refreshsimlist(_request):
 
 @dajaxice_register
 def overview_update_sim_gui_batch(_request, simfile_ids):
+    ensure_config()
+
     if isinstance(simfile_ids, int):
         simfile_ids = [simfile_ids]
     elif isinstance(simfile_ids, basestring):
@@ -191,7 +193,16 @@ def overview_update_sim_gui_batch(_request, simfile_ids):
         assert False
     res = []
     for simfile_id in simfile_ids:
-        sim_file = SimFile.get_tracked_sims(id = simfile_id)
+
+        try:
+            sim_file = SimFile.get_tracked_sims(id = simfile_id)
+        except SimFile.DoesNotExist:
+            continue
+
+        if not sim_file.does_file_exist():
+            sim_file.delete()
+            continue
+
         runconfig = _request.session['current_runconfig']
         last_run = sim_file.get_last_run(runconfig=runconfig)
         exec_date = last_run.execution_data_string() if last_run is not None else ""
@@ -201,7 +212,6 @@ def overview_update_sim_gui_batch(_request, simfile_ids):
                      'latest_exec_id':last_run.id if last_run else "",
                      'latest_exec_date': str(exec_date),
                      'latest_exec_duration': last_run.execution_time if last_run else '' ,
-                     #'latest_exec_date_unix': 
                     } ) 
 
     v = simplejson.dumps(res)

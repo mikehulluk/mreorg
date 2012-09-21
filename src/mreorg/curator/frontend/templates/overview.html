@@ -45,7 +45,6 @@ function update_table_entry(status_info)
 {
     var id = status_info.sim_id;
     var state = status_info.state
-    //var queued = status_info.is_queued
     var is_in_queue = status_info.is_queued
 
     // set_sim_file_status(id, state, queued)
@@ -58,24 +57,21 @@ function update_table_entry(status_info)
     // Set the class, for coloring:
     var simfile_id_tag = 'SimFileID'+id
     var simfile_id_obj = document.getElementById('SimFileID'+id)
-    //if(!simfile_id_obj){
-    //    console.log('NOT FOUND! %s', simfile_id_tag)
-    //}
 
     document.getElementById('SimFileID'+id).className = state + " " + is_in_queue_str;
     document.getElementById( "SimFileTDStatus"+id ).innerHTML = state
 
     var textTD = document.getElementById('SimFileID'+id).getElementsByTagName('a')[0];
-    if( is_in_queue )
-    {
+    if( is_in_queue ) {
         textTD.innerHTML = 'Cancel';
     }
-    else
-    {
+    else {
         textTD.innerHTML = 'Run';
     }
-    var node = document.getElementById("SimFileLatestRun"+id)
+
+
     // Update the Last Run Info and hrefs:
+    var node = document.getElementById("SimFileLatestRun"+id)
     var day = moment(status_info.latest_exec_date, "YYYY-MM-DD HH:mm");
     node.innerHTML =  status_info.latest_exec_date
     if( day ){
@@ -87,10 +83,6 @@ function update_table_entry(status_info)
     if( duration ){
         node.innerHTML =  duration.humanize()
     }
-    //d = Date.parse(status_info.latest_exec_date)
-    //var d = new Date(year, month [, date [, hours[, minutes[, seconds[, ms]]]]])
-    //var d = new Date(year, month [, date [, hours[, minutes[, seconds[, ms]]]]])
-//2012-09-20 11:51
     node.href =  "simfileruns/" + status_info.latest_exec_id
 }
 
