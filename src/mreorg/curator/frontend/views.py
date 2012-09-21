@@ -301,6 +301,7 @@ def doremovesimulationsfromqueue(request):
 
 
 def do_queue_add_sims(request):
+    ensure_config(request)
     if not request.method == 'POST':
         return HttpResponseRedirect('/viewsimulationqueue')
 
@@ -310,10 +311,12 @@ def do_queue_add_sims(request):
     sim_id_matches = [r.match(k) for k in request.POST]
     sim_ids = [int(m.groupdict()['id']) for m in sim_id_matches if m]
 
+    runconfig=request.session['current_runconfig']
+
     for simfile_id in sim_ids:
         sim_file = SimFile.get_tracked_sims(id = simfile_id)
 
-        qe = SimQueueEntry(simfile=sim_file)
+        qe = SimQueueEntry(simfile=sim_file, runconfig=runconfig)
         qe.save()
 
         # Avoid Duplication

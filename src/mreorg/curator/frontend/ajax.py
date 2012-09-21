@@ -199,7 +199,9 @@ def overview_update_sim_gui_batch(_request, simfile_ids):
                      'state':sim_file.get_status(runconfig=runconfig),
                      'is_queued':sim_file.is_queued(runconfig=runconfig),
                      'latest_exec_id':last_run.id if last_run else "",
-                     'latest_exec_date': exec_date,
+                     'latest_exec_date': str(exec_date),
+                     'latest_exec_duration': last_run.execution_time if last_run else '' ,
+                     #'latest_exec_date_unix': 
                     } ) 
 
     v = simplejson.dumps(res)

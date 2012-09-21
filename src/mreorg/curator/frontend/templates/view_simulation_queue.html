@@ -19,11 +19,15 @@
   <th> DocString </th>
 </tr>
 {% for latest_run in latest_runs %}
-<tr class="{{ latest_run.simfile.get_status}}">
+<tr class="{{ latest_run.get_status}}">
     <td> <a href="/simfiles/{{latest_run.simfile.id}}"> {{latest_run.simfile.get_short_filename }} </a> </td>
     <td>  {{latest_run.runconfig.name}} </td>
-    <td> <a href="/simfileruns/{{latest_run.simfile.get_latest_run.id}}">{{latest_run.simfile.get_latest_run.execution_date}} </td>
-    <td> {{latest_run.simfile.get_latest_run.get_status}} </td>
+    <td> <a href="/simfileruns/{{latest_run.id}}">
+            <div>{{latest_run.execution_date}}</div>
+            <div>{{latest_run.execution_date|timesince}}</div>
+        </a>
+        </td>
+    <td> {{latest_run.get_status}} </td>
     <td> {{latest_run.simfile.get_docstring}} </td>
 </tr>
 

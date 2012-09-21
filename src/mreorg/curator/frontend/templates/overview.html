@@ -74,10 +74,23 @@ function update_table_entry(status_info)
     {
         textTD.innerHTML = 'Run';
     }
-
-    // Update the Last Run Info and hrefs:
     var node = document.getElementById("SimFileLatestRun"+id)
+    // Update the Last Run Info and hrefs:
+    var day = moment(status_info.latest_exec_date, "YYYY-MM-DD HH:mm");
     node.innerHTML =  status_info.latest_exec_date
+    if( day ){
+        node.innerHTML =  day.fromNow();
+    }
+
+    var node = document.getElementById("SimFileLatestRunTime"+id)
+    var duration = moment.duration(status_info.latest_exec_duration, 'seconds');
+    if( duration ){
+        node.innerHTML =  duration.humanize()
+    }
+    //d = Date.parse(status_info.latest_exec_date)
+    //var d = new Date(year, month [, date [, hours[, minutes[, seconds[, ms]]]]])
+    //var d = new Date(year, month [, date [, hours[, minutes[, seconds[, ms]]]]])
+//2012-09-20 11:51
     node.href =  "simfileruns/" + status_info.latest_exec_id
 }
 
@@ -214,7 +227,7 @@ function countdown_callback(){
             <td class="Status" id="SimFileTDStatus{{sim_file.id}}"> {{ sim_file.get_status }} </td>
             <td> <a href="/simfiles/{{sim_file.id}}"> {{sim_file.get_short_filename }} </a> </td>
             <td> <a id="SimFileLatestRun{{sim_file.id}}" href="/simfileruns/{{sim_file.get_last_run.id}}">{{sim_file.get_last_run.execution_date|timesince}} A </a></td>
-            <td> <a id="SimFileLatestRun{{sim_file.id}}">{{sim_file.get_last_run.execution_time}} s</a></td>
+            <td> <a id="SimFileLatestRunTime{{sim_file.id}}">{{sim_file.get_last_run.execution_time}} s</a></td>
             <td> {{sim_file.get_docstring}} </td>
         </tr>
 
