@@ -39,6 +39,8 @@ from mreorg.curator.frontend.models import RunConfiguration
 from mreorg.curator.frontend.models import FileGroup
 #from mreorg.curator.frontend.views import ensure_config
 
+from django.db import transaction
+
 def ensure_config():
     pass
 
@@ -75,6 +77,47 @@ def overview_resubmit_simfile(_request, simfile_id):
     return simplejson.dumps({})
 
 
+@dajaxice_register
+@transaction.commit_on_success
+def update_queue(_request, action):
+    ensure_config()
+
+    if action == 'clear-all':
+        SimQueueEntry.objects.filter(status=SimQueueEntryState.Waiting).delete()
+
+    elif action == 'add-all':
+        for sim_file in SimFile.get_tracked_sims():
+            if not sim_file.simqueueentry_set.count():
+                SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
+
+    elif action == 'add-all-failures':
+        for sim_file in SimFile.get_tracked_sims():
+            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Sucess:
+                continue
+            if not sim_file.simqueueentry_set.count():
+                SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
+
+    elif action == 'add-all-failures-not-timeout':
+
+        for sim_file in SimFile.get_tracked_sims():
+            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Sucess:
+                continue
+            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.TimeOut:
+                continue
+            if not sim_file.simqueueentry_set.count():
+                SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
+
+    elif action == 'add-all-changed':
+        for sim_file in SimFile.get_tracked_sims():
+            if not sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.FileChanged:
+                continue
+            if not sim_file.simqueueentry_set.count():
+                SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
+
+    else:
+        assert False
+
+    return simplejson.dumps({})
 
 
 

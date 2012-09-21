@@ -15,13 +15,27 @@
         <form action='/do/queue/add_sims/' method='post'>
         {% csrf_token %}
         <table class='std'>
+        <!--
+        <col width='5%'/>
+        <col width='30%'/> 
+        <col width='10%'/> 
+        <col width='15%'/> 
+        <col width='40%'/> 
+        -->
+
+
+        <col width='5'/>
+        <col width='30'/> 
+        <!--<col width='10'/> -->
+        <!--<col width='15'/> -->
+        <col width='40'/> 
 
         <tr>
         <th/>
         <th> File </th>
-        <th> Last Run </th>
-        <th> Result </th>
-        <th> Docstring </th>
+        <!--<th> Last Run </th> -->
+        <!--<th> Exception </th> -->
+        <th> Details </th>
         </tr>
 
 
@@ -29,12 +43,14 @@
         {% for sim_file in failed_simulations %}
         <tr class="{{ sim_file.get_status}}">
             <td> <input type="checkbox" name="simid_{{sim_file.id}}"/> </td>
-            <td> <a href="/simfiles/{{sim_file.id}}"> {{sim_file.get_short_filename }} </a> </td>
-            <td> <a href="/simfileruns/{{sim_file.get_last_run.id}}">{{sim_file.get_last_run.execution_date}} </td>
-            <td> {{sim_file.get_last_run.get_status}} </td>
-            <td> {{sim_file.get_last_run.exception_type}} </td>
-            <td> <pre>{{sim_file.get_last_run.exception_traceback}} </pre></td>
-            <td> {{sim_file.get_docstring}} </td>
+            <td> 
+                <div><a href="/simfiles/{{sim_file.id}}"> {{sim_file.get_short_filename }} </a> </div>
+                <div><a href="/simfileruns/{{sim_file.get_last_run.id}}">(Last run {{sim_file.get_last_run.execution_date|timesince}} ago)</a></div>
+            </td>
+            <td>
+                <div>Exception: {{sim_file.get_last_run.exception_type}}</div>
+                <div><pre>{{sim_file.get_last_run.exception_traceback}} </pre></div>
+            </td>
         </tr>
         {% endfor %}
 

@@ -138,21 +138,7 @@ def view_overview(request):
 def view_sim_output_summaries(request):
     ensure_config(request)
     sims = build_proxy_for_sim_files( request.session['current_filegroup'].tracked_files, runconfig= request.session['current_runconfig'] )
-
-    last_runs = {}
-    for simfile in SimFile.get_tracked_sims():
-        last_runs[simfile] = simfile.get_last_run(request.session['current_runconfig'])
-
-    print last_runs
-
-    runconfig = request.session['current_runconfig']
-    #data =[]
-    #for fg in FileGroup.objects.all():
-    #    sim_data = [ (sim, sim.get_last_run(runconfig)) for sim in fg.simfiles.all() ]
-    #    data.append( (fg, sim_data) )
-    ##cxt_data = {'last_runs':last_runs}
     cxt_data = {'simfiles':sims}
-
     csrf_context = RequestContext(request, cxt_data, [config_processor] )
     return render_to_response('simulation_output_summaries.html',
                               csrf_context)
@@ -160,7 +146,6 @@ def view_sim_output_summaries(request):
 
 def view_configurations(request):
     ensure_config(request)
-
     cxt_data = {}
     csrf_context = RequestContext(request, cxt_data, [config_processor])
     return render_to_response('configurations.html', csrf_context)
@@ -207,7 +192,6 @@ def do_track_all(request):
         sim.save()
     return HttpResponseRedirect('/tracking')
 
-
 @transaction.commit_on_success
 def do_untrack_all(request):
     for sim in SimFile.get_tracked_sims():
@@ -234,8 +218,6 @@ def do_untrack_src_dir(request, srcdir_id):
 	
 def do_track_rescanfs(request):
     rescan_filesystem()
-    #for src_dir in SourceSimDir.objects.all():
-    #    SimFile.update_all_db(src_dir.directory_name)
     return HttpResponseRedirect('/tracking')
 
 
@@ -291,8 +273,6 @@ def viewsimulationqueue(request):
          )[0:10]}
 
     SimQueueEntry.trim_dangling_jobs()
-    #for queue_entry in SimQueueEntry.objects.all():
-    #    queue_entry.resubmit_if_process_died()
 
     csrf_context = RequestContext(request, cxt_data)
     return render_to_response('view_simulation_queue.html', csrf_context)
@@ -300,9 +280,6 @@ def viewsimulationqueue(request):
 
 def view_simulation_failures(request):
     ensure_config(request)
-    #runconfig = request.session['current_runconfig']
-    #filegroup = request.session['current_filegroup']
-    #simfiles = [ sim for sim in SimFile.get_tracked_sims() if filegroup.contains_simfile(sim) ]
     simfiles = build_proxy_for_sim_files( SimFile.get_tracked_sims(), runconfig= None )
     cxt_data = {
         'failed_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.UnhandledException],

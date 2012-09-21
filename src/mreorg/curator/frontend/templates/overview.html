@@ -66,7 +66,6 @@ function update_table_entry(status_info)
     document.getElementById( "SimFileTDStatus"+id ).innerHTML = state
 
     var textTD = document.getElementById('SimFileID'+id).getElementsByTagName('a')[0];
-    console.log('Setting TextID %s', simfile_id_tag)
     if( is_in_queue )
     {
         textTD.innerHTML = 'Cancel';
@@ -93,58 +92,46 @@ function update_sim_gui_callback_batch(results)
     }
 }
 
-// Scripts local to this page:
+// Functions that call ajax on the server:
 function refresh_simfile_status_all() {
     ids = '{% for sim_file in simfiles %} {{sim_file.id}} {% endfor %} '
     Dajaxice.mreorg.curator.frontend.overview_update_sim_gui_batch(update_sim_gui_callback_batch, {'simfile_ids':ids})
+    refresh_time_until_next = refresh_interval
 }
 function refresh_simfile_status_single(sim_id) {
     Dajaxice.mreorg.curator.frontend.overview_update_sim_gui_batch(update_sim_gui_callback_batch, {'simfile_ids':sim_id});
 }
 
-
-
-
-
-function clear_sim_queue() {
-    Dajaxice.mreorg.curator.frontend.overview_clear_sim_queue(refresh_simfile_status_all);
+function update_queue(action) {
+    Dajaxice.mreorg.curator.frontend.update_queue(refresh_simfile_status_all, {'action':action});
 }
 
+function queue_clear_all() {
+    update_queue('clear-all')
+}
+function queue_resubmit_all_sims() {
+    update_queue('add-all')
+}
+function queue_resubmit_all_failures() {
+    update_queue('add-all-failures')
+}
+function queue_resubmit_all_failures_not_timeout() {
+    update_queue('add-all-failures-not-timeout')
+}
+function queue_resubmit_all_changed() {
+    update_queue('add-all-changed')
+}
+
+
+// Called when the simulation is clicked:
 function toggle_sim_for_resubmit(id) {
     Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simfile_id':id});
-}
-
-
-
-function resubmit_all_sims()
-{
-    {% for sim_file in simfiles %}
-        {%if sim_file.does_file_exist %}
-            Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile(pass, {'simfile_id':{{sim_file.id}} });
-            refresh_simfile_status_single({{sim_file.id}})
-        {% endif %}
-    {% endfor %}
-}
-
-function resubmit_all_failures()
-{
-
-    {% for sim_file in simfiles %}
-    {%if sim_file.does_file_exist %}
-        Dajaxice.mreorg.curator.frontend.overview_resubmit_simfile_if_failure(pass, {'simfile_id':{{sim_file.id}} });
-        refresh_simfile_status_single({{sim_file.id}})
-    {%endif %}
-    {% endfor %}
+    refresh_simfile_status_single(id);
 }
 
 
 
 
-
-function clickResubmitButton( sim_id ) {
-    toggle_sim_for_resubmit(sim_id);
-    refresh_simfile_status_single(sim_id);
-}
 
 
 function reloadPage() {
@@ -156,28 +143,17 @@ function deleteSimFile(id) {
 }
 
 
-function deleteNonExistantFiles() {
-    {% for sim_file in simfiles %}
-    {%if not sim_file.does_file_exist %}
-    Dajaxice.mreorg.curator.frontend.overview_delete_simfile(pass, {'simfile_id': {{sim_file.id}} } );
-    {% endif %}
-    {% endfor %}
-
-    reloadPage();
-}
-
-
-var timeOut = 60;
-var time = 0;
+var refresh_interval = 60;
+var refresh_time_until_next = 0;
 function countdown_callback(){
-    document.getElementById( "idUpdateBox" ).innerHTML = "Updating in "
-    if(time ==0){
-        time = timeOut;
+    document.getElementById( "refresh_span" ).innerHTML = "Updating in "
+    if(refresh_time_until_next ==0){
+        refresh_time_until_next = refresh_interval;
         refresh_simfile_status_all();
     }
     else{
-        time = time -1;
-        document.getElementById( "idUpdateBox" ).innerHTML = "Refresh("+ time +")";
+        refresh_time_until_next = refresh_time_until_next -1;
+        document.getElementById( "refresh_span" ).innerHTML = "Refresh("+ refresh_time_until_next +")";
     }
     setTimeout("countdown_callback()", 1000);
 }
@@ -203,10 +179,12 @@ function countdown_callback(){
           <div class='actionbar'>
               <div class='inner'>
                   <ul>
-                      <li> <a onclick="resubmit_all_sims()"><span>Submit-All<span></span></a></li>
-                      <li> <a onclick="resubmit_all_failures()"><span>Submit-Failures<span></span></a></li>
-                      <li> <a onclick="clear_sim_queue();" ><span>Clear-Queue</span></a></li>
-                      <li> <a onclick="refresh_simfile_status_all()" ><span id='idUpdateBox'>Refresh</span></a></li>
+                      <li> <a onclick="queue_resubmit_all_sims()"><span>Submit-All<span></span></a></li>
+                      <li> <a onclick="queue_resubmit_all_failures()"><span>Submit-Failures<span></span></a></li>
+                      <li> <a onclick="queue_resubmit_all_failures_not_timeout()"><span>Submit-Failures (Not Timeout)<span></span></a></li>
+                      <li> <a onclick="queue_resubmit_all_changed()"><span>Submit-Changed<span></span></a></li>
+                      <li> <a onclick="queue_clear_all();" ><span>Clear-Queue</span></a></li>
+                      <li> <a onclick="refresh_simfile_status_all()" ><span id='refresh_span'>Refresh</span></a></li>
                   </ul>
               </div>
           </div>
@@ -221,9 +199,9 @@ function countdown_callback(){
         <tr>
           <th width="5%"> Queue</th>
           <th width="10%"> Status </th>
-          <th width="20%"> File </th>
-          <th width="5%"> Last Run </th>
-          <th width="5%"> Sim Time </th>
+          <th width="15%"> File </th>
+          <th width="15%"> Last Run </th>
+          <th width="10%"> Sim Time </th>
           <th width="30%"> DocString </th>
         </tr>
 
@@ -232,7 +210,7 @@ function countdown_callback(){
 
         {% if sim_file.does_file_exist %}
         <tr class="" id="SimFileID{{sim_file.id}}">
-            <td class="Toggle interactive"> <a onclick="clickResubmitButton({{sim_file.id}})" > -- </a>  </td>
+            <td class="Toggle interactive"> <a onclick="toggle_sim_for_resubmit({{sim_file.id}})" > -- </a>  </td>
             <td class="Status" id="SimFileTDStatus{{sim_file.id}}"> {{ sim_file.get_status }} </td>
             <td> <a href="/simfiles/{{sim_file.id}}"> {{sim_file.get_short_filename }} </a> </td>
             <td> <a id="SimFileLatestRun{{sim_file.id}}" href="/simfileruns/{{sim_file.get_last_run.id}}">{{sim_file.get_last_run.execution_date|timesince}} A </a></td>
