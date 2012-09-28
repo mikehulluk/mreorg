@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (cxt_data) 2012 Michael Hull.
 # All rights reserved.
@@ -58,7 +59,6 @@ mimetypes.init()
 from django.db import transaction
 
 
-
 def ensure_config(request):
     if not 'current_runconfig' in request.session:
         request.session['current_runconfig'] = RunConfiguration.get_initial()
@@ -68,10 +68,12 @@ def ensure_config(request):
 def config_processor(request):
     ensure_config(request)
 
-    return { 'runconfigs': RunConfiguration.objects.all(),
-             'filegroups': FileGroup.objects.all(),
-             'current_runconfig': request.session['current_runconfig'],
-             'current_filegroup': request.session['current_filegroup'] }
+    return {
+        'runconfigs': RunConfiguration.objects.all(),
+        'filegroups': FileGroup.objects.all(),
+        'current_runconfig': request.session['current_runconfig'],
+        'current_filegroup': request.session['current_filegroup'],
+        }
 
 
 def view_overview(request):
@@ -94,21 +96,18 @@ def view_sim_output_summaries(request):
 
     print last_runs
 
-    runconfig = (request.session['current_runconfig'])
-    data =[]
+    runconfig = request.session['current_runconfig']
+    data = []
     for fg in FileGroup.objects.all():
-        sim_data = [ (sim, sim.get_last_run(runconfig)) for sim in fg.simfiles.all() ]
-        data.append( (fg, sim_data) )
+        sim_data = [(sim, sim.get_last_run(runconfig)) for sim in fg.simfiles.all() ]
+        data.append((fg, sim_data))
     #cxt_data = {'last_runs':last_runs}
     cxt_data = {'data':data}
     print cxt_data
 
-    csrf_context = RequestContext(request, cxt_data, [config_processor] )
+    csrf_context = RequestContext(request, cxt_data, [config_processor])
     return render_to_response('simulation_output_summaries.html',
                               csrf_context)
-
-
-
 
 
 def view_configurations(request):
@@ -117,7 +116,6 @@ def view_configurations(request):
     cxt_data = {}
     csrf_context = RequestContext(request, cxt_data, [config_processor])
     return render_to_response('configurations.html', csrf_context)
-
 
 
 def simfilerun_details(request, run_id):
@@ -162,6 +160,7 @@ def do_track_all(request):
         sim.save()
     return HttpResponseRedirect('/tracking')
 
+
 @transaction.commit_on_success
 def do_untrack_all(request):
     for sim in SimFile.get_tracked_sims():
@@ -169,6 +168,7 @@ def do_untrack_all(request):
         sim.save()
 
     return HttpResponseRedirect('/tracking')
+
 
 def do_track_src_dir(request):
     if request.method != 'POST':
@@ -178,17 +178,15 @@ def do_track_src_dir(request):
 			should_recurse='recurse' in request.POST)
     return HttpResponseRedirect('/tracking')
 
+
 def do_untrack_src_dir(request, srcdir_id):
     o = SourceSimDir.objects.get(id=srcdir_id)
     o.delete()
     return HttpResponseRedirect('/tracking')
 
-	
 
 def do_track_rescanfs(request):
     rescan_filesystem()
-    #for src_dir in SourceSimDir.objects.all():
-    #    SimFile.update_all_db(src_dir.directory_name)
     return HttpResponseRedirect('/tracking')
 
 
@@ -196,7 +194,6 @@ def do_track_rescanfs(request):
 def do_track_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')
-
 
     # Find all keys matching untracked_sim_id_XX, and get the XX's
 
@@ -217,7 +214,6 @@ def do_untrack_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')
 
-
     # Find all keys matching untracked_sim_id_XX, and get the XX's
     print request.POST.keys()
     r = re.compile(r"""simid_(?P<id>\d+)""", re.VERBOSE)
@@ -234,12 +230,8 @@ def do_untrack_sim(request):
     # Update the list of untracked files:
     return do_track_rescanfs(request)
 
+
 # ====================
-
-
-
-
-
 
 def viewsimulationqueue(request):
     cxt_data = \
@@ -248,10 +240,7 @@ def viewsimulationqueue(request):
          'latest_runs': SimFileRun.objects.order_by('-execution_date'
          )[0:10]}
 
-
     SimQueueEntry.trim_dangling_jobs()
-    #for queue_entry in SimQueueEntry.objects.all():
-    #    queue_entry.resubmit_if_process_died()
 
 
     csrf_context = RequestContext(request, cxt_data)
@@ -276,7 +265,6 @@ def view_simulation_failures(request):
                                == SimRunStatus.NeverBeenRun],
         }
 
-
     csrf_context = RequestContext(request, cxt_data)
     return render_to_response('view_simulation_failures.html',
                               csrf_context)
@@ -297,24 +285,20 @@ def do_queue_add_sims(request):
     sim_ids = [int(m.groupdict()['id']) for m in sim_id_matches if m]
 
     for simfile_id in sim_ids:
-        sim_file = SimFile.get_tracked_sims(id = simfile_id)
+        sim_file = SimFile.get_tracked_sims(id=simfile_id)
 
         qe = SimQueueEntry(simfile=sim_file)
         qe.save()
 
         # Avoid Duplication
     return HttpResponseRedirect('/viewsimulationqueue')
-# ==================================
-
-
-
 
 
 
 def doeditsimfile(request, simfile_id):
 
-    #Open up the file in an editor:
-    sim_file = SimFile.get_tracked_sims(id = simfile_id)
+    # Open up the file in an editor:
+    sim_file = SimFile.get_tracked_sims(id=simfile_id)
 
     cwd = os.getcwd()
     os.chdir( os.path.split(sim_file.full_filename)[0])
@@ -324,7 +308,6 @@ def doeditsimfile(request, simfile_id):
         t = string.Template(cxt_data).substitute(**data_dict)
         os.system(t)
     os.chdir(cwd)
-
 
     # Return to the previous page:
     referer = request.META.get('HTTP_REFERER', None)
@@ -336,9 +319,6 @@ def doeditsimfile(request, simfile_id):
         return HttpResponseRedirect(redirect_to)
     except IndexError:
         return HttpResponseRedirect('/')
-
-
-
 
 
 def get_image_file(request, filename):

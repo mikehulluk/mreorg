@@ -1,12 +1,15 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import models
 from django.db import transaction
 import os
 import mreorg
 
+
 def from_default_monitor_dirs():
-    #default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
-    #for fgname, fgglobs in default_filegroups.iteritems():
+    # default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
+    # for fgname, fgglobs in default_filegroups.iteritems():
     pass
 
 
@@ -15,11 +18,11 @@ def from_default_monitor_dirs():
 def update_all_db(cls, directory):
 
     print 'Updating untracked simulation files', directory
-    for (dirpath, dirnames, filenames) in os.walk( directory ):
+    for (dirpath, dirnames, filenames) in os.walk(directory):
         for filename in filenames:
-            if not filename.endswith(".py"):
+            if not filename.endswith('.py'):
                 continue
-            full_filename = os.path.join( dirpath, filename ) 
+            full_filename = os.path.join(dirpath, filename)
             if mreorg.MReOrgConfig.is_non_curated_file(filename):
                 continue
             if mreorg.MReOrgConfig.is_non_curated_file(full_filename):
@@ -81,13 +84,9 @@ def update_db_from_config():
         print 'Finished Reconfiguring'
 
 
-
-
-
 def rescan_filesystem():
     for src_dir in models.SourceSimDir.objects.all():
         models.SimFile.update_all_db(src_dir.directory_name)
-
 
 
 def mh_adddefault_locations():

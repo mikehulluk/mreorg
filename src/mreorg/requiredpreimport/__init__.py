@@ -1,4 +1,6 @@
-#----------------------------------------------------------------------
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -25,7 +27,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 import os
 import mreorg
@@ -61,27 +63,26 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     matplotlib.pylab.show = show
     pylab.show = show
 
-
     # Monkey-Patch 'matplotlib.savefig()' and 'pylab.savefig()', allowing us
     # to save to directories that don't exist by automatically creating them:
     orig_mplsavefig = matplotlib.pylab.savefig
 
+
     def savefig(filename, *args, **kwargs):
         if ScriptFlags.MREORG_SAVEFIGADDINFO:
             F = pylab.gcf()
-            x,y = F.get_size_inches()
-            txt = 'Size: x=%2.2f y=%2.2f (inches)' % (x,y) 
+            (x, y) = F.get_size_inches()
+            txt = 'Size: x=%2.2f y=%2.2f (inches)' % (x, y)
             txt += '\n' + filename.split('/')[-1]
             pylab.figtext(0.0, 0.5, txt, backgroundcolor='white')
-
 
         if ScriptFlags.MREORG_AUTOMAKEDIRS:
             mreorg.ensure_directory_exists(filename)
         return orig_mplsavefig(filename, *args, **kwargs)
+
+
     matplotlib.pylab.savefig = savefig
     pylab.savefig = savefig
-
-
 
 
 
@@ -99,10 +100,4 @@ if ScriptFlags.MREORG_ENABLECOVERAGE:
 if ScriptFlags.MREORG_CURATIONRUN:
     from mreorg.curator.backend_sim.db_writer_hooks import CurationSimDecorator
     CurationSimDecorator.activate()
-
-
-
-
-
-
 

@@ -1,4 +1,6 @@
-#----------------------------------------------------------------------
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -25,7 +27,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 import sys
 
@@ -40,5 +42,5 @@ passing it your settings module.\n(If the file settings.py does indeed exist,
 it's causing an ImportError somehow.)\n""" % __file__)
     sys.exit(1)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     execute_manager(settings)

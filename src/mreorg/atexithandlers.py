@@ -1,4 +1,6 @@
-#----------------------------------------------------------------------
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -25,14 +27,12 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 
+class AtExitHandler(object):
 
-
-class AtExitHandler():
-    """
-    Class that allows us to order the function calls made it 'atexit'.
+    """ Class that allows us to order the function calls made it 'atexit'.
     We need to do this to get the ordering write when writing to database.
     """
 
@@ -44,12 +44,11 @@ class AtExitHandler():
 
     @classmethod
     def at_exit(cls, *args, **kwargs):
-        for _priority, handler in sorted(cls._handlers):
+        for (_priority, handler) in sorted(cls._handlers):
             handler(*args, **kwargs)
-
 
 
 # Hook in this handler into the
 # python atexit handler:
 import atexit
-atexit.register( AtExitHandler.at_exit )
+atexit.register(AtExitHandler.at_exit)

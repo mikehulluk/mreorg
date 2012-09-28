@@ -1,4 +1,6 @@
-#----------------------------------------------------------------------
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -25,7 +27,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 import os
 import datetime
 import StringIO
@@ -38,14 +40,15 @@ from pygments.formatters import HtmlFormatter
 import mreorg
 
 
-
 class Options(object):
+
     MinimumFileCheckInterval = datetime.timedelta(minutes=5)
 
 
 
 
 class SourceSimDir(models.Model):
+
     class Meta():
         ordering = ['directory_name']
 
@@ -53,13 +56,12 @@ class SourceSimDir(models.Model):
     should_recurse = models.BooleanField()
 
     def does_exist(self):
-        return os.path.exists( self.directory_name)
-
+        return os.path.exists(self.directory_name)
 
     @classmethod
     def create(cls, directory_name, should_recurse=True):
 	directory_name = os.path.normpath(directory_name)
-        if SourceSimDir.objects.filter(directory_name = directory_name).count() !=0:
+        if SourceSimDir.objects.filter(directory_name=directory_name).count() !=0:
             return
 
         # Create and save
@@ -67,19 +69,10 @@ class SourceSimDir(models.Model):
         p.save()
 
 
-
 class TrackingStatus(object):
+
     Tracked='Tracked'
     NotTracked='Nottracked'
-
-
-
-
-
-
-
-
-
 
 
 
