@@ -39,9 +39,9 @@ MREORG_ROOTDIR = os.path.join(this_dir,'../../../')
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-#ADMINS = (
-#    # ('Your Name', 'your_email@domain.com'),
-#)
+ADMINS = (
+    # ('Your Name', 'your_email@domain.com'),
+)
 
 MANAGERS = ADMINS
 

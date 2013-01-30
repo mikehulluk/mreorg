@@ -77,7 +77,7 @@ def extract_docstring_from_fileobj(fileobj):
             return text.strip()
         else:
             tokenname = token.tok_name[tok]
-			msg = 'Unexpected token %s (%s)' % (tokenname, tok)
+	    msg = 'Unexpected token %s (%s)' % (tokenname, tok)
             raise ValueError(msg)
     return None
 
