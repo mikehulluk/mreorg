@@ -25,7 +25,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 from django.core.management import setup_environ
 import mreorg.curator.settings as settings
@@ -41,19 +41,20 @@ import random
 
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
-import django
+
 
 
 
 def simulate( sim_queue_entry):
     filename = sim_queue_entry.simfile.full_filename
     print ' - Simulating: ', filename
-    dname, fname = os.path.split(filename)
+    (dname, fname) = os.path.split(filename)
 
     # Update the database to reflect
     print '   - Updating database'
     sim_queue_entry.status = SimQueueEntryState.Executing
     sim_queue_entry.simulation_start_time = datetime.datetime.now()
+    sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
     sim_queue_entry.save(force_update=True)
     
 
@@ -94,7 +95,9 @@ def simulate( sim_queue_entry):
 
     # Setup the heartbeat, to say that we are actually alive:
     heartbeat_interval = 30
+
     def handler(*args, **kwargs):
+        #print 'Handler Called'
         signal.alarm(heartbeat_interval)
         try_heartbeat()
 
@@ -105,9 +108,9 @@ def simulate( sim_queue_entry):
     print '   - Changing Directory to', dname
     os.chdir(dname)
     try:
-        subprocess.check_call(["python", fname])
+        subprocess.check_call(['python', fname])
         print '   - Finished Simulating [Exit OK]'
-    except subprocess.CalledProcessError as exception:
+    except subprocess.CalledProcessError, exception:
         print '   - Finished Simulating [Non-zero exitcode]'
         last_run = sim_queue_entry.simfile.get_last_run(sim_queue_entry.runconfig)
         if not last_run:
@@ -126,9 +129,8 @@ def simulate( sim_queue_entry):
     sim_queue_entry.simfile.recache_from_filesystem()
 
 
-
 def _run_backend():
-    
+
     sleep_time = 2
 
     while True:
@@ -136,13 +138,13 @@ def _run_backend():
         print '\r Checking for Queued Sims: ', time.strftime('%l:%M%p (%S) on %b %d, %Y'),
         sys.stdout.flush()
         queued_objects = SimQueueEntry.objects.\
-                filter( status=SimQueueEntryState.Waiting).\
+                filter(status=SimQueueEntryState.Waiting).\
                 order_by('submit_time')
 
         if queued_objects:
             print
-            simulate( queued_objects[0] )
-            print 
+            simulate(queued_objects[0])
+            print
 
         time.sleep( random.randint(3,20) )
 
@@ -152,6 +154,7 @@ def run_backend():
     except KeyboardInterrupt:
         print 'Stopping'
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     run_backend()
 

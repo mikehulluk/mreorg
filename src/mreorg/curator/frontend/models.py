@@ -1,4 +1,6 @@
-#----------------------------------------------------------------------
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -25,7 +27,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 import os
 import datetime
 import StringIO
@@ -45,7 +47,7 @@ class Options(object):
 
 class SourceSimDir(models.Model):
 
-    class Meta:
+    class Meta():
 
         ordering = ['directory_name']
 
@@ -53,7 +55,7 @@ class SourceSimDir(models.Model):
     should_recurse = models.BooleanField()
 
     def does_exist(self):
-        return os.path.exists( self.directory_name)
+        return os.path.exists(self.directory_name)
 
     @classmethod
     def create(cls, directory_name, should_recurse=True):
@@ -133,7 +135,6 @@ class SimFile(models.Model):
 
 
 
-
     # Handle Caching:
     # ##########################################
     def _is_cache_valid(self):
@@ -182,7 +183,7 @@ class SimFile(models.Model):
         if len(runs) == 0:
             return None
         else:
-            return runs[0] #self.get_runs(runconfig=runconfig)[0]
+            return self.get_runs(runconfig=runconfig)[0]
 
     def get_current_checksum(self):
         return mreorg.get_file_sha1hash(self.full_filename)
@@ -191,10 +192,10 @@ class SimFile(models.Model):
         return os.path.split(self.full_filename)[1]
 
     def get_runs(self, runconfig):
-        if runconfig != None:
-            return SimFileRun.objects.filter(simfile=self.id, runconfig=runconfig).order_by('-execution_date')
-        else:
-            return SimFileRun.objects.filter(simfile=self.id).order_by('-execution_date')
+        return SimFileRun.objects. \
+                    filter(simfile=self.id, runconfig=runconfig). \
+                    order_by('-execution_date')
+
 
     def get_status(self, runconfig):
         last_run = self.get_last_run(runconfig)
@@ -211,8 +212,6 @@ class SimFile(models.Model):
 
     def is_queued(self, runconfig):
         return self.simqueueentry_set.filter(runconfig=runconfig).count() != 0
-    def is_currently_running(self, runconfig):
-        return self.simqueueentry_set.filter(runconfig=runconfig, status=SimQueueEntryState.Executing).count() != 0
 
     def getCSSQueueState(self, runconfig):
         p = self.is_queued(runconfig=runconfig)
@@ -237,7 +236,7 @@ class RunConfiguration(models.Model):
             runconf = RunConfiguration(name=name, **make_kwargs)
             runconf.save()
         return runconf
-
+    
     class Meta:
         ordering = ('name',)
     name = models.CharField(max_length=10000000)
@@ -287,6 +286,7 @@ class FileGroup(models.Model):
             return self.name
 
     def contains_simfile(self, simfile):
+        print 'Does', self.name, 'contain', simfile.full_filename, '?'
         if self.name == 'all':
             return True
 

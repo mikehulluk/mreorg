@@ -146,9 +146,11 @@ def view_sim_output_summaries(request):
 
 def view_configurations(request):
     ensure_config(request)
+
     cxt_data = {}
     csrf_context = RequestContext(request, cxt_data, [config_processor])
     return render_to_response('configurations.html', csrf_context)
+
 
 
 def simfilerun_details(request, run_id):
@@ -157,6 +159,7 @@ def simfilerun_details(request, run_id):
             RequestContext(request,
                 {'simulationrun': SimFileRun.objects.get(id=run_id) },
                 [config_processor] ) )
+
 
 
 def simfile_details(request, simfile_id):
@@ -215,9 +218,12 @@ def do_untrack_src_dir(request, srcdir_id):
     o.delete()
     return HttpResponseRedirect('/tracking')
 
+	
 
 def do_track_rescanfs(request):
     rescan_filesystem()
+    #for src_dir in SourceSimDir.objects.all():
+    #    SimFile.update_all_db(src_dir.directory_name)
     return HttpResponseRedirect('/tracking')
 
 
@@ -225,6 +231,7 @@ def do_track_rescanfs(request):
 def do_track_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')
+
 
     # Find all keys matching untracked_sim_id_XX, and get the XX's
 
@@ -245,6 +252,7 @@ def do_untrack_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')
 
+
     # Find all keys matching untracked_sim_id_XX, and get the XX's
     print request.POST.keys()
     r = re.compile(r"""simid_(?P<id>\d+)""", re.VERBOSE)
@@ -261,17 +269,23 @@ def do_untrack_sim(request):
     # Update the list of untracked files:
     return do_track_rescanfs(request)
 
-
 # ====================
 
+
+
+
+
+
 def viewsimulationqueue(request):
-    ensure_config(request)
     cxt_data = \
         {'simulation_queue_executing': SimQueueEntry.objects.filter(status=SimQueueEntryState.Executing),
          'simulation_queue': SimQueueEntry.objects.filter(status=SimQueueEntryState.Waiting),
          'latest_runs': SimFileRun.objects.order_by('-execution_date')[0:10]}
 
     SimQueueEntry.trim_dangling_jobs()
+    #for queue_entry in SimQueueEntry.objects.all():
+    #    queue_entry.resubmit_if_process_died()
+
 
     csrf_context = RequestContext(request, cxt_data)
     return render_to_response('view_simulation_queue.html', csrf_context)
@@ -341,6 +355,7 @@ def doeditsimfile(request, simfile_id):
         os.system(t)
     os.chdir(cwd)
 
+
     # Return to the previous page:
     referer = request.META.get('HTTP_REFERER', None)
     if referer is None:
@@ -351,6 +366,9 @@ def doeditsimfile(request, simfile_id):
         return HttpResponseRedirect(redirect_to)
     except IndexError:
         return HttpResponseRedirect('/')
+
+
+
 
 
 def get_image_file(request, filename):

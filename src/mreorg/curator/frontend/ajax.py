@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -27,7 +27,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
@@ -37,9 +37,7 @@ from mreorg.curator.frontend.models import SimRunStatus
 from mreorg.curator.frontend.models import SimQueueEntryState
 from mreorg.curator.frontend.models import RunConfiguration
 from mreorg.curator.frontend.models import FileGroup
-#from mreorg.curator.frontend.views import ensure_config
 
-from django.db import transaction
 
 def ensure_config():
     pass
@@ -58,14 +56,11 @@ def base_set_filegroup(request, filegroup_id):
     return simplejson.dumps({})
 
 
-
-
-# Called when a 
 @dajaxice_register
 def overview_resubmit_simfile(_request, simfile_id):
     ensure_config()
     try:
-        sim_file = SimFile.get_tracked_sims(id = simfile_id)
+        sim_file = SimFile.get_tracked_sims(id=simfile_id)
     except:
         return simplejson.dumps({})
 
@@ -78,71 +73,9 @@ def overview_resubmit_simfile(_request, simfile_id):
 
 
 @dajaxice_register
-@transaction.commit_on_success
-def update_queue(_request, action):
-    ensure_config()
-
-    filegroup = _request.session['current_filegroup']
-
-    if action == 'clear-all':
-        SimQueueEntry.objects.filter(status=SimQueueEntryState.Waiting).delete()
-
-    elif action == 'add-all':
-        for sim_file in filegroup.tracked_sims:
-            if not sim_file.simqueueentry_set.count():
-                SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
-
-    elif action == 'add-all-failures':
-        #for sim_file in SimFile.get_tracked_sims():
-        for sim_file in filegroup.tracked_sims:
-            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Success:
-                continue
-            if not sim_file.simqueueentry_set.count():
-                SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
-
-    elif action == 'add-all-failures-not-timeout':
-
-        #for sim_file in SimFile.get_tracked_sims():
-        for sim_file in filegroup.tracked_sims:
-            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Success:
-                continue
-            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.TimeOut:
-                continue
-            if not sim_file.simqueueentry_set.count():
-                SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
-
-    elif action == 'add-all-changed':
-        #for sim_file in SimFile.get_tracked_sims():
-        for sim_file in filegroup.tracked_sims:
-            if not sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.FileChanged:
-                continue
-            if not sim_file.simqueueentry_set.count():
-                SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
-
-    else:
-        assert False
-
-    return simplejson.dumps({})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@dajaxice_register
 def overview_resubmit_simfile_if_failure(_request, simfile_id):
-    ensure_config()
     try:
-        sim_file = SimFile.get_tracked_sims(id = simfile_id)
+        sim_file = SimFile.get_tracked_sims(id=simfile_id)
     except:
         return simplejson.dumps({})
 
@@ -160,7 +93,7 @@ def overview_toggle_simfile_for_resubmit(_request, simfile_id):
     ensure_config()
 
     try:
-        sim_file = SimFile.get_tracked_sims(id = simfile_id)
+        sim_file = SimFile.get_tracked_sims(id=simfile_id)
     except:
         return simplejson.dumps({})
 
@@ -181,7 +114,7 @@ def refreshsimlist(_request):
     states = {}
     for simfile in SimFile.get_tracked_sims():
         states[simfile.id] = simfile.get_status()
-    return simplejson.dumps({'sim_file_states':states})
+    return simplejson.dumps({'sim_file_states': states})
 
 
 
@@ -229,12 +162,11 @@ def overview_update_sim_gui_batch(_request, simfile_ids):
 
 @dajaxice_register
 def overview_update_sim_gui(_request, simfile_id):
-    #ensure_config()
     print 'Dajax call recieved', simfile_id
     from views import ensure_config
     ensure_config(_request)
     print 'A'
-    sim_file = SimFile.get_tracked_sims(id = simfile_id)
+    sim_file = SimFile.get_tracked_sims(id=simfile_id)
     runconfig = _request.session['current_runconfig']
     print 'B'
     last_run = sim_file.get_last_run(runconfig=runconfig)
@@ -252,12 +184,13 @@ def overview_update_sim_gui(_request, simfile_id):
     return v
 
 
+
 @dajaxice_register
 def overview_clear_sim_queue(_request):
-    ensure_config()
-    SimQueueEntry.objects.all().filter(status=SimQueueEntryState.Waiting).delete()
+    SimQueueEntry.objects.all()\
+            .filter(status = SimQueueEntryState.Waiting)\
+            .delete()
     return simplejson.dumps({})
-
 
 @dajaxice_register
 def overview_delete_simfile(_request, simfile_id ):

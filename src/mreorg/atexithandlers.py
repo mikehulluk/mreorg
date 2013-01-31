@@ -25,12 +25,12 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 
 
-class AtExitHandler(object):
 
+class AtExitHandler():
     """
     Class that allows us to order the function calls made it 'atexit'.
     We need to do this to get the ordering write when writing to database.
@@ -48,8 +48,7 @@ class AtExitHandler(object):
             handler(*args, **kwargs)
 
 
-
 # Hook in this handler into the
 # python atexit handler:
 import atexit
-atexit.register( AtExitHandler.at_exit )
+atexit.register(AtExitHandler.at_exit)

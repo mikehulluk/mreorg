@@ -1,4 +1,6 @@
-#----------------------------------------------------------------------
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -25,7 +27,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 import os
 
@@ -35,7 +37,8 @@ from django.conf.urls.defaults import include, patterns
 from dajaxice.core import dajaxice_autodiscover
 dajaxice_autodiscover()
 
-views_mod='mreorg.curator.frontend.views'
+
+views_mod = 'mreorg.curator.frontend.views'
 url_patterns = (
     (r'^$', 'mreorg.curator.frontend.views.view_overview'),
 
@@ -43,28 +46,28 @@ url_patterns = (
     # Main pages:
     (r'^overview$', views_mod + '.view_overview'),
     (r'^tracking$', views_mod + '.view_tracking'),
-    (r'^viewsimulationoutputsummaries', views_mod+'.view_sim_output_summaries'),
+    (r'^viewsimulationoutputsummaries', views_mod + '.view_sim_output_summaries'),
     (r'^viewsimulationfailures$', views_mod+ '.view_simulation_failures'),
-    (r'^viewsimulationqueue$', views_mod+'.viewsimulationqueue'),
-    (r'^viewconfigurations$', views_mod+'.view_configurations'),
+    (r'^viewsimulationqueue$', views_mod + '.viewsimulationqueue'),
+    (r'^viewconfigurations$', views_mod + '.view_configurations'),
 
     # Details about specific files and runs:
-    (r'^simfiles/(\d+)$', views_mod+'.simfile_details'),
-    (r'^simfileruns/(\d+)', views_mod+'.simfilerun_details'),
-    (r'^simfile/(\d+)', views_mod+'.simfile_details'),
+    (r'^simfiles/(\d+)$', views_mod + '.simfile_details'),
+    (r'^simfileruns/(\d+)', views_mod + '.simfilerun_details'),
+    (r'^simfile/(\d+)', views_mod + '.simfile_details'),
 
     # Tracking
-    (r'^do/track/rescan', views_mod+'.do_track_rescanfs'),
-    (r'^do/track/track_sim', views_mod+'.do_track_sim'),
-    (r'^do/track/untrack_sim', views_mod+'.do_untrack_sim'),
-    (r'^do/track/untrack_src_dir/(\d+)', views_mod+'.do_untrack_src_dir'),
-    (r'^do/track/add_src_dir', views_mod+'.do_track_src_dir'),
-    (r'^do/track/track_all_sims', views_mod+'.do_track_all'),
-    (r'^do/track/untrack_all_sims', views_mod+'.do_untrack_all'),
+    (r'^do/track/rescan', views_mod + '.do_track_rescanfs'),
+    (r'^do/track/track_sim', views_mod + '.do_track_sim'),
+    (r'^do/track/untrack_sim', views_mod + '.do_untrack_sim'),
+    (r'^do/track/untrack_src_dir/(\d+)', views_mod + '.do_untrack_src_dir'),
+    (r'^do/track/add_src_dir', views_mod + '.do_track_src_dir'),
+    (r'^do/track/track_all_sims', views_mod + '.do_track_all'),
+    (r'^do/track/untrack_all_sims', views_mod + '.do_untrack_all'),
 
     # Queuing:
-    (r'^do/queue/add_sims', views_mod+'.do_queue_add_sims'),
-    (r'^do/editsimfile/(\d+)', views_mod+'.doeditsimfile'),
+    (r'^do/queue/add_sims', views_mod + '.do_queue_add_sims'),
+    (r'^do/editsimfile/(\d+)', views_mod + '.doeditsimfile'),
 
 
     # Handle image request
@@ -85,4 +88,4 @@ url_patterns = url_patterns + (
     )
 
 
-urlpatterns = patterns('',*url_patterns)
+urlpatterns = patterns('', *url_patterns)

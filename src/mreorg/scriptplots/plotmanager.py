@@ -31,6 +31,7 @@
 
 import os
 import pylab
+
 import mreorg
 from mreorg.utils import ScriptUtils
 
@@ -47,10 +48,10 @@ class PlotManager:
 
     fig_num = 0
     figures_saved = []
-    figures_saved_nums =      []              # This is the numbers
+    figures_saved_nums = []  # This is the numbers
     figures_saved_filenames = []
 
-    _fig_loc =  """_output/figures/{modulename}/{figtype}/"""
+    _fig_loc = """_output/figures/{modulename}/{figtype}/"""
     _fig_name = """fig{fignum:03d}_{figname}.{figtype}"""
     autosave_default_image_filename_tmpl = _fig_loc + _fig_name
     autosave_image_formats = [FigFormat.EPS, FigFormat.PDF,
@@ -69,8 +70,6 @@ class PlotManager:
         if remap_dot_to_underscore:
             figname = figname.replace('.', '-')
 
-#        assert False
-
         if not filename_tmpl:
             filename_tmpl = cls.autosave_default_image_filename_tmpl
         if not figtypes:
@@ -81,13 +80,14 @@ class PlotManager:
         # Get the figure:
         fig = (figure if figure else pylab.gcf())
 
-        #assert f.number == cls.fig_num
+        # assert f.number == cls.fig_num
         # Some small changes:
         fig.subplots_adjust(bottom=0.15)
 
         # Find the module this function was called from:
 
         modname = ScriptUtils.get_calling_script_file(include_ext=False)
+
 
         # Print what we are saving:
         subst_dict = {
@@ -96,7 +96,7 @@ class PlotManager:
             'figname': figname,
             'figtype': '{%s}' % ','.join(figtypes),
             }
-        print 'PlotMnager:Saving ',  filename_tmpl.format(**subst_dict)
+        print 'PlotMnager:Saving ', filename_tmpl.format(**subst_dict)
 
         # For each filetype:
         for figtype in figtypes:
@@ -120,29 +120,29 @@ class PlotManager:
             PlotManager.figures_saved.append(fig)
             PlotManager.figures_saved_nums.append(fig.number)
             PlotManager.figures_saved_filenames.append(full_filename)
-            #print 'Saving File', filename
 
         # Increment the fignum:
         PlotManager.fig_num = PlotManager.fig_num + 1
+
 
     @classmethod
     def save_active_figures(cls):
         import matplotlib
 
         active_figures = [manager.canvas.figure for manager in
-                        matplotlib._pylab_helpers.Gcf.get_all_fig_managers()]
+                          matplotlib._pylab_helpers.Gcf.get_all_fig_managers()]
         active_figures_new = [a for a in active_figures if not a.number
-                            in cls.figures_saved_nums]
+                              in cls.figures_saved_nums]
 
         # Add to the list of saved figures
-        #[SavedFigures.figures_saved_nums.add(a.number) for a in active_figures]
+        # [SavedFigures.figures_saved_nums.add(a.number) for a in active_figures]
 
         # Save the new figures:
         for fig in active_figures_new:
             if fig in PlotManager.figures_saved:
                 continue
 
-            PlotManager.save_figure(figname='Autosave_figure_%d' % fig.number,
-                                figure=fig)
+            PlotManager.save_figure(figname='Autosave_figure_%d'
+                                    % fig.number, figure=fig)
 
 

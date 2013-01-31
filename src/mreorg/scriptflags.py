@@ -33,7 +33,6 @@ import os
 
 
 class ScriptFlags(object):
-
     """Control the behaviour of matplotlib within scripts using environmental
     variables. This allows the script to act differently if its being used
     for interactive work or for producing the figures as part of a batch run.
@@ -44,17 +43,15 @@ class ScriptFlags(object):
     """
 
     osenv = os.environ
-    ENVVAR_MREORG_NOSHOW  =  'MREORG_NOSHOW' in osenv
-    ENVVAR_MREORG_SAVEALL =  'MREORG_SAVEALL' in osenv
-    ENVVAR_MREORG_SAVEFIGADDINFO =  'MREORG_SAVEFIGADDINFO' in osenv
-
-    
+    ENVVAR_MREORG_NOSHOW = 'MREORG_NOSHOW' in osenv
+    ENVVAR_MREORG_SAVEALL = 'MREORG_SAVEALL' in osenv
+    ENVVAR_MREORG_SAVEFIGADDINFO = 'MREORG_SAVEFIGADDINFO' in osenv
 
     # 'Meta-options' that enable other options:
     ENVVAR_MREORG_CURATIONRUN = 'MREORG_CURATIONRUN' in osenv
-    ENVVAR_MREORG_BATCHRUN =    'MREORG_BATCHRUN' in osenv
+    ENVVAR_MREORG_BATCHRUN = 'MREORG_BATCHRUN' in osenv
 
-    ENVVAR_MREORG_ENABLECOVERAGE =  'MREORG_ENABLECOVERAGE' in osenv
+    ENVVAR_MREORG_ENABLECOVERAGE = 'MREORG_ENABLECOVERAGE' in osenv
 
     _expected_options = (
         'MREORG_NOSHOW',
@@ -62,18 +59,21 @@ class ScriptFlags(object):
         'MREORG_SAVEFIGADDINFO',
         'MREORG_CURATIONRUN',
         'MREORG_BATCHRUN',
-        'MREORG_ENABLECOVERAGE', 
+        'MREORG_ENABLECOVERAGE',
         'MREORG_CURATION_REENTRYFLAG',
         'MREORG_TIMEOUT',
         'MREORG_MPLCONFIG',
         )
 
 
+
+    # Temp Hack: lets turn coverage off!
+    ENVVAR_MREORG_ENABLECOVERAGE =  False
+
     # Don't call pylab.show() if ...
     MREORG_NOSHOW = ENVVAR_MREORG_NOSHOW or \
                     ENVVAR_MREORG_CURATIONRUN or \
-                    ENVVAR_MREORG_BATCHRUN #or \
-                    #True # Temp to turn off plotting
+                    ENVVAR_MREORG_BATCHRUN
 
     # Save all figures produced in the simulation:
     # This will happen when figures are produced and 'pylab.show()'

@@ -8,8 +8,8 @@ import mreorg
 
 
 def from_default_monitor_dirs():
-    #default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
-    #for fgname, fgglobs in default_filegroups.iteritems():
+    # default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
+    # for fgname, fgglobs in default_filegroups.iteritems():
     pass
 
 
@@ -18,11 +18,11 @@ def from_default_monitor_dirs():
 def update_all_db(cls, directory):
 
     print 'Updating untracked simulation files', directory
-    for (dirpath, dirnames, filenames) in os.walk( directory ):
+    for (dirpath, dirnames, filenames) in os.walk(directory):
         for filename in filenames:
             if not filename.endswith('.py'):
                 continue
-            full_filename = os.path.join( dirpath, filename ) 
+            full_filename = os.path.join(dirpath, filename)
             if mreorg.MReOrgConfig.is_non_curated_file(filename):
                 continue
             if mreorg.MReOrgConfig.is_non_curated_file(full_filename):
@@ -46,16 +46,16 @@ def update_db_from_config():
             for fgglob in fgglobs:
                 filenames.update(mreorg.glob2.glob(fgglob) )
 
-            # Safely get the FileGroup:
-            fg = FileGroup.get_or_make(name=fgname)
-            assert not fg.is_special(), 'Trying to overwrite a builtin filegroup'
-            for filename in filenames:
-                simfile = SimFile.get_or_make(full_filename=filename)
-                if not fg.contains_simfile(simfile):
-                    fg.simfiles.add(simfile)
-                    fg.save()
+        # Safely get the FileGroup:
+        fg = FileGroup.get_or_make(name=fgname)
+        assert not fg.is_special(), 'Trying to overwrite a builtin filegroup'
+        for filename in filenames:
+            simfile = SimFile.get_or_make(full_filename=filename)
+            if not fg.contains_simfile(simfile):
+                fg.simfiles.add(simfile)
+                fg.save()
 
-            print 'Updated FileGroup: %s' % (fgname,)
+        print 'Updated FileGroup: %s' % (fgname,)
 
 
     # Update the RunConfigurations:
@@ -66,17 +66,17 @@ def update_db_from_config():
             assert not runconf.is_special(), 'Trying to add a builtin-configuration'
             runconf.timeout = confinfo.get('timeout',None)
 
-            for (key, value) in confinfo.get('env_vars',{}).iteritems():
-                try:
-                    envvar = runconf.environvar_set.get(key=key)
-                    envvar.value = value
-                    envvar.save()
-                except EnvironVar.DoesNotExist:
-                    envvar = EnvironVar(key=key,value=value,config=runconf)
-                    envvar.save()
+        for (key, value) in confinfo.get('env_vars',{}).iteritems():
+            try:
+                envvar = runconf.environvar_set.get(key=key)
+                envvar.value = value
+                envvar.save()
+            except EnvironVar.DoesNotExist:
+                envvar = EnvironVar(key=key,value=value,config=runconf)
+                envvar.save()
 
-            runconf.save()
-            print 'Updated RunConfig: %s' % confname
+        runconf.save()
+        print 'Updated RunConfig: %s' % confname
 
         # Add default locations:
         mh_adddefault_locations()

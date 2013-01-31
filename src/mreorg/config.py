@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -27,7 +28,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 import os
 import fnmatch
@@ -54,8 +55,8 @@ class MReOrgConfig(object):
 
         # Start with a dictionary of defaults, then load in the rc-file
         # file to override, if it exists:
-        cls._config_file_ns = dict( cls._defaults)
-        if os.path.exists( cls.rcfilename ):
+        cls._config_file_ns = dict(cls._defaults)
+        if os.path.exists(cls.rcfilename):
             execfile(cls.rcfilename, cls._config_file_ns)
 
     @classmethod

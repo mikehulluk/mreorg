@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -27,7 +27,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 import os
 import mreorg
@@ -89,6 +89,7 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     matplotlib.pylab.show = show
     pylab.show = show
 
+
     # Monkey-Patch 'matplotlib.savefig()' and 'pylab.savefig()', allowing us
     # to save to directories that don't exist by automatically creating them:
     orig_mplsavefig = matplotlib.pylab.savefig
@@ -98,15 +99,16 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
         if ScriptFlags.MREORG_SAVEFIGADDINFO or FigureOptions.is_draft:
             F = pylab.gcf()
             (x, y) = F.get_size_inches()
-            txt = 'Size: x=%2.2f y=%2.2f (inches)' % (x,y)
+            txt = 'Size: x=%2.2f y=%2.2f (inches)' % (x, y)
             txt += '\n' + filename.split('/')[-1]
             txt += '\n' + ScriptUtils.get_calling_script_file(include_ext=True)
             pylab.figtext(0.0, 0.5, txt, backgroundcolor='white')
 
+
         if ScriptFlags.MREORG_AUTOMAKEDIRS:
             mreorg.ensure_directory_exists(filename)
         return orig_mplsavefig(filename, *args, **kwargs)
-    
+
     matplotlib.pylab.savefig = savefig
     pylab.savefig = savefig
 
@@ -149,80 +151,3 @@ if ScriptFlags.MREORG_CURATIONRUN:
 
 
 
-
-
-
-#~ 
-#~ import matplotlib as mpl
-#~ mpl.rcParams['xtick.major.size'] = 0
-#~ mpl.rcParams['xtick.minor.size'] = 0
-#~ mpl.rcParams['ytick.major.size'] = 0
-#~ mpl.rcParams['ytick.minor.size'] = 0.5
-#~ mpl.rcParams['axes.labelsize'] =  8
-#~ mpl.rcParams['font.size'] =  8
-#~ mpl.rcParams['legend.fontsize'] =  8
-#~ mpl.rcParams['xtick.labelsize'] =  7
-#~ mpl.rcParams['ytick.labelsize'] =  7
-#~ mpl.rcParams['figure.subplot.left'] =  0.1
-#~ mpl.rcParams['figure.subplot.right'] = 0.95
-#~ 
-#~ 
-#~ 
-#~ phi = 1.61803
-#~ def figsize(width_in=None, width_cm=None, height_cm=None, height_in=None):
-    #~ assert not (width_in and width_cm)
-    #~ assert width_in or width_cm
-#~ 
-    #~ if width_cm:
-        #~ width_in = width_cm / 2.54
-#~ 
-    #~ assert not (height_in and height_cm)
-    #~ if not height_in and not height_cm:
-        #~ height_in = width_in / phi
-    #~ elif height_cm:
-        #~ height_in = height_cm / 2.54
-    #~ else:
-        #~ #height_in=height_in
-        #~ pass
-#~ 
-    #~ return (width_in, height_in)
-
-
-
-
-
-#~ 
-#~ 
-#~ 
-#~ 
-#~ 
-#~ import mreorg
-#~ 
-#~ mreorg.PlotManager.autosave_image_formats = [mreorg.FigFormat.SVG]
-#~ 
-#~ 
-#~ import matplotlib
-#~ import pylab
-#~ 
-#~ import pylab
-#~ oldsavefig = pylab.savefig
-#~ def new_savefig(*args, **kwargs):
-#~ 
-    #~ if 'bb_inches' in kwargs:
-        #~ del kwargs['bb_inches']
-    #~ F = pylab.gcf()
-    #~ x,y = F.get_size_inches()
-    #~ txt = 'FS: x=%2.2f y=%2.2f' % (x,y) 
-    #~ txt += '\n' + args[0].split('/')[-1]
-#~ 
-#~ 
-    #~ if not 'transparent' in kwargs:
-        #~ kwargs['transparent'] = True
-#~ 
-    #~ return oldsavefig(*args, **kwargs)
-#~ 
-#~ pylab.savefig=new_savefig
-#~ 
-#~ 
-#~ 
-#~ 

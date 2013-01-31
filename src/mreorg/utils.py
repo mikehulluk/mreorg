@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -27,7 +27,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 import inspect
 import os
@@ -49,11 +49,11 @@ class ScriptUtils(object):
 
     @classmethod
     def get_calling_script_directory(cls):
-        return  os.path.dirname( cls.get_calling_script() )
+        return os.path.dirname(cls.get_calling_script())
 
     @classmethod
     def get_calling_script_file(cls, include_ext):
-        filename = os.path.basename( cls.get_calling_script() )
+        filename = os.path.basename(cls.get_calling_script())
         if include_ext:
             return filename
         else:
@@ -77,7 +77,8 @@ def extract_docstring_from_fileobj(fileobj):
             return text.strip()
         else:
             tokenname = token.tok_name[tok]
-            raise ValueError('Unexpected token %s (%s)' % (tokenname, tok))
+            msg = 'Unexpected token %s (%s)' % (tokenname, tok)
+            raise ValueError(msg)
     return None
 
 
@@ -87,11 +88,10 @@ def ensure_directory_exists(filename):
         os.makedirs(dirname)
     return filename
 
-
 def get_file_sha1hash(filename):
     hash_obj = hashlib.sha1()
-    with  open(filename) as fileobj:
-        hash_obj.update( fileobj.read() )
+    with open(filename) as fileobj:
+        hash_obj.update(fileobj.read())
     return hash_obj.hexdigest()
 
 

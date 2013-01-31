@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -27,7 +27,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 import os
 import sys
@@ -48,7 +48,7 @@ from mreorg.layouts import FigureOptions
 
 
 # Setup glob2 path
-# ##################
+# ----------------
 local_dir = os.path.dirname(__file__)
 glob2_src_dir = os.path.join(local_dir,'../../dependances/glob2/src/')
 sys.path.append(glob2_src_dir)
