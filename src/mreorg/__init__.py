@@ -43,6 +43,10 @@ from mreorg.config import MReOrgConfig
 
 from mreorg.utils import get_file_sha1hash
 
+from mreorg.layouts import FigureLayouts
+from mreorg.layouts import FigureOptions
+
+
 # Setup glob2 path
 # ##################
 local_dir = os.path.dirname(__file__)
@@ -59,4 +63,7 @@ __all__ = [
     'ensure_directory_exists',
     'get_file_sha1hash',
     'glob2',
+    'FigureLayouts',
+    'FigureOptions',
+    
 ]

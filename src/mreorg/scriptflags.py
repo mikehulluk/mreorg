@@ -48,6 +48,8 @@ class ScriptFlags(object):
     ENVVAR_MREORG_SAVEALL =  'MREORG_SAVEALL' in osenv
     ENVVAR_MREORG_SAVEFIGADDINFO =  'MREORG_SAVEFIGADDINFO' in osenv
 
+    
+
     # 'Meta-options' that enable other options:
     ENVVAR_MREORG_CURATIONRUN = 'MREORG_CURATIONRUN' in osenv
     ENVVAR_MREORG_BATCHRUN =    'MREORG_BATCHRUN' in osenv
@@ -63,15 +65,15 @@ class ScriptFlags(object):
         'MREORG_ENABLECOVERAGE', 
         'MREORG_CURATION_REENTRYFLAG',
         'MREORG_TIMEOUT',
+        'MREORG_MPLCONFIG',
         )
 
-    # Temp Hack: lets turn coverage off!
-    ENVVAR_MREORG_ENABLECOVERAGE =  False
 
     # Don't call pylab.show() if ...
     MREORG_NOSHOW = ENVVAR_MREORG_NOSHOW or \
                     ENVVAR_MREORG_CURATIONRUN or \
-                    ENVVAR_MREORG_BATCHRUN
+                    ENVVAR_MREORG_BATCHRUN #or \
+                    #True # Temp to turn off plotting
 
     # Save all figures produced in the simulation:
     # This will happen when figures are produced and 'pylab.show()'
@@ -93,6 +95,21 @@ class ScriptFlags(object):
     MREORG_ENABLECOVERAGE = ENVVAR_MREORG_ENABLECOVERAGE
 
     MREORG_SAVEFIGADDINFO =  ENVVAR_MREORG_SAVEFIGADDINFO
+    
+    
+    # Setup the environment:
+    MREORG_MPLCONFIG =  osenv.get('MREORG_MPLCONFIG', None)
+    if MREORG_MPLCONFIG:
+        currpath = os.path.dirname( os.path.abspath(__file__) )
+        mplconfigdir = os.path.join( currpath, '../../mplconfigs/')
+        target_config_file = os.path.join(mplconfigdir,MREORG_MPLCONFIG + '.conf')
+        if not os.path.exists(target_config_file):
+            assert False, "Can't find file: %s" % target_config_file
+        MREORG_MPLCONFIG_FILE=target_config_file
+    else:
+        MREORG_MPLCONFIG_FILE=None
+    
+    
 
 
 # Look out for unexpected flags:

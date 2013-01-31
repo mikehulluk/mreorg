@@ -280,8 +280,13 @@ class FileGroup(models.Model):
     def is_special(self):
         return self.name in FileGroup.special_groups
 
+    def display_name(self):
+        if self.is_special():
+            return '--%s--' % self.name
+        else:
+            return self.name
+
     def contains_simfile(self, simfile):
-        #print 'Does', self.name, 'contain', simfile.full_filename, '?'
         if self.name == 'all':
             return True
 
@@ -299,6 +304,10 @@ class FileGroup(models.Model):
     def get_initial(cls):
         return cls.get_or_make(name='all')
 
+
+    @property
+    def tracked_sims(self):
+        return self.tracked_files
 
     @property
     def tracked_files(self):
@@ -321,7 +330,7 @@ class EnvironVar(models.Model):
 
 
 class SimRunStatus(object):
-    Sucess = 'Sucess'
+    Success = 'Success'
     UnhandledException = 'UnhandledException'
     TimeOut = 'Timeout'
     NonZeroExitCode = 'NonZeroExitCode'
@@ -367,7 +376,7 @@ class SimFileRun(models.Model):
             return SimRunStatus.UnhandledException
         if self.return_code != 0:
             return SimRunStatus.NonZeroExitCode
-        return SimRunStatus.Sucess
+        return SimRunStatus.Success
 
 
 

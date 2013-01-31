@@ -46,7 +46,13 @@ default_runconfigs ={
     'full':{
         'timeout': None,
         'env_vars': { 'MF_QUICK': None, }
-    }
+    },
+
+    'std-coverage':{
+        'timeout': 1800,
+        'env_vars': { 'MREORG_ENABLECOVERAGE': '', },
+        'argv': [],
+    },
 
 }
 

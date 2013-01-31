@@ -137,7 +137,7 @@ Environmental variables are read once when then :py:mod:`mreorg` module is initi
 Managing Simulations with |mreorg.curate|
 -------------------------------------------
 
-Over the course of my PhD, I found I had hundreds of simulation scripts written in python, which took different lengths of time to run, and produced lots of matplotlib graphs. I often wanted to browse through the output of these simulations, and since there was often dependancies between files; when I made changes, I wanted to know whether they had sucessfully run since the last change. I started with a system of makefiles, which slowly developed into a more user-friendly |mreorg.curate|, which I hope can be of use to other people.
+Over the course of my PhD, I found I had hundreds of simulation scripts written in python, which took different lengths of time to run, and produced lots of matplotlib graphs. I often wanted to browse through the output of these simulations, and since there was often dependancies between files; when I made changes, I wanted to know whether they had successfully run since the last change. I started with a system of makefiles, which slowly developed into a more user-friendly |mreorg.curate|, which I hope can be of use to other people.
 
 If you are using a single simulator-program, and changing the values of commandline options you pass to it; then Andrew Davison's `Sumatra package <http://packages.python.org/Sumatra/>`_ might be a more appropriate option.
 
@@ -265,7 +265,7 @@ smart enough not to run the same simulation). You can cancel a worker with
 By default, a script that takes longer than 1800 secs (30 mins) will raise a
 *TimeOutException*. (I will make this configurable at some point).
 
-When you run this command, the result should be a sucess, and after a short
+When you run this command, the result should be a success, and after a short
 while, the yellow row on the overview page on the webpage should turn green
 automatically. (By default, the 'Overview-Page' updates every 60 seconds, but it
 is possible to force an update by reloading the entire page.)

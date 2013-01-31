@@ -77,7 +77,7 @@ def config_processor(request):
 
 
 class SimFileWithRunConfigProxy(object):
-    
+
 
     def __init__(self, simfile, runconfig):
         self.simfile = simfile
@@ -97,13 +97,13 @@ class SimFileWithRunConfigProxy(object):
         return self.simfile.is_queued(runconfig=self.runconfig)
     def getCSSQueueState(self):
         return self.simfile.getCSSQueueState(runconfig=self.runconfig)
-    @property 
+    @property
     def full_filename(self):
         return self.simfile.full_filename
-    @property 
+    @property
     def id(self):
         return self.simfile.id
-    @property 
+    @property
     def tracking_status(self):
         return self.simfile.tracking_status
     def get_last_run(self):
@@ -155,7 +155,7 @@ def simfilerun_details(request, run_id):
     return render_to_response(
             'simulation_run_details.html',
             RequestContext(request,
-                {'simulationrun': SimFileRun.objects.get(id=run_id) }, 
+                {'simulationrun': SimFileRun.objects.get(id=run_id) },
                 [config_processor] ) )
 
 
@@ -178,7 +178,7 @@ def view_tracking(request):
     csrf_context = RequestContext(request, cxt_data , [config_processor] )
     return render_to_response('tracking.html',
                               csrf_context
-                              
+
                               )
 
 
@@ -215,7 +215,7 @@ def do_untrack_src_dir(request, srcdir_id):
     o.delete()
     return HttpResponseRedirect('/tracking')
 
-	
+
 def do_track_rescanfs(request):
     rescan_filesystem()
     return HttpResponseRedirect('/tracking')
@@ -284,7 +284,7 @@ def view_simulation_failures(request):
         'failed_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.UnhandledException],
         'timeout_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.TimeOut],
         'nonzero_exitcode_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.NonZeroExitCode],
-        'changed_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.FileChanged], 
+        'changed_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.FileChanged],
         'notrun_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.NeverBeenRun],
         }
 

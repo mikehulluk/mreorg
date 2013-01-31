@@ -82,25 +82,29 @@ def overview_resubmit_simfile(_request, simfile_id):
 def update_queue(_request, action):
     ensure_config()
 
+    filegroup = _request.session['current_filegroup']
+
     if action == 'clear-all':
         SimQueueEntry.objects.filter(status=SimQueueEntryState.Waiting).delete()
 
     elif action == 'add-all':
-        for sim_file in SimFile.get_tracked_sims():
+        for sim_file in filegroup.tracked_sims:
             if not sim_file.simqueueentry_set.count():
                 SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
 
     elif action == 'add-all-failures':
-        for sim_file in SimFile.get_tracked_sims():
-            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Sucess:
+        #for sim_file in SimFile.get_tracked_sims():
+        for sim_file in filegroup.tracked_sims:
+            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Success:
                 continue
             if not sim_file.simqueueentry_set.count():
                 SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
 
     elif action == 'add-all-failures-not-timeout':
 
-        for sim_file in SimFile.get_tracked_sims():
-            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Sucess:
+        #for sim_file in SimFile.get_tracked_sims():
+        for sim_file in filegroup.tracked_sims:
+            if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Success:
                 continue
             if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.TimeOut:
                 continue
@@ -108,7 +112,8 @@ def update_queue(_request, action):
                 SimQueueEntry.create(sim_file=sim_file, runconfig=_request.session['current_runconfig'])
 
     elif action == 'add-all-changed':
-        for sim_file in SimFile.get_tracked_sims():
+        #for sim_file in SimFile.get_tracked_sims():
+        for sim_file in filegroup.tracked_sims:
             if not sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.FileChanged:
                 continue
             if not sim_file.simqueueentry_set.count():
@@ -141,7 +146,7 @@ def overview_resubmit_simfile_if_failure(_request, simfile_id):
     except:
         return simplejson.dumps({})
 
-    if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Sucess:
+    if sim_file.get_status(runconfig=_request.session['current_runconfig']) == SimRunStatus.Success:
         return simplejson.dumps({})
 
     if not sim_file.simqueueentry_set.count():
