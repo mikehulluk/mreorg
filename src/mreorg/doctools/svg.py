@@ -10,6 +10,8 @@ import xml
 import xmlwitch
 
 import collections
+from functools import partial
+import shutil
 
 def normalise_measurement(length):
     # Return size in mm:
@@ -42,88 +44,107 @@ def getWidthHeight(filename):
 
 
 class MyXMLParser(xml.sax.handler.ContentHandler):
-    
-    
+
+
     def get_style_dict(self, attrs):
         toks = [tok.split(':') for tok in attrs.get('style','').split(';') if tok]
         return  dict( toks )
-        
+
     def update_global_style_dict(self, style_dict, element ):
         for k,v in style_dict.items():
-            self.all_styles[element][k].add(v)
-    
-    
+            self.svg_data.all_styles[element][k].add(v)
+
+
     def do_path(self, attrs):
-        print 'Path!'
-        
-        
         style_dict = self.get_style_dict(attrs)
         self.update_global_style_dict(style_dict=style_dict, element='path')
-        
-        #print toks
-        
-        
-        
-        #print style_dict
-        #stroke-width:1pt
-        #self.colors
-        
-        
-        
-    def do_g(self, attrs):        
-        pass
-            
-    def do_marker(self, attrs):
-        pass
-        #print 'marker'
-        
-        
-    def do_tspan(self, attrs):
-        pass
-        #print 'tspan!'
+
+
+
+
     def do_text(self, attrs):
-        #print 'Text!'
+        style_dict = self.get_style_dict(attrs)
+        self.update_global_style_dict(style_dict=style_dict, element='text')
+
+    def do_g(self, attrs):
         pass
 
-        
-    def do_svg(self, attrs):        
-        pass            
+    def do_marker(self, attrs):
+        pass
+
+
+    def do_tspan(self, attrs):
+        pass
+
+    def do_svg(self, attrs):
+        pass
     def do_image(self, attrs):
         pass
         #print 'image!'
-    
-    
-    
+
+    def do_rect(self, attrs):
+        pass
+    def do_circle(self, attrs):
+        pass
+    def do_ellipse(self, attrs):
+        pass
+    def do_polygon(self, attrs):
+        pass
+    def do_polyline(self, attrs):
+        pass
+    def do_style(self, attrs):
+        pass
+    def do_line(self, attrs):
+        pass
+
+
     def startElement(self, name, attrs):
-        
+        self.svg_data.n_nodes+=1
+
         if 'transform' in attrs.keys():
-            print name, attrs['transform']
-        
+            tr = attrs['transform']
+            if tr.startswith('rotate') or tr.startswith('translate'):
+                pass
+            else:
+                self.svg_data.transforms.append(tr)
+            #print name, attrs['transform']
+
         self.parse_stack.append( [] )
-        
+
         # Sanity check:
         colored_properties = ['fill', 'stroke', 'stop-color', 'flood-color','lighting-color']
-        assert len( set(attrs.keys()) & set(colored_properties) ) == 0, 'Unexpected properties'
-        
-        
+        if len( set(attrs.keys()) & set(colored_properties) ) != 0:
+            print  'Unexpected properties'
+            print 'Node', name, attrs.keys()
+
+
         # Ignored elements:
-        ignored_elements = ['defs', 'sodipodi:namedview', 'metadata',
-                            'rdf:RDF', 'cc:Work', 'dc:format',
-                            'dc:type', 'dc:title' ]
-        
+        ignored_elements = ['defs', 'sodipodi:namedview','sodipodi:guide', 'metadata',
+                            'rdf:RDF', 'cc:Work', 'inkscape:grid',
+                            'dc:format', 'dc:type', 'dc:title',
+                            'mask','clipPath','radialGradient','stop','linearGradient','filter', 'feGaussianBlur',
+                            'use', ]
+
         method_lut = {
             'text': self.do_text,
+            'rect': self.do_rect,
+            'circle': self.do_circle,
+            'ellipse': self.do_ellipse,
             'g': self.do_g,
             'svg': self.do_svg,
             'text': self.do_text,
             'marker': self.do_marker,
             'tspan': self.do_tspan,
+            'style': self.do_style,
             'image': self.do_image,
             'text': self.do_text,
             'path': self.do_path,
+            'line': self.do_line,
+            'polyline': self.do_polyline,
+            'polygon': self.do_polygon,
             }
-         
-         
+
+
         if name in method_lut.keys():
             method_lut[name](attrs)
         elif name in ignored_elements:
@@ -131,108 +152,237 @@ class MyXMLParser(xml.sax.handler.ContentHandler):
         else:
             print 'Unknown node:', name
             assert False
-        
-        
+
+
 
     def endElement(self, name):
-        self.parse_stack.pop()
+        #self.parse_stack.pop()
+        pass
 
 
     def __init__(self):
-        self.colors = set()
+
+        self.svg_data = SVGData()
         self.parse_stack=[]
-        self.all_styles = collections.defaultdict( lambda : collections.defaultdict(set) )
+
+
+        #self.transforms=[]
+
+
+
+
+class SVGData(object):
+    def __init__(self):
+        self.n_nodes = 0
+
+        self.all_styles = collections.defaultdict( partial(collections.defaultdict,set ) )
+        self.transforms = []
+
+        # Load some details:
+        self.x_mm = 10
+        self.y_mm = 10
+
 
 
 
 class FileObj(object):
     def __init__(self, filename):
         self.filename = filename
-    
-    @property    
+
+    @property
     def short_filename(self):
         return os.path.split( self.filename )[-1]
     @property
+    def full_filename(self):
+        return os.path.join( os.getcwd(), self.filename )
+
+    @property
     def size_MB(self):
         return os.path.getsize(self.filename) / 1.0e6
-        
-    
+
+
+import pickle
 
 class SVGFile(FileObj):
+    xml_parse_cache_filename='.xmlcache'
+
+    @classmethod
+    def load_parse_cache(cls,):
+        if os.path.exists(cls.xml_parse_cache_filename):
+            with open(cls.xml_parse_cache_filename) as f:
+                parse_cache = pickle.load(f)
+        else:
+            parse_cache = {}
+        return parse_cache
+
+    @classmethod
+    def save_parse_cache(cls,parse_cache):
+        with open(cls.xml_parse_cache_filename,'w') as f:
+            pickle.dump(parse_cache,f)
+
+
     def __init__(self, filename):
         super( SVGFile, self).__init__(filename=filename)
-        
-        
+
+
         with open(self.filename) as f:
             self.contents = f.read()
-            
-            
-        # Load some details:
-        self.x_mm = None
-        self.y_mm = None
 
-        self.internal_details = None
 
-        self.parse_xml()
-        
-    
+        self.svg_data = self.parse_xml()
+
+        print str(self)
+
+
+
     def parse_xml(self):
-        self.internal_details = MyXMLParser()
-        xml.sax.parseString(self.contents, handler=self.internal_details)
-        
-        
-    
-    
-        # Load some details:
-        self.x_mm = 10
-        self.y_mm = 10
-    
-        print self.internal_details.all_styles
-        
-    
+
+        parse_cache=self.load_parse_cache()
+        if not self.filename in parse_cache:
+
+            my_parser = MyXMLParser()
+            xml.sax.parse(self.filename, handler=my_parser)
+            parse_cache[self.filename] = my_parser.svg_data
+            self.save_parse_cache(parse_cache)
+
+        return parse_cache[self.filename]
+
+
+
+
+
+
+
     def __str__(self,):
-        
-        return '<SVGFile: [%3.2fMB]  %s  (%dx%d) >' % ( self.size_MB, self.short_filename, self.x_mm, self.y_mm)
+
+        return '<SVGFile: [%3.2f MB; %4d nodes] %s (%dx%d) NTransforms: %s>' % (
+                self.size_MB,
+                self.svg_data.n_nodes,
+                self.short_filename,
+                self.svg_data.x_mm,
+                self.svg_data.y_mm,
+                len(self.svg_data.transforms) )
 
 
 
 
     def build_html_details(self, xml=None, ):
-        print 'details'
-        
+
         if xml is None:
             xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
-            
-            
-        with xml.div():    
+
+
+        with xml.div():
             with xml.h1():
-                xml.write_escaped(self.filename)
-            
-            with xml.image(src=self.filename):
+                with xml.a(name=self.short_filename):
+                    #xml.write_escaped(self.filename)
+                    xml.write_escaped(self.short_filename)
+
+            with xml.image(src=self.full_filename):
                 pass
-            
-            #with xml.p():
-            #    xml.write_escaped(str(self.internal_details.all_styles))
-            
+
             #for each element type: g, path, text, etc
-            for (element,attrs) in sorted(self.internal_details.all_styles.items()):
+            for (element,attrs) in sorted(self.svg_data.all_styles.items()):
                 with xml.table():
-                    
+
                     # for each style type (color, fill, etc):
                     for (attr,vals) in sorted(attrs.items()):
-                        
+
                         # Print each values
                         for i,val in enumerate(vals):
                             with xml.tr():
                                 xml.td( element if i==0 else '' )
                                 xml.td( attr )
                                 xml.td(val)
-            
-        return  xml
-            
-            
-        
 
+            xml.write_escaped( str(','.join(self.svg_data.transforms) ) )
+
+        return  xml
+
+
+
+#def format_
+
+class SVGFileSet(object):
+    def __init__(self, svgfiles):
+        self.svgfiles = svgfiles
+
+
+    def build_summary_table(self, xml):
+
+        all_styles = collections.defaultdict( partial(collections.defaultdict, partial(collections.defaultdict,set ) ) )
+
+        for svgfile in self.svgfiles:
+            for (element, data) in svgfile.svg_data.all_styles.items():
+                for (prop, values) in data.items():
+                    for value in values:
+                        all_styles[element][prop][value].add(svgfile)
+
+
+        xml.h1('Summary')
+        with xml.table():
+
+            for element in sorted(all_styles):
+                for prop in sorted(all_styles[element]):
+                    for value in sorted(all_styles[element][prop]):
+
+                        with xml.tr():
+
+                            kwargs = {}
+                            if value.startswith('#'):
+                                kwargs['bgcolor'] = value
+
+                            xml.td( element  )
+                            xml.td( prop  )
+                            xml.td( value, **kwargs )
+                            svgfiles= sorted(all_styles[element][prop][value])
+                            with xml.td():
+                                xml.write( ','.join( ['<a href="#%s">%s</a>' % ( svgfile.short_filename, svgfile.short_filename) for svgfile in  svgfiles]) )
+
+
+                        #for i,svgfile in enumerate(sorted(all_styles[element][prop][value])):
+                        #        with xml.tr():
+
+                        #            kwargs = {}
+                        #            if value.startswith('#'):
+                        #                kwargs['bgcolor'] = value
+
+                        #            xml.td( element if i==0 else '' )
+                        #            xml.td( prop if i==0 else '' )
+                        #            xml.td( value if i==0 else '', **kwargs )
+                        #            xml.td( svgfile.short_filename )
+
+
+
+        #['node']['property'] -> ['file1','file2','file3'...]
+
+        #pass
+
+
+
+    def build_html_output(self, output_dir='./image_html/'):
+
+        xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
+
+
+        # Summary Table of all tags and colors:
+        self.build_summary_table(xml)
+
+
+        # General table:
+        for svgfile in sorted( self.svgfiles, key=lambda o:o.filename ):
+            svgfile.build_html_details(xml=xml)
+
+            # Copy files accross:
+            shutil.copyfile(svgfile.full_filename, os.path.join(output_dir,svgfile.short_filename ))
+
+
+
+        # Create the output:
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        with open(os.path.join(output_dir,'index.html'),'w' ) as f:
+            f.write(str(xml))
 
 
 
