@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 import os
 
 import xml
-
+import xmlwitch
 
 import collections
 
@@ -48,9 +48,9 @@ class MyXMLParser(xml.sax.handler.ContentHandler):
         toks = [tok.split(':') for tok in attrs.get('style','').split(';') if tok]
         return  dict( toks )
         
-    def update_global_style_dict(self, style_dict ):
+    def update_global_style_dict(self, style_dict, element ):
         for k,v in style_dict.items():
-            self.all_styles[k].add(v)
+            self.all_styles[element][k].add(v)
     
     
     def do_path(self, attrs):
@@ -58,7 +58,7 @@ class MyXMLParser(xml.sax.handler.ContentHandler):
         
         
         style_dict = self.get_style_dict(attrs)
-        self.update_global_style_dict(style_dict)
+        self.update_global_style_dict(style_dict=style_dict, element='path')
         
         #print toks
         
@@ -136,13 +136,12 @@ class MyXMLParser(xml.sax.handler.ContentHandler):
 
     def endElement(self, name):
         self.parse_stack.pop()
-        #print 'Ending', name
 
 
     def __init__(self):
         self.colors = set()
         self.parse_stack=[]
-        self.all_styles = collections.defaultdict(set)
+        self.all_styles = collections.defaultdict( lambda : collections.defaultdict(set) )
 
 
 
@@ -172,19 +171,70 @@ class SVGFile(FileObj):
         self.x_mm = None
         self.y_mm = None
 
+        self.internal_details = None
+
         self.parse_xml()
+        
     
     def parse_xml(self):
-        sax_parser = MyXMLParser()
-        xml.sax.parseString(self.contents, handler=sax_parser)
+        self.internal_details = MyXMLParser()
+        xml.sax.parseString(self.contents, handler=self.internal_details)
         
-        print sax_parser.all_styles
+        
+    
     
         # Load some details:
         self.x_mm = 10
         self.y_mm = 10
     
+        print self.internal_details.all_styles
+        
     
     def __str__(self,):
         
         return '<SVGFile: [%3.2fMB]  %s  (%dx%d) >' % ( self.size_MB, self.short_filename, self.x_mm, self.y_mm)
+
+
+
+
+    def build_html_details(self, xml=None, ):
+        print 'details'
+        
+        if xml is None:
+            xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
+            
+            
+        with xml.div():    
+            with xml.h1():
+                xml.write_escaped(self.filename)
+            
+            with xml.image(src=self.filename):
+                pass
+            
+            #with xml.p():
+            #    xml.write_escaped(str(self.internal_details.all_styles))
+            
+            #for each element type: g, path, text, etc
+            for (element,attrs) in sorted(self.internal_details.all_styles.items()):
+                with xml.table():
+                    
+                    # for each style type (color, fill, etc):
+                    for (attr,vals) in sorted(attrs.items()):
+                        
+                        # Print each values
+                        for i,val in enumerate(vals):
+                            with xml.tr():
+                                xml.td( element if i==0 else '' )
+                                xml.td( attr )
+                                xml.td(val)
+            
+        return  xml
+            
+            
+        
+
+
+
+
+
+
