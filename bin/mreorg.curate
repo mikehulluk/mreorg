@@ -12,8 +12,8 @@ import mreorg
 import mreorg.curator.backend_sim.simmgr_backend
 
 
-# django internally will call this file, when files on the disk change. 
-# To allow this; we set a flag as an environmental variable, and 
+# django internally will call this file, when files on the disk change.
+# To allow this; we set a flag as an environmental variable, and
 # check to see if we are 're-entering' when running the webserver:
 if 'MREORG_CURATION_REENTRYFLAG' in os.environ:
     execute_from_command_line(sys.argv)
@@ -57,27 +57,36 @@ def cmd_reloadconfig(params):
 
 
 
-description = "mreorg.curate is tool for managing large numbers of simulations"
-parser = argparse.ArgumentParser(description=description)
-subparsers = parser.add_subparsers(help='sub-command help')
 
-parser_reloadconfig = subparsers.add_parser('reconfig', help='Reload the configuration from the configuration file' )
-parser_reloadconfig.set_defaults(func=cmd_reloadconfig)
+def build_parser():
+    description = "mreorg.curate is tool for managing large numbers of simulations"
+    parser = argparse.ArgumentParser(description=description)
+    subparsers = parser.add_subparsers(help='sub-command help')
 
-parser_runserver = subparsers.add_parser('runserver', help='run the django backend' )
-parser_runserver.add_argument('-p', '--port', type=int, default=8000, help='the port to run django on')
-parser_runserver.set_defaults(func=cmd_runserver)
+    parser_reloadconfig = subparsers.add_parser('reconfig', help='Reload the configuration from the configuration file' )
+    parser_reloadconfig.set_defaults(func=cmd_reloadconfig)
+
+    parser_runserver = subparsers.add_parser('runserver', help='run the django backend' )
+    parser_runserver.add_argument('-p', '--port', type=int, default=8000, help='the port to run django on')
+    parser_runserver.set_defaults(func=cmd_runserver)
 
 
-parser_runbackend = subparsers.add_parser('runbackend', help="launch a 'backend-worker")
-parser_runbackend.set_defaults(func=cmd_runbackend)
+    parser_runbackend = subparsers.add_parser('runbackend', help="launch a 'backend-worker")
+    parser_runbackend.set_defaults(func=cmd_runbackend)
 
-parser_builddb = subparsers.add_parser('builddb', help='create the database')
-parser_builddb.add_argument('-r', '--rebuild',action='store_true',  help='delete an existing database before starting')
-parser_builddb.set_defaults(func=cmd_builddb)
+    parser_builddb = subparsers.add_parser('builddb', help='create the database')
+    parser_builddb.add_argument('-r', '--rebuild',action='store_true',  help='delete an existing database before starting')
+    parser_builddb.set_defaults(func=cmd_builddb)
 
-parser_backup = subparsers.add_parser('backup', help='backup the existing database')
-parser_backup.set_defaults(func=cmd_backup)
+    parser_backup = subparsers.add_parser('backup', help='backup the existing database')
+    parser_backup.set_defaults(func=cmd_backup)
+    return parser
 
-args = parser.parse_args()
-args.func(args)
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()

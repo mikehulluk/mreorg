@@ -30,10 +30,11 @@
 # ----------------------------------------------------------------------
 
 import os
-import pylab
 
 import mreorg
 from mreorg.utils import ScriptUtils
+from mreorg.layouts import FigureOptions
+from mreorg.config import MReOrgConfig
 
 
 class FigFormat:
@@ -54,8 +55,11 @@ class PlotManager:
     _fig_loc = """_output/figures/{modulename}/{figtype}/"""
     _fig_name = """fig{fignum:03d}_{figname}.{figtype}"""
     autosave_default_image_filename_tmpl = _fig_loc + _fig_name
-    autosave_image_formats = [FigFormat.EPS, FigFormat.PDF,
-                              FigFormat.PNG, FigFormat.SVG]
+
+    autosave_image_formats = None
+    _all_autosave_image_formats = [
+            FigFormat.EPS, FigFormat.PDF,
+            FigFormat.PNG, FigFormat.SVG]
 
     @classmethod
     def save_figure(
@@ -73,13 +77,29 @@ class PlotManager:
         if not filename_tmpl:
             filename_tmpl = cls.autosave_default_image_filename_tmpl
         if not figtypes:
-            figtypes = cls.autosave_image_formats
+            # Has it been set explicity in the class??
+            if cls.autosave_image_formats is not None:
+                figtypes = cls.autosave_image_formats
 
-        assert isinstance(figtypes, list)
+            # Is it specified in a layout config file:
+            elif FigureOptions.default_autosave_formats is not None:
+                figtypes = FigureOptions.default_autosave_formats
+            # Or the rc file?
+            elif 'default_autosave_formats' in MReOrgConfig.get_ns():
+                figtypes = MReOrgConfig.get_ns()['default_autosave_formats']
+
+            # No?, then lets default to everything:
+            else:
+                figtypes = cls._all_autosave_image_formats
+
+        assert isinstance(figtypes, list), 'figtypes: %s <%s>'%(figtypes, type(figtypes))
 
         # Get the figure:
+        import pylab
         fig = (figure if figure else pylab.gcf())
 
+
+        # TODO: Move to mreorg layouts:
         # assert f.number == cls.fig_num
         # Some small changes:
         fig.subplots_adjust(bottom=0.15)
@@ -144,5 +164,7 @@ class PlotManager:
 
             PlotManager.save_figure(figname='Autosave_figure_%d'
                                     % fig.number, figure=fig)
+
+
 
 

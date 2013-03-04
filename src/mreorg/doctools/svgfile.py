@@ -373,7 +373,7 @@ class SVGFileSet(object):
         for svgfile in sorted( self.svgfiles, key=lambda o:o.filename ):
             svgfile.build_html_details(xml=xml)
 
-            # Copy files accross:
+            # Copy files across:
             shutil.copyfile(svgfile.full_filename, os.path.join(output_dir,svgfile.short_filename ))
 
 

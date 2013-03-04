@@ -37,7 +37,7 @@ from mreorg.curator.frontend.models import SimRunStatus
 from mreorg.curator.frontend.models import SimQueueEntryState
 from mreorg.curator.frontend.models import RunConfiguration
 from mreorg.curator.frontend.models import FileGroup
-
+from django.db import transaction
 
 def ensure_config():
     pass
@@ -117,10 +117,41 @@ def refreshsimlist(_request):
     return simplejson.dumps({'sim_file_states': states})
 
 
+@dajaxice_register
+def update_queue(_request, action):
+    print 'Action', action
+    tracked_sim_files = SimFile.get_tracked_sims()
+    print 'Tracked sim files:', len(tracked_sim_files)
+
+    if action == 'add-all':
+        with transaction.commit_on_success():
+            for simfile in tracked_sim_files:
+                if simfile.simqueueentry_set.count() > 0:
+                    continue
+                sqe = SimQueueEntry.create(
+                    sim_file=simfile,
+                    runconfig=_request.session['current_runconfig'])
+        return simplejson.dumps({})
+
+    if action == 'clear-all':
+        SimQueueEntry.objects.all() .filter(status = SimQueueEntryState.Waiting).delete()
+        return simplejson.dumps({})
+
+    # TODO! Move functionality into here!
+
+
+
+    else:
+        assert False, 'Unhandled aciton'
+    print 'Action', action
+    return simplejson.dumps({})
+
+
 
 
 @dajaxice_register
 def overview_update_sim_gui_batch(_request, simfile_ids):
+    print 'Updating!'
     ensure_config()
 
     if isinstance(simfile_ids, int):
@@ -153,7 +184,8 @@ def overview_update_sim_gui_batch(_request, simfile_ids):
                     } ) 
 
     v = simplejson.dumps(res)
-    print v
+    print 'Retunrign from AJax'
+    #print v
     return v
 
 

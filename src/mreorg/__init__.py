@@ -32,16 +32,15 @@
 import os
 import sys
 
-# Ensure our monkey patching takes place first:
-import mreorg.requiredpreimport
+import utils
+from mreorg.utils import ensure_directory_exists
+from mreorg.utils import get_file_sha1hash
 
 from mreorg.scriptplots import PlotManager, PM
 from mreorg.scriptplots import FigFormat
 from mreorg.scriptflags import ScriptFlags
-from mreorg.utils import ensure_directory_exists
-from mreorg.config import MReOrgConfig
 
-from mreorg.utils import get_file_sha1hash
+from mreorg.config import MReOrgConfig
 
 from mreorg.layouts import FigureLayouts
 from mreorg.layouts import FigureOptions
@@ -53,6 +52,11 @@ local_dir = os.path.dirname(__file__)
 glob2_src_dir = os.path.join(local_dir,'../../dependances/glob2/src/')
 sys.path.append(glob2_src_dir)
 import glob2
+
+
+
+# OK< now lets do some monkey-patching
+import mreorg.requiredpreimport
 
 __all__ = [
     'MReOrgConfig',

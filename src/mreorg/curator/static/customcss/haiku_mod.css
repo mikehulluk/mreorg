@@ -106,8 +106,8 @@ h5 a:hover, a:active {
 div.nav {
 	background: #e0e0e0;
 	padding: 0;
-        margin-bottom:100px;
-	height: 36px;
+    margin-bottom:30px;
+	height: 26px;
 }
 
 
@@ -289,12 +289,12 @@ pre {
 
 #content div.section
 {
-margin-bottom:75px;
+margin-bottom:30px;
 }
 
 #content div.subsection
 {
-margin-bottom:100px;
+margin-bottom:30px;
 width:95%;
 float:right;
 }
@@ -303,7 +303,7 @@ float:right;
 div.sectionheader
 {
 	border-bottom: thin dotted #e0e0e0;
-	margin-top: 75px;
+	margin-top: 45px;
 	margin-bottom: 35px;
 }
 div.sectionheader div h2 a 

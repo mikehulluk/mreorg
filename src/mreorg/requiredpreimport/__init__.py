@@ -31,18 +31,23 @@
 
 import os
 import mreorg
+
+from mreorg.scriptflags import ScriptFlags
+
+
 # Lets monkey-patch matplotlib!
 # ===============================
 
-from mreorg.scriptflags import ScriptFlags
-from mreorg.scriptplots import PlotManager
-from mreorg.layouts import FigureOptions
-from mreorg.utils import ScriptUtils
 
 
 if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
-
     import matplotlib
+    is_running_headless = not  os.environ.get('DISPLAY', None)
+
+
+    #if not ScriptFlags.MREORG_MPLCONFIG_FILE and  is_running_headless:
+    #    raise 'Running headless and no $MREORG_MPLCONFIG_FILE  found'
+
 
     # Preconfiguration, before we import pylab:
     if ScriptFlags.MREORG_MPLCONFIG_FILE:
@@ -52,18 +57,28 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
         config = ConfigObj(ScriptFlags.MREORG_MPLCONFIG_FILE)
 
 
-        # matplotlib config:
+        # Setup the backend:
+        backend=None
+        if is_running_headless:
+            if 'mpl_backend_headless' in config['options']:
+                backend = config['options']['mpl_backend_headless']
+            else:
+                backend = config['options']['mpl_backend']
+        else:
+            backend = config['options']['mpl_backend']
+
+        assert backend, 'No backend set for config: %s' % ScriptFlags.MREORG_MPLCONFIG_FILE
+        matplotlib.use(backend)
+
+
+
+        # Setup the rc-params values:
         mpl_rcparams = config.get('matplotlib',{})
         for (k,v) in mpl_rcparams.items():
             print "Setting: %s to %s" %(k,v)
             matplotlib.rcParams[k] = v
 
 
-    # If we are running headless, then
-    # explictly set the backend to something
-    # that won't need $DISPLAY variable:
-    if not os.environ.get('DISPLAY', None):
-        matplotlib.use('Agg')
 
 
 
@@ -75,6 +90,7 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
 
 
     def show(*args, **kwargs):
+        from mreorg.scriptplots import PlotManager
         # Should we save all the figures?
         if ScriptFlags.MREORG_SAVEALL:
             PlotManager.save_active_figures()
@@ -94,8 +110,9 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     # to save to directories that don't exist by automatically creating them:
     orig_mplsavefig = matplotlib.pylab.savefig
 
-
     def savefig(filename, *args, **kwargs):
+        from mreorg.layouts import FigureOptions
+        from mreorg.utils import ScriptUtils
         if ScriptFlags.MREORG_SAVEFIGADDINFO or FigureOptions.is_draft:
             F = pylab.gcf()
             (x, y) = F.get_size_inches()
@@ -117,7 +134,7 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     from matplotlib import axes
     set_xlabel_old = axes.Axes.set_xlabel
     set_ylabel_old = axes.Axes.set_ylabel
-    
+
     def set_xlabel_new(self, *args, **kwargs):
         if not 'multialignment' in kwargs:
             kwargs['multialignment'] = 'center'

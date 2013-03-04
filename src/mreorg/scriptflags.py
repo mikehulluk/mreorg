@@ -95,8 +95,8 @@ class ScriptFlags(object):
     MREORG_ENABLECOVERAGE = ENVVAR_MREORG_ENABLECOVERAGE
 
     MREORG_SAVEFIGADDINFO =  ENVVAR_MREORG_SAVEFIGADDINFO
-    
-    
+
+
     # Setup the environment:
     MREORG_MPLCONFIG =  osenv.get('MREORG_MPLCONFIG', None)
     if MREORG_MPLCONFIG:
@@ -108,11 +108,14 @@ class ScriptFlags(object):
         MREORG_MPLCONFIG_FILE=target_config_file
     else:
         MREORG_MPLCONFIG_FILE=None
-    
-    
 
+
+
+
+#print 'MREORG_NOSHOW', ScriptFlags.MREORG_NOSHOW
+#assert False
 
 # Look out for unexpected flags:
 for key in os.environ:
     if key.startswith('MREORG'):
-        assert key in ScriptFlags._expected_options, 'MREORG config option not recognised: %s' % key
+        assert key in ScriptFlags._expected_options, 'MREORG config option not recognised: %s. Possible options: [%s]' % (key, ','.join(ScriptFlags._expected_options))

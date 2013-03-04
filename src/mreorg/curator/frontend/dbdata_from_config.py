@@ -46,16 +46,16 @@ def update_db_from_config():
             for fgglob in fgglobs:
                 filenames.update(mreorg.glob2.glob(fgglob) )
 
-        # Safely get the FileGroup:
-        fg = FileGroup.get_or_make(name=fgname)
-        assert not fg.is_special(), 'Trying to overwrite a builtin filegroup'
-        for filename in filenames:
-            simfile = SimFile.get_or_make(full_filename=filename)
-            if not fg.contains_simfile(simfile):
-                fg.simfiles.add(simfile)
-                fg.save()
+            # Safely get the FileGroup:
+            fg = FileGroup.get_or_make(name=fgname)
+            assert not fg.is_special(), 'Trying to overwrite a builtin filegroup'
+            for filename in filenames:
+                simfile = SimFile.get_or_make(full_filename=filename)
+                if not fg.contains_simfile(simfile):
+                    fg.simfiles.add(simfile)
+                    fg.save()
 
-        print 'Updated FileGroup: %s' % (fgname,)
+            print 'Updated FileGroup: %s' % (fgname,)
 
 
     # Update the RunConfigurations:

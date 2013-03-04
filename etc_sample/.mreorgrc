@@ -1,5 +1,11 @@
 
 
+# Generally, what shall we save as?
+default_autosave_formats = ['svg','eps','pdf','png']
+
+
+
+
 
 
 # Where shall we track by default. Adding entries here makes it easier to wipe
@@ -9,7 +15,7 @@
 
 # default dictionary:  {recurse='False', should_exist=False, auto_track=False}
 default_monitor_directories = [
-    ( "/home/michael/hw_to_come/hw-results/src/",),
+    ("/home/michael/hw_to_come/hw-results/src/",),
     ("/home/michael/hw_to_come/morphforge/src/morphforgeexamples/", {'recurse':True, 'should_exist':True, 'auto_track':True, 'filegroup':'examples'}),
     ("/home/michael/hw_to_come/hw-results/src/12-00/", {'recurse':True, 'should_exist':True , 'auto_track':False, 'filegroup':'blah'} ),
     ("/home/michael/hw_to_come/hw-results/src/simulations_for_paper1/", {'recurse':False, 'should_exist':True, 'auto_track':True, 'filegroup':'paper2' } )

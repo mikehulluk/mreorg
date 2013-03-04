@@ -51,7 +51,7 @@ from mreorg.curator.frontend.models import SimFileRun
 from mreorg.curator.frontend.models import SimFile
 from mreorg.curator.frontend.models import SimFileRunOutputImage
 from mreorg.curator.frontend.models import RunConfiguration
-
+from django.db import transaction
 
 class SimDBWriter(object):
 
@@ -90,41 +90,41 @@ class SimDBWriter(object):
 
         simres.save()
 
-		with transaction.commit_on_success():
-		    output_file_dir = mreorg.MReOrgConfig.get_image_store_dir()
-		    # Create the images
-		    for image_filename in sim_run_info.output_images:
-		        if not image_filename.endswith('svg'):
-		            continue
+        with transaction.commit_on_success():
+            output_file_dir = mreorg.MReOrgConfig.get_image_store_dir()
+            # Create the images
+            for image_filename in sim_run_info.output_images:
+                if not image_filename.endswith('svg'):
+                    continue
 
-		        # Copy the output file:
-		        try:
-		            hashstr = mreorg.get_file_sha1hash(image_filename)
-		        except:
-		            hashstr = None
+                # Copy the output file:
+                try:
+                    hashstr = mreorg.get_file_sha1hash(image_filename)
+                except:
+                    hashstr = None
 
-		        if hashstr == None:
-		            continue
+                if hashstr == None:
+                    continue
 
-		        opfile1 = output_file_dir + '/' + hashstr + '.svg'
-		        shutil.copyfile(image_filename, opfile1)
+                opfile1 = output_file_dir + '/' + hashstr + '.svg'
+                shutil.copyfile(image_filename, opfile1)
 
-		        f_thumb = image_filename.replace(".svg","thumb.png")
-		        os.system('convert %s -resize 400x300 %s'%(
-		                     pipes.quote(image_filename),pipes.quote(f_thumb)))
-		        hashstr = hashlib.md5( open(f_thumb).read() ).hexdigest()
-		        hashstr = mreorg.get_file_sha1hash( f_thumb)
-		        opfile2 = output_file_dir + '/' + hashstr + ".png"
-		        shutil.copyfile(f_thumb, opfile2)
-		        im_obj = SimFileRunOutputImage(
-		                original_name = image_filename,
-		                hash_name = opfile1,
-		                hash_thumbnailname = opfile2,
-		                simulation = simres
-		                )
+                f_thumb = image_filename.replace(".svg","thumb.png")
+                os.system('convert %s -resize 400x300 %s'%(
+                             pipes.quote(image_filename),pipes.quote(f_thumb)))
+                hashstr = hashlib.md5( open(f_thumb).read() ).hexdigest()
+                hashstr = mreorg.get_file_sha1hash( f_thumb)
+                opfile2 = output_file_dir + '/' + hashstr + ".png"
+                shutil.copyfile(f_thumb, opfile2)
+                im_obj = SimFileRunOutputImage(
+                        original_name = image_filename,
+                        hash_name = opfile1,
+                        hash_thumbnailname = opfile2,
+                        simulation = simres
+                        )
 
 
-		        im_obj.save()
+                im_obj.save()
 
 
 class SimRunInfo(object):
@@ -203,7 +203,7 @@ class CurationSimDecorator(object):
         # Get the timing:
         info.time_taken = int(time.time() - cls.start_time)
 
-        # Has thier been an exception?
+        # Has there been an exception?
         info.exception_details = cls.exception_details
         if info.exception_details != (None, None, None):
             print 'Exception details', info.exception_details

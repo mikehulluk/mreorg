@@ -30,6 +30,7 @@
 from django.core.management import setup_environ
 import mreorg.curator.settings as settings
 setup_environ(settings)
+import django
 
 import time
 import os

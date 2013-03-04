@@ -107,6 +107,18 @@ function refresh_simfile_status_single(sim_id) {
     Dajaxice.mreorg.curator.frontend.overview_update_sim_gui_batch(update_sim_gui_callback_batch, {'simfile_ids':sim_id});
 }
 
+
+
+// Called when the simulation is clicked:
+function toggle_sim_for_resubmit(id) {
+    Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simfile_id':id});
+    refresh_simfile_status_single(id);
+}
+
+
+
+
+// New functions:
 function update_queue(action) {
     Dajaxice.mreorg.curator.frontend.update_queue(refresh_simfile_status_all, {'action':action});
 }
@@ -128,11 +140,7 @@ function queue_resubmit_all_changed() {
 }
 
 
-// Called when the simulation is clicked:
-function toggle_sim_for_resubmit(id) {
-    Dajaxice.mreorg.curator.frontend.overview_toggle_simfile_for_resubmit(pass, {'simfile_id':id});
-    refresh_simfile_status_single(id);
-}
+
 
 
 
