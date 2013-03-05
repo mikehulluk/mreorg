@@ -123,6 +123,7 @@ class MyXMLParser(xml.sax.handler.ContentHandler):
                             'rdf:RDF', 'cc:Work', 'inkscape:grid',
                             'dc:format', 'dc:type', 'dc:title',
                             'mask','clipPath','radialGradient','stop','linearGradient','filter', 'feGaussianBlur',
+                            'flowRoot', 'flowRegion','flowPara',
                             'use', ]
 
         method_lut = {
@@ -228,7 +229,7 @@ class SVGFile(FileObj):
         with open(self.filename) as f:
             self.contents = f.read()
 
-
+        print filename
         self.svg_data = self.parse_xml()
 
         print str(self)
@@ -356,7 +357,46 @@ class SVGFileSet(object):
 
         #['node']['property'] -> ['file1','file2','file3'...]
 
+        from matplotlib.colors import ColorConverter
         #pass
+        #colors = set()
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+        #from mpl_toolkits.mplot3d import Axes3D
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+
+        for element in sorted(all_styles):
+            for prop in sorted(all_styles[element]):
+                for value in sorted(all_styles[element][prop]):
+                    if value.startswith('#'):
+                        files = all_styles[element][prop][value]
+                        s = float(len(files)) * 3
+
+                        colors = np.array( ColorConverter().to_rgb(value) ) 
+                        colors = colors.reshape( (1,3))
+                        print colors
+                        print colors.shape
+                        l = ax.scatter(colors[:,0], colors[:,1], colors[:,2], c=colors, s=s, picker=5)
+                        l.src_color = value
+                        l.src_files = files
+
+
+
+
+
+        def onpick(event):
+            print 'On event', event, event.artist
+            l = event.artist
+            print l.src_color
+            print [ f.filename for f in l.src_files]
+        fig.canvas.mpl_connect('pick_event', onpick)
+
+        plt.show()
 
 
 
@@ -368,6 +408,9 @@ class SVGFileSet(object):
         # Summary Table of all tags and colors:
         self.build_summary_table(xml)
 
+        # Create the output:
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
         # General table:
         for svgfile in sorted( self.svgfiles, key=lambda o:o.filename ):
@@ -378,9 +421,6 @@ class SVGFileSet(object):
 
 
 
-        # Create the output:
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
         with open(os.path.join(output_dir,'index.html'),'w' ) as f:
             f.write(str(xml))
 

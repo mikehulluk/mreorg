@@ -25,6 +25,7 @@ class _FigureLayouts():
 
 
 
+from validate import Validator
 
 
 
@@ -35,6 +36,8 @@ class _FigureOptions():
             'default_autosave_formats' : None
             }
 
+    _configspecfile = '/home/michael/hw_to_come/libs/mreorg/mplconfigs/mplconfig.spec'
+
     def __init__(self,):
         self.default_autosave_formats = None
         # Load the defaults:
@@ -43,14 +46,18 @@ class _FigureOptions():
         # Load the config file:
         if ScriptFlags.MREORG_MPLCONFIG_FILE:
             from configobj import ConfigObj
-            config = ConfigObj(ScriptFlags.MREORG_MPLCONFIG_FILE, interpolation='template')
-            config.interpolation = 'template'
+
+            config = ConfigObj(ScriptFlags.MREORG_MPLCONFIG_FILE, interpolation='template', configspec=_FigureOptions._configspecfile)
+            validator = Validator()
+            result = config.validate(validator)
+            assert result == True, 'Invalid Config for mreorg'
+
             self.__dict__.update(config.get('options',{}))
+
 
     @property
     def is_draft(self):
         return self.draft
-        #return False
 
 
 

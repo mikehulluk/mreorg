@@ -33,6 +33,8 @@ import os
 import mreorg
 
 from mreorg.scriptflags import ScriptFlags
+from mreorg.layouts import FigureOptions
+import datetime
 
 
 # Lets monkey-patch matplotlib!
@@ -71,12 +73,23 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
         matplotlib.use(backend)
 
 
-
         # Setup the rc-params values:
         mpl_rcparams = config.get('matplotlib',{})
+
+        ## Downscale values set in mreorg, if needs be. This is too work around a bug in matplotlib SVG backend:
+        #downscale_options = ['font.size','axes.labelsize','legend.fontsize','xtick.labelsize','ytick.labelsize']
+        #if FigureOptions.downscale_fontsize:
+        #    for k in downscale_options:
+        #        if k in mpl_rcparams.keys():
+        #            mpl_rcparams[k] = float(mpl_rcparams[k]) / FigureOptions.downscale_fontsize
+
+
+
+
         for (k,v) in mpl_rcparams.items():
             print "Setting: %s to %s" %(k,v)
             matplotlib.rcParams[k] = v
+
 
 
 
@@ -117,6 +130,8 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
             F = pylab.gcf()
             (x, y) = F.get_size_inches()
             txt = 'Size: x=%2.2f y=%2.2f (inches)' % (x, y)
+            txt += '\n' + 'On: %s' % datetime.datetime.today().strftime('%d, %h %Y (%H:%M)')
+            txt += '\n' + 'Using MPLCONFIGFILE: %s' % ScriptFlags.MREORG_MPLCONFIG_FILE
             txt += '\n' + filename.split('/')[-1]
             txt += '\n' + ScriptUtils.get_calling_script_file(include_ext=True)
             pylab.figtext(0.0, 0.5, txt, backgroundcolor='white')
@@ -147,6 +162,29 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     axes.Axes.set_ylabel = set_ylabel_new
 
 
+
+    def monkeypatch_method(cls):
+        def decorator(func):
+            setattr(cls, func.__name__, func)
+            return func
+        return decorator
+
+
+
+    # SVG hack
+    # SVG output is a problem, because of a conversion between pt to px, which I don't really understand.
+    # we interecept the call to 'draw_text' at a really low level, in order to rescale the font:
+    if matplotlib.get_backend() == 'svg' and FigureOptions.downscale_fontsize_hack:
+        import matplotlib.backends.backend_svg as svg
+        def myfunc(self, ctx, x, y,  text, fp, *args,**kwargs):
+            fp = fp.copy()
+            fp.set_size(fp.get_size() / 1.25) 
+            #print text, fp
+            orig = getattr(self, 'mreorg_draw_text')
+            return orig( ctx,x,y, text, fp,*args, **kwargs)
+        # Rename the original method
+        setattr( svg.RendererSVG, 'mreorg_draw_text', getattr(svg.RendererSVG,'draw_text') )
+        setattr( svg.RendererSVG, 'draw_text', myfunc)
 
 
 # Hook in the coverage
