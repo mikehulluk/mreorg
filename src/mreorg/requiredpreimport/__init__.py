@@ -76,12 +76,12 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
         # Setup the rc-params values:
         mpl_rcparams = config.get('matplotlib',{})
 
-        ## Downscale values set in mreorg, if needs be. This is too work around a bug in matplotlib SVG backend:
-        #downscale_options = ['font.size','axes.labelsize','legend.fontsize','xtick.labelsize','ytick.labelsize']
-        #if FigureOptions.downscale_fontsize:
-        #    for k in downscale_options:
-        #        if k in mpl_rcparams.keys():
-        #            mpl_rcparams[k] = float(mpl_rcparams[k]) / FigureOptions.downscale_fontsize
+        # Downscale values set in mreorg, if needs be. This is too work around a bug in matplotlib SVG backend:
+        downscale_options = ['font.size','axes.labelsize','legend.fontsize','xtick.labelsize','ytick.labelsize']
+        if FigureOptions.downscale_fontsize:
+            for k in downscale_options:
+                if k in mpl_rcparams.keys():
+                    mpl_rcparams[k] = float(mpl_rcparams[k]) / FigureOptions.downscale_fontsize
 
 
 

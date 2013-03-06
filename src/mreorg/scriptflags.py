@@ -44,6 +44,7 @@ class ScriptFlags(object):
 
     osenv = os.environ
     ENVVAR_MREORG_NOSHOW = 'MREORG_NOSHOW' in osenv
+    ENVVAR_MREORG_NOMPLIMPORT = 'MREORG_NOMPLIMPORT' in osenv
     ENVVAR_MREORG_SAVEALL = 'MREORG_SAVEALL' in osenv
     ENVVAR_MREORG_SAVEFIGADDINFO = 'MREORG_SAVEFIGADDINFO' in osenv
 
@@ -63,6 +64,7 @@ class ScriptFlags(object):
         'MREORG_CURATION_REENTRYFLAG',
         'MREORG_TIMEOUT',
         'MREORG_MPLCONFIG',
+        'MREORG_NOMPLIMPORT',
         )
 
 
@@ -86,7 +88,7 @@ class ScriptFlags(object):
     MREORG_CURATIONRUN = ENVVAR_MREORG_CURATIONRUN
 
     # If we are building on read-the-docs, we can't import matplotlib:
-    MREORG_DONTIMPORTMATPLOTLIB =  'READTHEDOCS' in os.environ
+    MREORG_DONTIMPORTMATPLOTLIB =  'READTHEDOCS' in os.environ or ENVVAR_MREORG_NOMPLIMPORT
 
     # Default, lets automatically create directories when they don't exist:
     MREORG_AUTOMAKEDIRS = True

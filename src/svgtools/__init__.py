@@ -31,6 +31,24 @@ def add_text(fig,  text, x_cm, y_cm, size=12, weight='bold', rotate=None, textal
     txt1 = sg.TextElement(x_pt,y_pt, text, size=size, weight=weight, **kwargs)
     fig.append(txt1)
 
+def add_figlabel(fig,  text, x_cm, y_cm, size=10, weight='bold', rotate=None, textalign=None, style=None, **kwargs):
+
+    x_pt = x_cm*cm_to_pt
+    y_pt = y_cm*cm_to_pt
+
+    if rotate is not None:
+        kwargs['transform'] = 'rotate(%f,%f,%f)' %(rotate, x_pt, y_pt)
+
+    if textalign is not None:
+        kwargs['text-anchor'] = textalign
+
+    if style is not None:
+        kwargs['style'] = style
+
+    txt1 = sg.TextElement(x_pt,y_pt, text, size=size, weight=weight, **kwargs)
+    fig.append(txt1)
+
+
 
 def write_rect_to_file(filename, x_cm, y_cm):
     data_dct = {'x_cm':x_cm, 'y_cm':y_cm}
