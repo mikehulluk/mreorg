@@ -32,6 +32,11 @@ def add_text(fig,  text, x_cm, y_cm, size=12, weight='bold', rotate=None, textal
     fig.append(txt1)
 
 def add_figlabel(fig,  text, x_cm, y_cm, size=10, weight='bold', rotate=None, textalign=None, style=None, **kwargs):
+    # Keep trailing '.'
+    if text.endswith('.'):
+        text = text[:-1]
+    text = text + '.'
+
 
     x_pt = x_cm*cm_to_pt
     y_pt = y_cm*cm_to_pt

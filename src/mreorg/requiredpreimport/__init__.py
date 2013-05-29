@@ -139,7 +139,7 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
 
         if ScriptFlags.MREORG_AUTOMAKEDIRS:
             mreorg.ensure_directory_exists(filename)
-        return orig_mplsavefig(filename, *args, **kwargs)
+        return orig_mplsavefig(filename, *args, transparent=True, **kwargs)
 
     matplotlib.pylab.savefig = savefig
     pylab.savefig = savefig
