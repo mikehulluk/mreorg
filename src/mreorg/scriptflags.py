@@ -30,6 +30,7 @@
 #----------------------------------------------------------------------
 
 import os
+import re
 
 
 class ScriptFlags(object):
@@ -41,18 +42,6 @@ class ScriptFlags(object):
     behaviours can be changed during the script run by setting the relevant
     class attributes.
     """
-
-    osenv = os.environ
-    ENVVAR_MREORG_NOSHOW = 'MREORG_NOSHOW' in osenv
-    ENVVAR_MREORG_NOMPLIMPORT = 'MREORG_NOMPLIMPORT' in osenv
-    ENVVAR_MREORG_SAVEALL = 'MREORG_SAVEALL' in osenv
-    ENVVAR_MREORG_SAVEFIGADDINFO = 'MREORG_SAVEFIGADDINFO' in osenv
-
-    # 'Meta-options' that enable other options:
-    ENVVAR_MREORG_CURATIONRUN = 'MREORG_CURATIONRUN' in osenv
-    ENVVAR_MREORG_BATCHRUN = 'MREORG_BATCHRUN' in osenv
-
-    ENVVAR_MREORG_ENABLECOVERAGE = 'MREORG_ENABLECOVERAGE' in osenv
 
     _expected_options = (
         'MREORG_NOSHOW',
@@ -66,6 +55,44 @@ class ScriptFlags(object):
         'MREORG_MPLCONFIG',
         'MREORG_NOMPLIMPORT',
         )
+
+    # Old Style - using individual config variables [to remove]
+    osenv = os.environ
+    old_ENVVAR_MREORG_NOSHOW = 'MREORG_NOSHOW' in osenv
+    old_ENVVAR_MREORG_NOMPLIMPORT = 'MREORG_NOMPLIMPORT' in osenv
+    old_ENVVAR_MREORG_SAVEALL = 'MREORG_SAVEALL' in osenv
+    old_ENVVAR_MREORG_SAVEFIGADDINFO = 'MREORG_SAVEFIGADDINFO' in osenv
+    # 'Meta-options' that enable other options:
+    old_ENVVAR_MREORG_CURATIONRUN = 'MREORG_CURATIONRUN' in osenv
+    old_ENVVAR_MREORG_BATCHRUN = 'MREORG_BATCHRUN' in osenv
+    old_ENVVAR_MREORG_ENABLECOVERAGE = 'MREORG_ENABLECOVERAGE' in osenv
+
+
+    # New Style:
+    mreorg_conf_string = os.environ['MREORG_CONFIG']
+    mreorg_conf = re.split(r'\W+', mreorg_conf_string)
+    _expected_options_new = [exp_opt.replace("MREORG_","") for exp_opt in _expected_options]
+    for opt in mreorg_conf:
+        assert opt in _expected_options_new, 'Unexpected option: %s' % opt
+    new_ENVVAR_MREORG_NOSHOW = 'NOSHOW' in mreorg_conf
+    new_ENVVAR_MREORG_NOMPLIMPORT = 'NOMPLIMPORT' in mreorg_conf
+    new_ENVVAR_MREORG_SAVEALL = 'SAVEALL' in mreorg_conf
+    new_ENVVAR_MREORG_SAVEFIGADDINFO = 'SAVEFIGADDINFO' in mreorg_conf
+    new_ENVVAR_MREORG_CURATIONRUN = 'CURATIONRUN' in mreorg_conf
+    new_ENVVAR_MREORG_BATCHRUN = 'BATCHRUN' in mreorg_conf
+    new_ENVVAR_MREORG_ENABLECOVERAGE = 'ENABLECOVERAGE' in mreorg_conf
+
+
+    # Allow either old or new for the time being:
+    ENVVAR_MREORG_NOSHOW = old_ENVVAR_MREORG_NOSHOW or new_ENVVAR_MREORG_NOSHOW
+    ENVVAR_MREORG_NOMPLIMPORT = old_ENVVAR_MREORG_NOMPLIMPORT or new_ENVVAR_MREORG_NOMPLIMPORT
+    ENVVAR_MREORG_SAVEALL = old_ENVVAR_MREORG_SAVEALL or new_ENVVAR_MREORG_SAVEALL
+    ENVVAR_MREORG_SAVEFIGADDINFO = old_ENVVAR_MREORG_SAVEFIGADDINFO or new_ENVVAR_MREORG_SAVEFIGADDINFO
+    ENVVAR_MREORG_CURATIONRUN = old_ENVVAR_MREORG_CURATIONRUN or new_ENVVAR_MREORG_CURATIONRUN
+    ENVVAR_MREORG_BATCHRUN = old_ENVVAR_MREORG_BATCHRUN or new_ENVVAR_MREORG_BATCHRUN
+    ENVVAR_MREORG_ENABLECOVERAGE = old_ENVVAR_MREORG_ENABLECOVERAGE or new_ENVVAR_MREORG_ENABLECOVERAGE
+
+
 
 
 
@@ -114,10 +141,8 @@ class ScriptFlags(object):
 
 
 
-#print 'MREORG_NOSHOW', ScriptFlags.MREORG_NOSHOW
-#assert False
 
 # Look out for unexpected flags:
 for key in os.environ:
-    if key.startswith('MREORG'):
+    if key.startswith('MREORG') and key != 'MREORG_CONFIG':
         assert key in ScriptFlags._expected_options, 'MREORG config option not recognised: %s. Possible options: [%s]' % (key, ','.join(ScriptFlags._expected_options))

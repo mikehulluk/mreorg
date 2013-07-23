@@ -144,6 +144,29 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     matplotlib.pylab.savefig = savefig
     pylab.savefig = savefig
 
+
+
+
+
+    # Trigger saving all images at the end of the program run:
+    if ScriptFlags.MREORG_SAVEALL:
+        
+        from mreorg.atexithandlers import AtExitHandler
+        def _save_all_at_exit(*args,**kwargs):
+            from mreorg.scriptplots import PlotManager
+            PlotManager.save_active_figures()
+
+
+        AtExitHandler.add_handler(_save_all_at_exit)
+
+
+
+
+
+
+
+
+
     # Monkey patch xlabel, ylabel, so the default is
     # multialignment='center'
     from matplotlib import axes

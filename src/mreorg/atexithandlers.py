@@ -33,7 +33,7 @@
 class AtExitHandler():
     """
     Class that allows us to order the function calls made it 'atexit'.
-    We need to do this to get the ordering write when writing to database.
+    We need to do this to get the ordering right when writing to database.
     """
 
     _handlers = []
