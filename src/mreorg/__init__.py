@@ -54,6 +54,12 @@ sys.path.append(glob2_src_dir)
 import glob2
 
 
+# Setup xmlwitch path
+# ----------------
+local_dir = os.path.dirname(__file__)
+glob2_src_dir = os.path.join(local_dir,'../../dependances/xmlwitch/')
+sys.path.append(glob2_src_dir)
+import xmlwitch
 
 # OK< now lets do some monkey-patching
 import mreorg.requiredpreimport

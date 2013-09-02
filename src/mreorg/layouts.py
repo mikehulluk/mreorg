@@ -1,4 +1,5 @@
 
+import os
 
 from mreorg.scriptflags import ScriptFlags
 
@@ -36,7 +37,9 @@ class _FigureOptions():
             'default_autosave_formats' : None
             }
 
-    _configspecfile = '/home/michael/hw_to_come/libs/mreorg/mplconfigs/mplconfig.spec'
+    
+    local_dir = os.path.dirname(__file__)
+    _configspecfile = os.path.join(local_dir, '../../mplconfigs/mplconfig.spec')
 
     def __init__(self,):
         self.default_autosave_formats = None

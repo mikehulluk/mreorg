@@ -148,16 +148,17 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
 
 
 
-    # Trigger saving all images at the end of the program run:
-    if ScriptFlags.MREORG_SAVEALL:
-        
-        from mreorg.atexithandlers import AtExitHandler
-        def _save_all_at_exit(*args,**kwargs):
-            from mreorg.scriptplots import PlotManager
-            PlotManager.save_active_figures()
+    ## Trigger saving all images at the end of the program run:
+    #if ScriptFlags.MREORG_SAVEALL:
+    #    
+    #    from mreorg.atexithandlers import AtExitHandler
+    #    def _save_all_at_exit(*args,**kwargs):
+    #        print 'Saving atexit:'
+    #        from mreorg.scriptplots import PlotManager
+    #        PlotManager.save_active_figures()
 
 
-        AtExitHandler.add_handler(_save_all_at_exit)
+    #    AtExitHandler.add_handler(_save_all_at_exit)
 
 
 
