@@ -3,6 +3,10 @@ import os
 
 from mreorg.scriptflags import ScriptFlags
 
+try:
+    from validate import Validator
+except ImportError:
+    print "Unable to import 'Validator'"
 
 class _FigureLayouts():
 
@@ -26,7 +30,6 @@ class _FigureLayouts():
 
 
 
-from validate import Validator
 
 
 

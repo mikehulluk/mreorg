@@ -19,14 +19,19 @@ def add_text(fig,  text, x_cm, y_cm, size=12, weight='bold', rotate=None, textal
     x_pt = x_cm*cm_to_pt
     y_pt = y_cm*cm_to_pt
 
-    if rotate is not None:
-        kwargs['transform'] = 'rotate(%f,%f,%f)' %(rotate, x_pt, y_pt)
+    #if rotate is not None:
+    #    kwargs['transform'] = 'rotate(%f,%f,%f)' %(rotate, x_pt, y_pt)
 
-    if textalign is not None:
-        kwargs['text-anchor'] = textalign
+    #if textalign is not None:
+    #    kwargs['text-anchor'] = textalign
 
     if style is not None:
         kwargs['style'] = style
+
+
+    if 'style' in kwargs:
+        del kwargs['style']
+
 
     txt1 = sg.TextElement(x_pt,y_pt, text, size=size, weight=weight, **kwargs)
     fig.append(txt1)
