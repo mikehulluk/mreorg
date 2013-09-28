@@ -65,22 +65,16 @@ class ScriptFlags(object):
         if '=' in opt:
             continue
         assert opt in _expected_options_new, 'Unexpected option: %s' % opt
-    new_ENVVAR_MREORG_NOSHOW = 'NOSHOW' in mreorg_conf
-    new_ENVVAR_MREORG_NOMPLIMPORT = 'NOMPLIMPORT' in mreorg_conf
-    new_ENVVAR_MREORG_SAVEALL = 'SAVEALL' in mreorg_conf
-    new_ENVVAR_MREORG_SAVEFIGADDINFO = 'SAVEFIGADDINFO' in mreorg_conf
-    new_ENVVAR_MREORG_CURATIONRUN = 'CURATIONRUN' in mreorg_conf
-    new_ENVVAR_MREORG_BATCHRUN = 'BATCHRUN' in mreorg_conf
-    new_ENVVAR_MREORG_ENABLECOVERAGE = 'ENABLECOVERAGE' in mreorg_conf
 
-    # Allow either old or new for the time being:
-    ENVVAR_MREORG_NOSHOW =  new_ENVVAR_MREORG_NOSHOW
-    ENVVAR_MREORG_NOMPLIMPORT = new_ENVVAR_MREORG_NOMPLIMPORT
-    ENVVAR_MREORG_SAVEALL = new_ENVVAR_MREORG_SAVEALL
-    ENVVAR_MREORG_SAVEFIGADDINFO = new_ENVVAR_MREORG_SAVEFIGADDINFO
-    ENVVAR_MREORG_CURATIONRUN = new_ENVVAR_MREORG_CURATIONRUN
-    ENVVAR_MREORG_BATCHRUN = new_ENVVAR_MREORG_BATCHRUN
-    ENVVAR_MREORG_ENABLECOVERAGE = new_ENVVAR_MREORG_ENABLECOVERAGE
+    ENVVAR_MREORG_NOSHOW = 'NOSHOW' in mreorg_conf
+    ENVVAR_MREORG_NOMPLIMPORT = 'NOMPLIMPORT' in mreorg_conf
+    ENVVAR_MREORG_SAVEALL = 'SAVEALL' in mreorg_conf
+    ENVVAR_MREORG_SAVEFIGADDINFO = 'SAVEFIGADDINFO' in mreorg_conf
+    ENVVAR_MREORG_CURATIONRUN = 'CURATIONRUN' in mreorg_conf
+    ENVVAR_MREORG_BATCHRUN = 'BATCHRUN' in mreorg_conf
+    ENVVAR_MREORG_ENABLECOVERAGE = 'ENABLECOVERAGE' in mreorg_conf
+    ENVVAR_MREORG_CURATION_REENTRY = 'CURATION_REENTRYFLAG' in mreorg_conf
+
 
 
 
@@ -103,6 +97,8 @@ class ScriptFlags(object):
 
     # Copy, for the sake of interface consistency:
     MREORG_CURATIONRUN = ENVVAR_MREORG_CURATIONRUN
+
+    MREORG_CURATION_REENTRY = ENVVAR_MREORG_CURATION_REENTRY
 
     # If we are building on read-the-docs, we can't import matplotlib:
     MREORG_DONTIMPORTMATPLOTLIB =  'READTHEDOCS' in os.environ or ENVVAR_MREORG_NOMPLIMPORT

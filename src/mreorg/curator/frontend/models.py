@@ -83,8 +83,7 @@ class SimFile(models.Model):
         try:
             simfile = SimFile.objects.get(full_filename=full_filename)
         except SimFile.DoesNotExist:
-            if make_kwargs is None:
-                make_kwargs = {}
+            make_kwargs = make_kwargs or {}
             simfile = SimFile(full_filename=full_filename, **make_kwargs)
             simfile.save()
         return simfile
@@ -124,11 +123,11 @@ class SimFile(models.Model):
         return SimFile.objects.filter(tracking_status=TrackingStatus.NotTracked)
 
 
-    @classmethod
-    def update_all_db(cls, directory):
-        import dbdata_from_config
-        assert False, 'Should call the method directly!'
-        return dbdata_from_config.update_all_db(directory)
+    #@classmethod
+    #def update_all_db(cls, directory):
+    #    import dbdata_from_config
+    #    assert False, 'Should call the method directly!'
+    #    return dbdata_from_config.update_all_db(directory)
 
 
 

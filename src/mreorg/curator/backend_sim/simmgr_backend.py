@@ -78,10 +78,15 @@ def simulate( sim_queue_entry):
 
     # Setup the environmental variables:
     # Pass the RunConfiguration.id as an environmental variable
-    os.environ['MREORG_CURATIONRUN'] ='True'
+    #os.environ['MREORG_CURATIONRUN'] ='True'
+    #os.environ['_MREORG_RUNCONFIGID'] = str(sim_queue_entry.runconfig.id)
+    
+    os.environ['MREORG_CONFIG'] =os.environ.get('MREORG_CONFIG') + ';CURATIONRUN'
     os.environ['_MREORG_RUNCONFIGID'] = str(sim_queue_entry.runconfig.id)
+
     if sim_queue_entry.runconfig.timeout:
-        os.environ['MREORG_TIMEOUT'] = '%d' % sim_queue_entry.runconfig.timeout
+        os.environ['MREORG_CONFIG'] =os.environ.get('MREORG_CONFIG') + ';TIMEOUT=%d' % sim_queue_entry.runconfig.timeout
+        #os.environ['MREORG_TIMEOUT'] = '%d' % sim_queue_entry.runconfig.timeout
 
     for envvar in sim_queue_entry.runconfig.environvar_set.all():
         key = envvar.key

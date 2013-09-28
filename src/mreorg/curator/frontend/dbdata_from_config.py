@@ -13,25 +13,25 @@ def from_default_monitor_dirs():
     pass
 
 
-@classmethod
+#@classmethod
 @transaction.commit_on_success
-def update_all_db(cls, directory):
+def update_all_db(directory):
 
     print 'Updating untracked simulation files', directory
     for (dirpath, dirnames, filenames) in os.walk(directory):
-        for filename in filenames:
+        for filename in sorted(filenames):
             if not filename.endswith('.py'):
                 continue
+            print filename
             full_filename = os.path.join(dirpath, filename)
             if mreorg.MReOrgConfig.is_non_curated_file(filename):
                 continue
             if mreorg.MReOrgConfig.is_non_curated_file(full_filename):
                 continue
 
-            try:
-                models.SimFile.objects.get(full_filename=full_filename)
-            except models.SimFile.DoesNotExist:
-                models.SimFile.create(full_filename=full_filename, tracked=False)
+            print ' -- Adding:', filename
+            models.SimFile.get_or_make( full_filename=full_filename, make_kwargs={'tracking_status':models.TrackingStatus.NotTracked})
+            print 'Added OK!'
 
 def update_db_from_config():
     import mreorg
@@ -93,10 +93,14 @@ def update_db_from_config():
 
 
 def rescan_filesystem():
+    import dbdata_from_config
 
     with transaction.commit_on_success():
         for src_dir in models.SourceSimDir.objects.all():
-            models.SimFile.update_all_db(src_dir.directory_name)
+            print 'Updating:', src_dir
+            #models.SimFile.update_all_db(src_dir.directory_name)
+            dbdata_from_config.update_all_db(src_dir.directory_name)
+
 
 
 def mh_adddefault_locations():

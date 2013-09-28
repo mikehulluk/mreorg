@@ -51,6 +51,7 @@ from mreorg.curator.frontend.models import SimFileRun
 from mreorg.curator.frontend.models import SimFile
 from mreorg.curator.frontend.models import SimFileRunOutputImage
 from mreorg.curator.frontend.models import RunConfiguration
+from mreorg.curator.frontend.models import TrackingStatus
 from django.db import transaction
 
 class SimDBWriter(object):
@@ -65,11 +66,13 @@ class SimDBWriter(object):
         if mreorg.MReOrgConfig.is_non_curated_file(sim_run_info.script_name):
             return
 
-        try:
-            simfile = SimFile.get_tracked_sims( full_filename=sim_run_info.script_name)
-        except: # DoesNotExistError,e :
-            simfile = SimFile.create( full_filename=sim_run_info.script_name, tracked=True)
-            simfile.save()
+
+        simfile = SimFile.get_or_make( full_filename=sim_run_info.script_name, make_kwargs={'tracking_status':TrackingStatus.Tracked} )
+        #try:
+        #    simfile = SimFile.get_tracked_sims( full_filename=sim_run_info.script_name)
+        #except: # DoesNotExistError,e :
+        #    simfile = SimFile.create( full_filename=sim_run_info.script_name, tracked=True)
+        #    simfile.save()
 
 
         # Create a simulation result object:
