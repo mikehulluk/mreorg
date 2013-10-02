@@ -13,13 +13,12 @@ setup(
     version = "0.0.1",
     author = "Mike Hull",
     author_email = "mikehulluk@gmail.com",
-    description = ("TODO - add description"),
+    description = ("Tools for organising and simplifying scripts for modelling"),
     license = "BSD",
-    keywords = "example documentation tutorial",
-    url = "http://packages.python.org/an_example_pypi_project",
+    #keywords = "example documentation tutorial",
+    url = "https://github.com/mikehulluk/mreorg",
     
     package_dir = {'':'src' },
-
     packages=['mreorg',
               'mreorg.dependancies',
               'mreorg.dependancies.xmlwitch',
@@ -32,7 +31,6 @@ setup(
               'mreorg.doctools',
               'mreorg.scriptplots',
               ],
-    
     
     long_description=read('README.md'),
     classifiers=[
