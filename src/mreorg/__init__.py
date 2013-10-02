@@ -46,19 +46,19 @@ from mreorg.config import MReOrgConfig
 from mreorg.layouts import FigureLayouts
 from mreorg.layouts import FigureOptions
 
-# Setup glob2 path
-# ----------------
-local_dir = os.path.dirname(__file__)
-glob2_src_dir = os.path.join(local_dir, '../../dependancies/python-glob2/src/')
-sys.path.append(glob2_src_dir)
-import glob2
+## Setup glob2 path
+## ----------------
+#local_dir = os.path.dirname(__file__)
+#glob2_src_dir = os.path.join(local_dir, '../../dependancies/python-glob2/src/')
+#sys.path.append(glob2_src_dir)
+#import glob2
 
-# Setup xmlwitch path
-# ----------------
-local_dir = os.path.dirname(__file__)
-glob2_src_dir = os.path.join(local_dir, '../../dependancies/xmlwitch/')
-sys.path.append(glob2_src_dir)
-import xmlwitch
+## Setup xmlwitch path
+## ----------------
+#local_dir = os.path.dirname(__file__)
+#glob2_src_dir = os.path.join(local_dir, '../../dependancies/xmlwitch/')
+#sys.path.append(glob2_src_dir)
+#import xmlwitch
 
 # OK< now lets do some monkey-patching
 import mreorg.requiredpreimport
