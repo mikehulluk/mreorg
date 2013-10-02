@@ -10,12 +10,11 @@ def read(fname):
 
 setup(
     name = "mreorg",
-    version = "0.0.1",
+    version = "0.0.1.1-rc3",
     author = "Mike Hull",
     author_email = "mikehulluk@gmail.com",
     description = ("Tools for organising and simplifying scripts for modelling"),
     license = "BSD",
-    #keywords = "example documentation tutorial",
     url = "https://github.com/mikehulluk/mreorg",
     
     package_dir = {'':'src' },
@@ -24,6 +23,7 @@ setup(
               'mreorg.dependancies.xmlwitch',
               'mreorg.dependancies.glob2',
               'mreorg.curator',
+              'mreorg.curator.cmdline',
               'mreorg.curator.backend_sim',
               'mreorg.curator.frontend',
               'mreorg.curator.frontend.templates',
@@ -31,8 +31,22 @@ setup(
               'mreorg.doctools',
               'mreorg.scriptplots',
               ],
+    # Could also have been done with 'scripts=':
+    entry_points = {
+        'console_scripts': [
+            'mreorg.curate = mreorg.curator.cmdline.main',
+        ],
+    },
     
-    long_description=read('README.md'),
+    data_files=[('etc', ['etc/configspec.ini']),
+                #('config', ['cfg/data.cfg']),
+                #('/etc/init.d', ['init-script'])
+                ],
+    
+        
+    requires=['matplotlib','configobj','Django'],
+        
+    long_description=read('README.txt'),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",

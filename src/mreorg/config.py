@@ -65,11 +65,13 @@ class MReOrgConfig(object):
     @classmethod
     def get_image_store_dir(cls):
         path = cls.config['FileSystem']['Curate']['output_image_dir']
+        path = os.path.expanduser(path)
         return mreorg.utils.ensure_directory_exists(path)
         
     @classmethod
     def get_simulation_sqllite_filename(cls):
         path = cls.config['FileSystem']['Curate']['sqllite_filename']
+        path = os.path.expanduser(path)
         return mreorg.utils.ensure_directory_exists(path)
 
 
