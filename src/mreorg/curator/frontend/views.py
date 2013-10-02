@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (cxt_data) 2012 Michael Hull.
 # All rights reserved.
@@ -78,36 +79,46 @@ def config_processor(request):
 
 class SimFileWithRunConfigProxy(object):
 
-
     def __init__(self, simfile, runconfig):
         self.simfile = simfile
         self.runconfig = runconfig
 
     def does_file_exist(self):
         return self.simfile.does_file_exist()
+
     def get_docstring(self):
         return self.simfile.get_docstring()
+
     def get_short_filename(self):
         return self.simfile.get_short_filename()
+
     def get_status(self):
         return self.simfile.get_status(runconfig=self.runconfig)
+
     def get_last_executiontime(self):
         return self.simfile.get_last_executiontime(runconfig=self.runconfig)
+
     def is_queued(self):
         return self.simfile.is_queued(runconfig=self.runconfig)
+
     def getCSSQueueState(self):
         return self.simfile.getCSSQueueState(runconfig=self.runconfig)
+
     @property
     def full_filename(self):
         return self.simfile.full_filename
+
     @property
     def id(self):
         return self.simfile.id
+
     @property
     def tracking_status(self):
         return self.simfile.tracking_status
+
     def get_last_run(self):
         return self.simfile.get_last_run(runconfig=self.runconfig)
+
     def __getattr__(self, name):
         print 'looking for attribute:', name
         assert False
@@ -152,7 +163,6 @@ def view_configurations(request):
     return render_to_response('configurations.html', csrf_context)
 
 
-
 def simfilerun_details(request, run_id):
     return render_to_response(
             'simulation_run_details.html',
@@ -163,26 +173,19 @@ def simfilerun_details(request, run_id):
 
 
 def simfile_details(request, simfile_id):
-    sim_file = SimFile.get_tracked_sims(id = simfile_id)
+    sim_file = SimFile.get_tracked_sims(id=simfile_id)
     cxt_data = {'simfile': sim_file}
     csrf_context = RequestContext(request, cxt_data)
-    return render_to_response('simfile_details.html',
-                              csrf_context)
-
-
+    return render_to_response('simfile_details.html', csrf_context)
 
 
 def view_tracking(request):
 
-    cxt_data = {
-                'src_directories': SourceSimDir.objects.all(),
-                'untracked_simfiles':SimFile.get_untracked_sims(),
+    cxt_data = {'src_directories': SourceSimDir.objects.all(),
+                'untracked_simfiles': SimFile.get_untracked_sims(),
                 'simfiles': SimFile.get_tracked_sims()}
-    csrf_context = RequestContext(request, cxt_data , [config_processor] )
-    return render_to_response('tracking.html',
-                              csrf_context
-
-                              )
+    csrf_context = RequestContext(request, cxt_data, [config_processor])
+    return render_to_response('tracking.html', csrf_context)
 
 
 # Tracking Commands
@@ -194,6 +197,7 @@ def do_track_all(request):
         sim.tracking_status = TrackingStatus.Tracked
         sim.save()
     return HttpResponseRedirect('/tracking')
+
 
 @transaction.commit_on_success
 def do_untrack_all(request):
@@ -218,12 +222,9 @@ def do_untrack_src_dir(request, srcdir_id):
     o.delete()
     return HttpResponseRedirect('/tracking')
 
-	
 
 def do_track_rescanfs(request):
     rescan_filesystem()
-    #for src_dir in SourceSimDir.objects.all():
-    #    SimFile.update_all_db(src_dir.directory_name)
     return HttpResponseRedirect('/tracking')
 
 
@@ -231,7 +232,6 @@ def do_track_rescanfs(request):
 def do_track_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')
-
 
     # Find all keys matching untracked_sim_id_XX, and get the XX's
 
@@ -252,7 +252,6 @@ def do_untrack_sim(request):
     if not request.method == 'POST':
         return HttpResponseRedirect('/tracking')
 
-
     # Find all keys matching untracked_sim_id_XX, and get the XX's
     print request.POST.keys()
     r = re.compile(r"""simid_(?P<id>\d+)""", re.VERBOSE)
@@ -269,12 +268,8 @@ def do_untrack_sim(request):
     # Update the list of untracked files:
     return do_track_rescanfs(request)
 
+
 # ====================
-
-
-
-
-
 
 def viewsimulationqueue(request):
     cxt_data = \
@@ -283,9 +278,6 @@ def viewsimulationqueue(request):
          'latest_runs': SimFileRun.objects.order_by('-execution_date')[0:10]}
 
     SimQueueEntry.trim_dangling_jobs()
-    #for queue_entry in SimQueueEntry.objects.all():
-    #    queue_entry.resubmit_if_process_died()
-
 
     csrf_context = RequestContext(request, cxt_data)
     return render_to_response('view_simulation_queue.html', csrf_context)
@@ -293,7 +285,7 @@ def viewsimulationqueue(request):
 
 def view_simulation_failures(request):
     ensure_config(request)
-    simfiles = build_proxy_for_sim_files( SimFile.get_tracked_sims(), runconfig= None )
+    simfiles = build_proxy_for_sim_files(SimFile.get_tracked_sims(), runconfig=None)
     cxt_data = {
         'failed_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.UnhandledException],
         'timeout_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.TimeOut],
@@ -303,9 +295,9 @@ def view_simulation_failures(request):
         }
 
 
-    csrf_context = RequestContext(request, cxt_data,  [config_processor] )
+    csrf_context = RequestContext(request, cxt_data, [config_processor])
     return render_to_response('view_simulation_failures.html',
-                              csrf_context, )
+                              csrf_context)
 
 
 
@@ -324,37 +316,32 @@ def do_queue_add_sims(request):
     sim_id_matches = [r.match(k) for k in request.POST]
     sim_ids = [int(m.groupdict()['id']) for m in sim_id_matches if m]
 
-    runconfig=request.session['current_runconfig']
+    runconfig = request.session['current_runconfig']
 
     for simfile_id in sim_ids:
-        sim_file = SimFile.get_tracked_sims(id = simfile_id)
+        sim_file = SimFile.get_tracked_sims(id=simfile_id)
 
         qe = SimQueueEntry(simfile=sim_file, runconfig=runconfig)
         qe.save()
 
         # Avoid Duplication
     return HttpResponseRedirect('/viewsimulationqueue')
-# ==================================
-
-
-
 
 
 
 def doeditsimfile(request, simfile_id):
 
-    #Open up the file in an editor:
-    sim_file = SimFile.get_tracked_sims(id = simfile_id)
+    # Open up the file in an editor:
+    sim_file = SimFile.get_tracked_sims(id=simfile_id)
 
     cwd = os.getcwd()
-    os.chdir( os.path.split(sim_file.full_filename)[0])
-    data_dict = {'full_filename':sim_file.full_filename}
-    cmds = MReOrgConfig.get_ns().get('drop_into_editor_cmds',['xterm &'])
+    os.chdir(os.path.split(sim_file.full_filename)[0])
+    data_dict = {'full_filename': sim_file.full_filename}
+    cmds = MReOrgConfig.get_ns().get('drop_into_editor_cmds', ['xterm &'])
     for cxt_data in cmds:
         t = string.Template(cxt_data).substitute(**data_dict)
         os.system(t)
     os.chdir(cwd)
-
 
     # Return to the previous page:
     referer = request.META.get('HTTP_REFERER', None)
@@ -366,9 +353,6 @@ def doeditsimfile(request, simfile_id):
         return HttpResponseRedirect(redirect_to)
     except IndexError:
         return HttpResponseRedirect('/')
-
-
-
 
 
 def get_image_file(request, filename):

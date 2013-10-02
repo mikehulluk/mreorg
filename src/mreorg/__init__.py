@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -45,19 +46,17 @@ from mreorg.config import MReOrgConfig
 from mreorg.layouts import FigureLayouts
 from mreorg.layouts import FigureOptions
 
-
 # Setup glob2 path
 # ----------------
 local_dir = os.path.dirname(__file__)
-glob2_src_dir = os.path.join(local_dir,'../../dependances/glob2/src/')
+glob2_src_dir = os.path.join(local_dir, '../../dependances/glob2/src/')
 sys.path.append(glob2_src_dir)
 import glob2
-
 
 # Setup xmlwitch path
 # ----------------
 local_dir = os.path.dirname(__file__)
-glob2_src_dir = os.path.join(local_dir,'../../dependances/xmlwitch/')
+glob2_src_dir = os.path.join(local_dir, '../../dependances/xmlwitch/')
 sys.path.append(glob2_src_dir)
 import xmlwitch
 
@@ -75,5 +74,5 @@ __all__ = [
     'glob2',
     'FigureLayouts',
     'FigureOptions',
-    
-]
+    ]
+

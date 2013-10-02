@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -57,9 +58,8 @@ class PlotManager:
     autosave_default_image_filename_tmpl = _fig_loc + _fig_name
 
     autosave_image_formats = None
-    _all_autosave_image_formats = [
-            FigFormat.EPS, FigFormat.PDF,
-            FigFormat.PNG, FigFormat.SVG]
+    _all_autosave_image_formats = [FigFormat.EPS, FigFormat.PDF,
+                                   FigFormat.PNG, FigFormat.SVG]
 
     @classmethod
     def save_figure(
@@ -98,7 +98,6 @@ class PlotManager:
         import pylab
         fig = (figure if figure else pylab.gcf())
 
-
         # TODO: Move to mreorg layouts:
         # assert f.number == cls.fig_num
         # Some small changes:
@@ -107,7 +106,6 @@ class PlotManager:
         # Find the module this function was called from:
 
         modname = ScriptUtils.get_calling_script_file(include_ext=False)
-
 
         # Print what we are saving:
         subst_dict = {
@@ -143,7 +141,6 @@ class PlotManager:
 
         # Increment the fignum:
         PlotManager.fig_num = PlotManager.fig_num + 1
-
 
     @classmethod
     def save_active_figures(cls):

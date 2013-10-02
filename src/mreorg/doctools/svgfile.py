@@ -1,6 +1,5 @@
-
-
-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 from xml.dom.minidom import parse, parseString
 import xml.etree.ElementTree as ET
@@ -13,47 +12,42 @@ import collections
 from functools import partial
 import shutil
 
+
 def normalise_measurement(length):
     # Return size in mm:
     try:
         pxs = float(length)
-        length='%fpt'%(pxs * 0.8)
+        length = '%fpt' % (pxs * 0.8)
     except:
         pass
 
     if length.endswith('pt'):
-        return float(length.replace('pt','')) * 0.035277778 * 10.
+        return float(length.replace('pt', '')) * 0.035277778 * 10.
     if length.endswith('cm'):
-        return float(length.replace('cm','')) * 10.
+        return float(length.replace('cm', '')) * 10.
 
-    assert False, "unable to read length: %s" % length
+    assert False, 'unable to read length: %s' % length
+
 
 def getWidthHeight(filename):
     root = ET.parse(filename).getroot()
-    height = normalise_measurement( root.attrib['height'])
-    width =  normalise_measurement( root.attrib['width'])
+    height = normalise_measurement(root.attrib['height'])
+    width = normalise_measurement(root.attrib['width'])
 
-    height, width = int(height), int(width)
-    #print height, width
-    return width,height
-
-
-
-
-
+    (height, width) = (int(height), int(width))
+    # print height, width
+    return (width, height)
 
 
 class MyXMLParser(xml.sax.handler.ContentHandler):
-
 
     def get_style_dict(self, attrs):
         toks = [tok.split(':') for tok in attrs.get('style','').split(';') if tok]
         return  dict( toks )
 
-    def update_global_style_dict(self, style_dict, element ):
-        for k,v in style_dict.items():
+    def update_global_style_dict(self, style_dict, element):
+        for (k, v) in style_dict.items():
             self.svg_data.all_styles[element][k].add(v)
-
 
     def do_path(self, attrs):
         style_dict = self.get_style_dict(attrs)
@@ -72,15 +66,14 @@ class MyXMLParser(xml.sax.handler.ContentHandler):
     def do_marker(self, attrs):
         pass
 
-
     def do_tspan(self, attrs):
         pass
 
     def do_svg(self, attrs):
         pass
+
     def do_image(self, attrs):
         pass
-        #print 'image!'
 
     def do_rect(self, attrs):
         pass

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -36,7 +37,6 @@ from django.conf.urls.defaults import include, patterns
 
 from dajaxice.core import dajaxice_autodiscover
 dajaxice_autodiscover()
-
 
 views_mod = 'mreorg.curator.frontend.views'
 url_patterns = (

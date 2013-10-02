@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -54,10 +55,11 @@ from mreorg.curator.frontend.models import RunConfiguration
 from mreorg.curator.frontend.models import TrackingStatus
 from django.db import transaction
 
+
 class SimDBWriter(object):
 
     @classmethod
-    def write_to_database( cls, sim_run_info):
+    def write_to_database(cls, sim_run_info):
         output_file_dir = mreorg.MReOrgConfig.get_image_store_dir()
 
         print 'Saving details from script: ', sim_run_info.script_name
@@ -67,12 +69,8 @@ class SimDBWriter(object):
             return
 
 
-        simfile = SimFile.get_or_make( full_filename=sim_run_info.script_name, make_kwargs={'tracking_status':TrackingStatus.Tracked} )
-        #try:
-        #    simfile = SimFile.get_tracked_sims( full_filename=sim_run_info.script_name)
-        #except: # DoesNotExistError,e :
-        #    simfile = SimFile.create( full_filename=sim_run_info.script_name, tracked=True)
-        #    simfile.save()
+        simfile = SimFile.get_or_make(full_filename=sim_run_info.script_name, make_kwargs={'tracking_status':TrackingStatus.Tracked})
+        
 
 
         # Create a simulation result object:
@@ -112,19 +110,18 @@ class SimDBWriter(object):
                 opfile1 = output_file_dir + '/' + hashstr + '.svg'
                 shutil.copyfile(image_filename, opfile1)
 
-                f_thumb = image_filename.replace(".svg","thumb.png")
-                os.system('convert %s -resize 400x300 %s'%(
+                f_thumb = image_filename.replace('.svg', 'thumb.png')
+                os.system('convert %s -resize 400x300 %s' % (
                              pipes.quote(image_filename),pipes.quote(f_thumb)))
-                hashstr = hashlib.md5( open(f_thumb).read() ).hexdigest()
-                hashstr = mreorg.get_file_sha1hash( f_thumb)
+                hashstr = hashlib.md5(open(f_thumb).read()).hexdigest()
+                hashstr = mreorg.get_file_sha1hash(f_thumb)
                 opfile2 = output_file_dir + '/' + hashstr + ".png"
                 shutil.copyfile(f_thumb, opfile2)
                 im_obj = SimFileRunOutputImage(
-                        original_name = image_filename,
-                        hash_name = opfile1,
-                        hash_thumbnailname = opfile2,
-                        simulation = simres
-                        )
+                        original_name=image_filename,
+                        hash_name=opfile1,
+                        hash_thumbnailname=opfile2,
+                        simulation=simres)
 
 
                 im_obj.save()
@@ -218,7 +215,7 @@ class CurationSimDecorator(object):
     @classmethod
     def top_level_exception_handler(cls, exception_type, exception, tracebackobj, *_args):
         try:
-            traceback_str = str(exception) +'\n'+ ''.join(traceback.format_tb(tracebackobj) )
+            traceback_str = str(exception) +'\n'+ ''.join(traceback.format_tb(tracebackobj))
 
             print ''
             print 'TopLevel-Handler Caught Exception:'

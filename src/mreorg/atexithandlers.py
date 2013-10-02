@@ -1,4 +1,6 @@
-#----------------------------------------------------------------------
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -28,9 +30,8 @@
 # ----------------------------------------------------------------------
 
 
+class AtExitHandler:
 
-
-class AtExitHandler():
     """
     Class that allows us to order the function calls made it 'atexit'.
     We need to do this to get the ordering right when writing to database.

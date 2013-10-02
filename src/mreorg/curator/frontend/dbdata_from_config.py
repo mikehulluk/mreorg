@@ -12,8 +12,6 @@ def from_default_monitor_dirs():
     # for fgname, fgglobs in default_filegroups.iteritems():
     pass
 
-
-#@classmethod
 @transaction.commit_on_success
 def update_all_db(directory):
 
@@ -32,6 +30,7 @@ def update_all_db(directory):
             print ' -- Adding:', filename
             models.SimFile.get_or_make( full_filename=full_filename, make_kwargs={'tracking_status':models.TrackingStatus.NotTracked})
             print 'Added OK!'
+
 
 def update_db_from_config():
     import mreorg
@@ -55,8 +54,7 @@ def update_db_from_config():
                     fg.simfiles.add(simfile)
                     fg.save()
 
-            print 'Updated FileGroup: %s' % (fgname,)
-
+            print 'Updated FileGroup: %s' % (fgname, )
 
     # Update the RunConfigurations:
     with transaction.commit_on_success():
@@ -97,8 +95,6 @@ def rescan_filesystem():
 
     with transaction.commit_on_success():
         for src_dir in models.SourceSimDir.objects.all():
-            print 'Updating:', src_dir
-            #models.SimFile.update_all_db(src_dir.directory_name)
             dbdata_from_config.update_all_db(src_dir.directory_name)
 
 

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 
 # Copyright (c) 2012 Michael Hull.
@@ -36,17 +37,19 @@ import mreorg
 
 from os.path import expanduser
 
+
 class MReOrgConfig(object):
+
     _config_file_ns = None
 
     rcfilename = expanduser('~/.mreorgrc')
 
     _defaults = [
-        ('SIMULATION_SQLLITE_FILENAME',expanduser("~/.mreorg/mreorg.sqlite")),
-        ('SIMULATION_IMAGE_STOREDIR',  expanduser('~/.mreorg/cache/images/')),
-        ('FILENAME_EXCLUDES',[] ),
-        ('COVERAGE_OUTPUT_DIR',expanduser("~/.mreorg/coverage")),
-        ]
+        ('SIMULATION_SQLLITE_FILENAME', expanduser('~/.mreorg/mreorg.sqlite')),
+        ('SIMULATION_IMAGE_STOREDIR', expanduser('~/.mreorg/cache/images/')),
+        ('FILENAME_EXCLUDES', []), 
+        ('COVERAGE_OUTPUT_DIR', expanduser('~/.mreorg/coverage'))
+    ]
 
     @classmethod
     def _load_config_file(cls):

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # svgutils.py
 
 import svgutils.transform as sg
@@ -42,12 +43,11 @@ def add_figlabel(fig,  text, x_cm, y_cm, size=10, weight='bold', rotate=None, te
         text = text[:-1]
     text = text + '.'
 
-
-    x_pt = x_cm*cm_to_pt
-    y_pt = y_cm*cm_to_pt
+    x_pt = x_cm * cm_to_pt
+    y_pt = y_cm * cm_to_pt
 
     if rotate is not None:
-        kwargs['transform'] = 'rotate(%f,%f,%f)' %(rotate, x_pt, y_pt)
+        kwargs['transform'] = 'rotate(%f,%f,%f)' % (rotate, x_pt, y_pt)
 
     if textalign is not None:
         kwargs['text-anchor'] = textalign
@@ -59,9 +59,8 @@ def add_figlabel(fig,  text, x_cm, y_cm, size=10, weight='bold', rotate=None, te
     fig.append(txt1)
 
 
-
 def write_rect_to_file(filename, x_cm, y_cm):
-    data_dct = {'x_cm':x_cm, 'y_cm':y_cm}
+    data_dct = {'x_cm': x_cm, 'y_cm': y_cm}
 
     xml = r"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
@@ -100,10 +99,8 @@ def figure_with_background(width_cm, height_cm):
     return fig
 
 
-
-
-
 class StdLayout:
+
     COL0_TEXT = 0.5
     COL0_FIG = 0.75
     COL1_TEXT = 5.5
@@ -111,4 +108,5 @@ class StdLayout:
 
     ROW0_TEXT = 0.5
     ROW0_FIG = 0.0
+
 

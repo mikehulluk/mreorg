@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -39,8 +40,10 @@ from mreorg.curator.frontend.models import RunConfiguration
 from mreorg.curator.frontend.models import FileGroup
 from django.db import transaction
 
+
 def ensure_config():
     pass
+
 
 @dajaxice_register
 def base_set_runconfig(request, runconfig_id):
@@ -110,7 +113,7 @@ def overview_toggle_simfile_for_resubmit(_request, simfile_id):
 def refreshsimlist(_request):
     assert False, 'Is this used?'
     ensure_config()
-    runconfig=_request.session['current_runconfig']
+    runconfig = _request.session['current_runconfig']
     states = {}
     for simfile in SimFile.get_tracked_sims():
         states[simfile.id] = simfile.get_status()
@@ -147,8 +150,6 @@ def update_queue(_request, action):
     return simplejson.dumps({})
 
 
-
-
 @dajaxice_register
 def overview_update_sim_gui_batch(_request, simfile_ids):
     print 'Updating!'
@@ -157,14 +158,14 @@ def overview_update_sim_gui_batch(_request, simfile_ids):
     if isinstance(simfile_ids, int):
         simfile_ids = [simfile_ids]
     elif isinstance(simfile_ids, basestring):
-        simfile_ids = [int(tok) for tok in simfile_ids.split() ]
+        simfile_ids = [int(tok) for tok in simfile_ids.split()]
     else:
         assert False
     res = []
     for simfile_id in simfile_ids:
 
         try:
-            sim_file = SimFile.get_tracked_sims(id = simfile_id)
+            sim_file = SimFile.get_tracked_sims(id=simfile_id)
         except SimFile.DoesNotExist:
             continue
 
@@ -216,7 +217,6 @@ def overview_update_sim_gui(_request, simfile_id):
     return v
 
 
-
 @dajaxice_register
 def overview_clear_sim_queue(_request):
     SimQueueEntry.objects.all()\
@@ -225,11 +225,11 @@ def overview_clear_sim_queue(_request):
     return simplejson.dumps({})
 
 @dajaxice_register
-def overview_delete_simfile(_request, simfile_id ):
+def overview_delete_simfile(_request, simfile_id):
     ensure_config()
 
     try:
-        sim_file = SimFile.get_tracked_sims(id = simfile_id)
+        sim_file = SimFile.get_tracked_sims(id=simfile_id)
         sim_file.delete()
     except:
         pass

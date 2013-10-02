@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -36,19 +37,12 @@ from mreorg.scriptflags import ScriptFlags
 from mreorg.layouts import FigureOptions
 import datetime
 
-
 # Lets monkey-patch matplotlib!
 # ===============================
 
-
-
 if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     import matplotlib
-    is_running_headless = not  os.environ.get('DISPLAY', None)
-
-
-    #if not ScriptFlags.MREORG_MPLCONFIG_FILE and  is_running_headless:
-    #    raise 'Running headless and no $MREORG_MPLCONFIG_FILE  found'
+    is_running_headless = not os.environ.get('DISPLAY', None)
 
 
     # Preconfiguration, before we import pylab:
@@ -58,9 +52,8 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
         from configobj import ConfigObj
         config = ConfigObj(ScriptFlags.MREORG_MPLCONFIG_FILE)
 
-
         # Setup the backend:
-        backend=None
+        backend = None
         if is_running_headless:
             if 'mpl_backend_headless' in config['options']:
                 backend = config['options']['mpl_backend_headless']
@@ -72,9 +65,8 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
         assert backend, 'No backend set for config: %s' % ScriptFlags.MREORG_MPLCONFIG_FILE
         matplotlib.use(backend)
 
-
         # Setup the rc-params values:
-        mpl_rcparams = config.get('matplotlib',{})
+        mpl_rcparams = config.get('matplotlib', {})
 
         # Downscale values set in mreorg, if needs be. This is too work around a bug in matplotlib SVG backend:
         downscale_options = ['font.size','axes.labelsize','legend.fontsize','xtick.labelsize','ytick.labelsize']
@@ -83,18 +75,9 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
                 if k in mpl_rcparams.keys():
                     mpl_rcparams[k] = float(mpl_rcparams[k]) / FigureOptions.downscale_fontsize
 
-
-
-
-        for (k,v) in mpl_rcparams.items():
-            print "Setting: %s to %s" %(k,v)
+        for (k, v) in mpl_rcparams.items():
+            print 'Setting: %s to %s' % (k, v)
             matplotlib.rcParams[k] = v
-
-
-
-
-
-
 
     # Monkey-Patch 'matplotlib.show()' and 'pylab.show()', allowing us
     # to disable them, and/or to save figures to disk.
@@ -118,10 +101,10 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     matplotlib.pylab.show = show
     pylab.show = show
 
-
     # Monkey-Patch 'matplotlib.savefig()' and 'pylab.savefig()', allowing us
     # to save to directories that don't exist by automatically creating them:
     orig_mplsavefig = matplotlib.pylab.savefig
+
 
     def savefig(filename, *args, **kwargs):
         from mreorg.layouts import FigureOptions
@@ -135,7 +118,6 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
             txt += '\n' + filename.split('/')[-1]
             txt += '\n' + ScriptUtils.get_calling_script_file(include_ext=True)
             pylab.figtext(0.0, 0.5, txt, backgroundcolor='white')
-
 
         if ScriptFlags.MREORG_AUTOMAKEDIRS:
             mreorg.ensure_directory_exists(filename)
@@ -174,25 +156,30 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     set_xlabel_old = axes.Axes.set_xlabel
     set_ylabel_old = axes.Axes.set_ylabel
 
+
     def set_xlabel_new(self, *args, **kwargs):
         if not 'multialignment' in kwargs:
             kwargs['multialignment'] = 'center'
         return set_xlabel_old(self, *args, **kwargs)
+
+
     def set_ylabel_new(self, *args, **kwargs):
         if not 'multialignment' in kwargs:
             kwargs['multialignment'] = 'center'
         return set_ylabel_old(self, *args, **kwargs)
+
+
     axes.Axes.set_xlabel = set_xlabel_new
     axes.Axes.set_ylabel = set_ylabel_new
 
 
-
     def monkeypatch_method(cls):
+
         def decorator(func):
             setattr(cls, func.__name__, func)
             return func
-        return decorator
 
+        return decorator
 
 
     # SVG hack
@@ -226,8 +213,4 @@ if ScriptFlags.MREORG_ENABLECOVERAGE:
 if ScriptFlags.MREORG_CURATIONRUN:
     from mreorg.curator.backend_sim.db_writer_hooks import CurationSimDecorator
     CurationSimDecorator.activate()
-
-
-
-
 

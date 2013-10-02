@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -47,7 +48,7 @@ class Options(object):
 
 class SourceSimDir(models.Model):
 
-    class Meta():
+    class Meta:
 
         ordering = ['directory_name']
 
@@ -70,11 +71,14 @@ class SourceSimDir(models.Model):
 
 class TrackingStatus(object):
 
-    Tracked='Tracked'
-    NotTracked='Nottracked'
+    Tracked = 'Tracked'
+    NotTracked = 'Nottracked'
 
 
 class SimFile(models.Model):
+
+    class Meta:
+        ordering = ['full_filename']
 
     @classmethod
     def get_or_make(self, full_filename, make_kwargs=None):
@@ -89,8 +93,8 @@ class SimFile(models.Model):
         return simfile
 
 
-    class Meta():
-        ordering = ['full_filename']
+
+
     full_filename = models.CharField(max_length=1000)
     tracking_status = models.CharField(
             max_length=1000,
@@ -214,14 +218,11 @@ class SimFile(models.Model):
 
     def getCSSQueueState(self, runconfig):
         p = self.is_queued(runconfig=runconfig)
-        LUT = { True:'SimQueued',False:'SimNotQueued'}
+        LUT = {True: 'SimQueued', False: 'SimNotQueued'}
         return LUT[p]
 
 
-
-
 class RunConfiguration(models.Model):
-
 
     special_configs = ['default']
 
@@ -235,9 +236,11 @@ class RunConfiguration(models.Model):
             runconf = RunConfiguration(name=name, **make_kwargs)
             runconf.save()
         return runconf
-    
+
     class Meta:
-        ordering = ('name',)
+
+        ordering = ('name', )
+
     name = models.CharField(max_length=10000000)
     timeout = models.IntegerField(null=True)
 
@@ -256,20 +259,21 @@ class RunConfiguration(models.Model):
         return cls.get_or_make(name='default')
 
 
-
-
 class FileGroup(models.Model):
+
     special_groups = ['all']
 
     class Meta:
-        ordering = ('name',)
+
+        ordering = ('name', )
+
     name = models.CharField(max_length=10000000)
     simfiles = models.ManyToManyField(SimFile)
 
     @classmethod
     def get_or_make(self, name):
         try:
-            fg =FileGroup.objects.get(name=name)
+            fg = FileGroup.objects.get(name=name)
         except FileGroup.DoesNotExist:
             fg = FileGroup(name=name)
             fg.save()
@@ -289,7 +293,7 @@ class FileGroup(models.Model):
         if self.name == 'all':
             return True
 
-        assert not self.is_special(),'NotImplementedYet'
+        assert not self.is_special(), 'NotImplementedYet'
         res = self.simfiles.filter(id=simfile.id).count() > 0
         return res
 
@@ -299,10 +303,10 @@ class FileGroup(models.Model):
             rc = cls.get_or_make(special_name)
             assert rc.is_special()
             rc.save()
+
     @classmethod
     def get_initial(cls):
         return cls.get_or_make(name='all')
-
 
     @property
     def tracked_sims(self):
@@ -314,21 +318,22 @@ class FileGroup(models.Model):
             if self.name == 'all':
                 srclist = SimFile.objects.all()
             else:
-                assert False,''
+                assert False, ''
         else:
             srclist = self.simfiles
 
         return srclist.filter(tracking_status=TrackingStatus.Tracked)
 
 
-
 class EnvironVar(models.Model):
+
     key = models.CharField(max_length=10000)
     value = models.CharField(max_length=10000, null=True)
     config = models.ForeignKey(RunConfiguration)
 
 
 class SimRunStatus(object):
+
     Success = 'Success'
     UnhandledException = 'UnhandledException'
     TimeOut = 'Timeout'
@@ -338,6 +343,7 @@ class SimRunStatus(object):
 
 
 class SimFileRun(models.Model):
+
     simfile = models.ForeignKey(SimFile)
     runconfig = models.ForeignKey(RunConfiguration)
     execution_date = models.DateTimeField('execution date')
@@ -350,7 +356,6 @@ class SimFileRun(models.Model):
     simulation_sha1hash = models.CharField(max_length=200)
     library_sha1hash = models.CharField(max_length=200)
     execution_time = models.IntegerField(null=True)
-
 
     def execution_data_string(self):
         import datetime
@@ -378,26 +383,29 @@ class SimFileRun(models.Model):
         return SimRunStatus.Success
 
 
-
-
 class SimFileRunOutputImage(models.Model):
+
     original_name = models.CharField(max_length=10000)
     hash_name = models.CharField(max_length=10000)
     hash_thumbnailname = models.CharField(max_length=10000)
     simulation = models.ForeignKey(SimFileRun, related_name='output_images')
 
     def hash_name_short(self):
-        return self.hash_name.split("/")[-1]
+        return self.hash_name.split('/')[-1]
+
     def hash_thumbnailname_short(self):
-        return self.hash_thumbnailname.split("/")[-1]
+        return self.hash_thumbnailname.split('/')[-1]
 
 
 
 class SimQueueEntryState(models.Model):
+
     Waiting = 'Waiting'
     Executing = 'Executing'
 
+
 class SimQueueEntry(models.Model):
+
     simfile = models.ForeignKey(SimFile)
     runconfig = models.ForeignKey(RunConfiguration)
     submit_time = models.DateTimeField('submission_time', default=datetime.datetime.now)
@@ -408,7 +416,8 @@ class SimQueueEntry(models.Model):
 
     @classmethod
     def create(cls, sim_file, runconfig):
-        queue_entry = SimQueueEntry( simfile = sim_file, runconfig=runconfig )
+        queue_entry = SimQueueEntry(simfile=sim_file,
+                                    runconfig=runconfig)
         queue_entry.save()
 
     def get_simulation_time(self):
@@ -417,7 +426,8 @@ class SimQueueEntry(models.Model):
     def time_since_last_heartbeat_in_s(self):
         if not self.simulation_last_heartbeat:
             return -1
-        return (datetime.datetime.now() - self.simulation_last_heartbeat).total_seconds()
+        return (datetime.datetime.now()
+                - self.simulation_last_heartbeat).total_seconds()
 
     def resubmit_if_process_died(self):
         if self.status == SimQueueEntryState.Executing:
@@ -425,8 +435,10 @@ class SimQueueEntry(models.Model):
                 print 'Resubmitting'
                 self.status = SimQueueEntryState.Waiting
                 self.save()
+
     @classmethod
     def trim_dangling_jobs(cls):
         for queue_entry in SimQueueEntry.objects.all():
             queue_entry.resubmit_if_process_died()
+
 

@@ -1,4 +1,6 @@
-#----------------------------------------------------------------------
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
 #
@@ -44,9 +46,7 @@ from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
 
 
-
-
-def simulate( sim_queue_entry):
+def simulate(sim_queue_entry):
     filename = sim_queue_entry.simfile.full_filename
     print ' - Simulating: ', filename
     (dname, fname) = os.path.split(filename)
@@ -57,11 +57,6 @@ def simulate( sim_queue_entry):
     sim_queue_entry.simulation_start_time = datetime.datetime.now()
     sim_queue_entry.simulation_last_heartbeat = datetime.datetime.now()
     sim_queue_entry.save(force_update=True)
-    
-
-
-
-
 
     def try_heartbeat():
         try:
@@ -69,19 +64,14 @@ def simulate( sim_queue_entry):
             sim_queue_entry.save(force_update=True)
         except django.db.utils.DatabaseError:
             pass
-    
+
     # First heartbeat:
     try_heartbeat()
 
-
-    
-
     # Setup the environmental variables:
     # Pass the RunConfiguration.id as an environmental variable
-    #os.environ['MREORG_CURATIONRUN'] ='True'
-    #os.environ['_MREORG_RUNCONFIGID'] = str(sim_queue_entry.runconfig.id)
     
-    os.environ['MREORG_CONFIG'] =os.environ.get('MREORG_CONFIG') + ';CURATIONRUN'
+    os.environ['MREORG_CONFIG']=os.environ.get('MREORG_CONFIG') + ';CURATIONRUN'
     os.environ['_MREORG_RUNCONFIGID'] = str(sim_queue_entry.runconfig.id)
 
     if sim_queue_entry.runconfig.timeout:
@@ -97,13 +87,10 @@ def simulate( sim_queue_entry):
         else:
             os.environ[key] = value
 
-
-
     # Setup the heartbeat, to say that we are actually alive:
     heartbeat_interval = 30
 
     def handler(*args, **kwargs):
-        #print 'Handler Called'
         signal.alarm(heartbeat_interval)
         try_heartbeat()
 
@@ -124,7 +111,6 @@ def simulate( sim_queue_entry):
         else:
             last_run.returncode = exception.returncode
             last_run.save(force_update=True)
-
 
     # Turn off heartbeating.
     signal.alarm(0)
@@ -152,7 +138,7 @@ def _run_backend():
             simulate(queued_objects[0])
             print
 
-        time.sleep( random.randint(3,20) )
+        time.sleep(random.randint(3,20))
 
 def run_backend():
     try:

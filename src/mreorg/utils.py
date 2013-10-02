@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------
 # Copyright (c) 2012 Michael Hull.
 # All rights reserved.
@@ -89,13 +90,12 @@ def ensure_directory_exists(filename):
         os.makedirs(dirname)
     return filename
 
+
 def get_file_sha1hash(filename):
     hash_obj = hashlib.sha1()
     with open(filename) as fileobj:
         hash_obj.update(fileobj.read())
     return hash_obj.hexdigest()
-
-
 
 
 @contextlib.contextmanager
@@ -104,11 +104,11 @@ def switch_into_working_directory(path):
     path, and then changes it back to its previous value on exit.
 
     """
+
     prev_cwd = os.getcwd()
     os.chdir(path)
     try:
-        yield
+        yield None
     finally:
         os.chdir(prev_cwd)
-        
 
