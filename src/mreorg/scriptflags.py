@@ -44,7 +44,17 @@ class ScriptFlags(object):
     behaviours can be changed during the script run by setting the relevant
     class attributes.
     """
-
+    
+    if not 'MREORG_CONFIG' in os.environ:
+        raise RuntimeException(r'''
+            The environmental variable "MREORG_CONFIG" is not set
+            Perhaps you should set it, for example:
+            export MREORG_CONFIG='SAVEALL;NOSHOW'
+            or
+            export MREORG_CONFIG=''
+        ''')
+    
+    
     _expected_options_new = (
         'NOSHOW',
         'SAVEALL',
@@ -57,7 +67,7 @@ class ScriptFlags(object):
         'MPLCONFIG',
         'NOMPLIMPORT',
         )
-    # New Style:
+
     mreorg_conf_string = os.environ['MREORG_CONFIG']
     mreorg_conf = re.split(r'[,;]', mreorg_conf_string)
     mreorg_conf = [m.strip() for m in mreorg_conf if m.strip()]

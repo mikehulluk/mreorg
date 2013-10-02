@@ -151,8 +151,7 @@ def view_sim_output_summaries(request):
     sims = build_proxy_for_sim_files( request.session['current_filegroup'].tracked_files, runconfig= request.session['current_runconfig'] )
     cxt_data = {'simfiles':sims}
     csrf_context = RequestContext(request, cxt_data, [config_processor] )
-    return render_to_response('simulation_output_summaries.html',
-                              csrf_context)
+    return render_to_response('simulation_output_summaries.html', csrf_context)
 
 
 def view_configurations(request):

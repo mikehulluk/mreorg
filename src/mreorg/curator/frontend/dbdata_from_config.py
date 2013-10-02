@@ -101,7 +101,9 @@ def rescan_filesystem():
 
 def mh_adddefault_locations():
     import mreorg
-    default_simulations = mreorg.MReOrgConfig.get_ns().get('default_simulations', [])
+    default_simulations = mreorg.MReOrgConfig.config['Settings']['Curate']['default_tracked_simulations']
+    
+    #default_simulations = mreorg.MReOrgConfig.get_ns().get('default_simulations', [])
 
     with transaction.commit_on_success():
         for l in default_simulations:

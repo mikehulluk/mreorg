@@ -127,17 +127,6 @@ class SimFile(models.Model):
         return SimFile.objects.filter(tracking_status=TrackingStatus.NotTracked)
 
 
-    #@classmethod
-    #def update_all_db(cls, directory):
-    #    import dbdata_from_config
-    #    assert False, 'Should call the method directly!'
-    #    return dbdata_from_config.update_all_db(directory)
-
-
-
-
-
-
     # Handle Caching:
     # ##########################################
     def _is_cache_valid(self):

@@ -68,7 +68,7 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
         # Setup the rc-params values:
         mpl_rcparams = config.get('matplotlib', {})
 
-        # Downscale values set in mreorg, if needs be. This is too work around a bug in matplotlib SVG backend:
+        # Downscale values set in mreorg, if needs be. (This is to work around a bug(?) in matplotlib SVG backend):
         downscale_options = ['font.size','axes.labelsize','legend.fontsize','xtick.labelsize','ytick.labelsize']
         if FigureOptions.downscale_fontsize:
             for k in downscale_options:
@@ -101,11 +101,10 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     matplotlib.pylab.show = show
     pylab.show = show
 
+
     # Monkey-Patch 'matplotlib.savefig()' and 'pylab.savefig()', allowing us
     # to save to directories that don't exist by automatically creating them:
     orig_mplsavefig = matplotlib.pylab.savefig
-
-
     def savefig(filename, *args, **kwargs):
         from mreorg.layouts import FigureOptions
         from mreorg.utils import ScriptUtils
@@ -156,7 +155,6 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     set_xlabel_old = axes.Axes.set_xlabel
     set_ylabel_old = axes.Axes.set_ylabel
 
-
     def set_xlabel_new(self, *args, **kwargs):
         if not 'multialignment' in kwargs:
             kwargs['multialignment'] = 'center'
@@ -168,30 +166,22 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
             kwargs['multialignment'] = 'center'
         return set_ylabel_old(self, *args, **kwargs)
 
-
-    axes.Axes.set_xlabel = set_xlabel_new
-    axes.Axes.set_ylabel = set_ylabel_new
-
-
-    def monkeypatch_method(cls):
-
-        def decorator(func):
-            setattr(cls, func.__name__, func)
-            return func
-
-        return decorator
+    hack_options = mreorg.MReOrgConfig.config['Settings']['mreorg']['Hacks']
+    if hack_options['xlabel_multialign_centre']:
+        axes.Axes.set_xlabel = set_xlabel_new
+    if hack_options['ylabel_multialign_centre']:
+        axes.Axes.set_ylabel = set_ylabel_new
 
 
     # SVG hack
     # SVG output is a problem, because of a conversion between pt to px, which I don't really understand.
     # we interecept the call to 'draw_text' at a really low level, in order to rescale the font:
-    do_hack=False
+    do_hack=hack_options['svg_downscale']
     if matplotlib.get_backend() == 'svg' and FigureOptions.downscale_fontsize_hack and do_hack:
         import matplotlib.backends.backend_svg as svg
         def myfunc(self, ctx, x, y,  text, fp, *args,**kwargs):
             fp = fp.copy()
             fp.set_size(fp.get_size() / 1.25) 
-            #print text, fp
             orig = getattr(self, 'mreorg_draw_text')
             return orig( ctx,x,y, text, fp,*args, **kwargs)
         # Rename the original method

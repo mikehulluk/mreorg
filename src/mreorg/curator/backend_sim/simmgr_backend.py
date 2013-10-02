@@ -88,7 +88,8 @@ def simulate(sim_queue_entry):
             os.environ[key] = value
 
     # Setup the heartbeat, to say that we are actually alive:
-    heartbeat_interval = 30
+    
+    heartbeat_interval = MReOrgConfig.config['Settings']['Curate']['backend_heartbeat_rate']
 
     def handler(*args, **kwargs):
         signal.alarm(heartbeat_interval)
