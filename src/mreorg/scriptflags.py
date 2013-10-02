@@ -46,7 +46,7 @@ class ScriptFlags(object):
     """
     
     if not 'MREORG_CONFIG' in os.environ:
-        raise RuntimeException(r'''
+        raise RuntimeError(r'''
             The environmental variable "MREORG_CONFIG" is not set
             Perhaps you should set it, for example:
             export MREORG_CONFIG='SAVEALL;NOSHOW'
