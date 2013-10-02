@@ -1,6 +1,6 @@
-[submodule "dependances/glob2"]
-	path = dependances/glob2
-	url = https://github.com/miracle2k/python-glob2.git
-[submodule "dependances/xmlwitch"]
-	path = dependances/xmlwitch
-	url = https://github.com/galvez/xmlwitch.git
+#[submodule "dependances/glob2"]
+#	path = dependances/glob2
+#	url = https://github.com/miracle2k/python-glob2.git
+#[submodule "dependances/xmlwitch"]
+#	path = dependances/xmlwitch
+#	url = https://github.com/galvez/xmlwitch.git
