@@ -44,6 +44,7 @@ import random
 
 from mreorg.curator.frontend.models import SimQueueEntry
 from mreorg.curator.frontend.models import SimQueueEntryState
+import mreorg
 
 
 def simulate(sim_queue_entry):
@@ -89,7 +90,7 @@ def simulate(sim_queue_entry):
 
     # Setup the heartbeat, to say that we are actually alive:
     
-    heartbeat_interval = MReOrgConfig.config['Settings']['Curate']['backend_heartbeat_rate']
+    heartbeat_interval = mreorg.MReOrgConfig.config['Settings']['Curate']['backend_heartbeat_rate']
 
     def handler(*args, **kwargs):
         signal.alarm(heartbeat_interval)
@@ -124,7 +125,7 @@ def simulate(sim_queue_entry):
 
 def _run_backend():
 
-    sleep_time = 2
+    #sleep_time = 2
 
     while True:
 

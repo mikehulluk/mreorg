@@ -114,6 +114,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 DAJAXICE_MEDIA_PREFIX = 'dajaxice'
 
+STATICFILES_FINDERS = ( 
+    'django.contrib.staticfiles.finders.FileSystemFinder', 
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder', 
+    'dajaxice.finders.DajaxiceFinder', 
+) 
 
 
 import logging

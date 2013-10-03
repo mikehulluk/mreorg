@@ -24,7 +24,6 @@ if mreorg.ScriptFlags.MREORG_CURATION_REENTRY:
 
 def cmd_runserver(params):
     os.environ['DJANGO_SETTINGS_MODULE']='mreorg.curator.settings'
-    #os.environ['MREORG_CURATION_REENTRYFLAG'] = 'TRUE'
     os.environ['MREORG_CONFIG'] = os.environ.get('MREORG_CONFIG','') + ';CURATION_REENTRYFLAG'
     sys.argv = [ __file__,  'runserver','%d'%params.port]
     execute_from_command_line(sys.argv)

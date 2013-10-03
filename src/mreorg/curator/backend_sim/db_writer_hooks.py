@@ -40,6 +40,7 @@ import signal
 import hashlib
 import shutil
 import pipes
+import subprocess
 
 # Setup django:
 from django.core.management import setup_environ
@@ -111,8 +112,8 @@ class SimDBWriter(object):
                 shutil.copyfile(image_filename, opfile1)
 
                 f_thumb = image_filename.replace('.svg', 'thumb.png')
-                os.system('convert %s -resize 400x300 %s' % (
-                             pipes.quote(image_filename),pipes.quote(f_thumb)))
+                os.system('convert %s -resize 400x300 %s' % (pipes.quote(image_filename),pipes.quote(f_thumb)))
+                #subprocess.check_call( ['convert', '%s -resize 400x300 %s' % (pipes.quote(image_filename),pipes.quote(f_thumb))] )
                 hashstr = hashlib.md5(open(f_thumb).read()).hexdigest()
                 hashstr = mreorg.get_file_sha1hash(f_thumb)
                 opfile2 = output_file_dir + '/' + hashstr + ".png"
