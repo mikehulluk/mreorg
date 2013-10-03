@@ -1,3 +1,6 @@
+/build/
+/dist/
+/src/mreorg.egg-info/
 /parser.out
 /parsetab.py
 /src/mreorg/curator/static/javascript-moment/moment.js~

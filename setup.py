@@ -16,7 +16,7 @@ setup(
     description = ("Tools for organising and simplifying scripts for modelling"),
     license = "BSD",
     url = "https://github.com/mikehulluk/mreorg",
-    
+
     package_dir = {'':'src' },
     packages=['mreorg',
               'mreorg.dependancies',
@@ -37,15 +37,15 @@ setup(
             'mreorg.curate = mreorg.curator.cmdline.main',
         ],
     },
-    
-    data_files=[('etc', ['etc/configspec.ini']),
+
+    data_files=[('mreorg/etc', ['etc/configspec.ini']),
                 #('config', ['cfg/data.cfg']),
                 #('/etc/init.d', ['init-script'])
                 ],
-    
-        
+
+
     requires=['matplotlib','configobj','Django'],
-        
+
     long_description=read('README.txt'),
     classifiers=[
         "Development Status :: 3 - Alpha",

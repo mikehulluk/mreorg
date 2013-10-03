@@ -38,36 +38,37 @@ import mreorg
 import configobj
 import validate
 from os.path import expanduser
+import cStringIO as StringIO
+
+from pkg_resources import resource_string
+configspec_str = resource_string(__name__, 'etc/configspec.ini')
 
 
 class MReOrgConfig(object):
 
     rcfilename = expanduser('~/.mreorgrc')
-    localdir = os.path.join(os.path.dirname(__file__),'../..')
-    configspecfilename = os.path.join(localdir, 'etc/configspec.ini')
-    
 
     # New:
-    # If the config file doesn't exist, make it from the defaults 
+    # If the config file doesn't exist, make it from the defaults
     # specified in the configspec.ini
     if not os.path.exists(rcfilename):
-        config = configobj.ConfigObj(configspec=configspecfilename)
+        config = configobj.ConfigObj(configspec=StringIO.StringIO(configspec_str))
         validator = validate.Validator()
         config.validate(validator,copy=True)
         with open(rcfilename,'w') as f:
             config.write(f)
-    config = configobj.ConfigObj(rcfilename, configspec=configspecfilename)
+    config = configobj.ConfigObj(rcfilename, configspec=StringIO.StringIO(configspec_str))
     validator = validate.Validator()
     config.validate(validator)
-    
-    
-    
+
+
+
     @classmethod
     def get_image_store_dir(cls):
         path = cls.config['FileSystem']['Curate']['output_image_dir']
         path = os.path.expanduser(path)
         return mreorg.utils.ensure_directory_exists(path)
-        
+
     @classmethod
     def get_simulation_sqllite_filename(cls):
         path = cls.config['FileSystem']['Curate']['sqllite_filename']
@@ -83,30 +84,30 @@ class MReOrgConfig(object):
                 return True
         return False
 
-    
-    
-        
-        
-        
-        #~ 
+
+
+
+
+
+        #~
     #~ # Old:
     #~ _config_file_ns = None
-#~ 
-    #~ 
-#~ 
+#~
+    #~
+#~
     #~ _defaults = [
         #~ ('SIMULATION_SQLLITE_FILENAME', expanduser('~/.mreorg/mreorg.sqlite')),
         #~ ('SIMULATION_IMAGE_STOREDIR', expanduser('~/.mreorg/cache/images/')),
-        #~ ('FILENAME_EXCLUDES', []), 
+        #~ ('FILENAME_EXCLUDES', []),
         #~ ('COVERAGE_OUTPUT_DIR', expanduser('~/.mreorg/coverage'))
     #~ ]
-#~ 
-    #~ 
-#~ 
-#~ 
+#~
+    #~
+#~
+#~
     #~ @classmethod
     #~ def _load_config_file(cls):
-#~ 
+#~
         #~ if cls._config_file_ns is not None:
             #~ return
         #~ assert False
@@ -115,27 +116,27 @@ class MReOrgConfig(object):
         #~ cls._config_file_ns = dict(cls._defaults)
         #~ if os.path.exists(cls.rcfilename):
             #~ execfile(cls.rcfilename, cls._config_file_ns)
-#~ 
+#~
     #~ @classmethod
     #~ def get_ns(cls):
         #~ cls._load_config_file()
         #~ return cls._config_file_ns
-#~ 
+#~
     #~ @classmethod
     #~ def _get_path(cls, key, ensure_dir_exists=True):
         #~ path = cls.get_ns()[key]
         #~ if ensure_dir_exists:
             #~ mreorg.utils.ensure_directory_exists(path)
         #~ return path
-#~ 
+#~
     #~ @classmethod
     #~ def get_image_store_dir(cls):
         #~ return cls._get_path('SIMULATION_IMAGE_STOREDIR')
-#~ 
+#~
     #~ @classmethod
     #~ def get_simulation_sqllite_filename(cls):
         #~ return cls._get_path('SIMULATION_SQLLITE_FILENAME')
-#~ 
-#~ 
-#~ 
-#~ 
+#~
+#~
+#~
+#~
