@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "mreorg",
-    version = "0.0.1.1-rc3",
+    version = "0.0.1.1-rc6",
     author = "Mike Hull",
     author_email = "mikehulluk@gmail.com",
     description = ("Tools for organising and simplifying scripts for modelling"),
@@ -44,7 +44,7 @@ setup(
                 ],
 
 
-    requires=['matplotlib','configobj','Django'],
+    install_requires=['matplotlib','configobj','Django'],
 
     long_description=read('README.txt'),
     classifiers=[
