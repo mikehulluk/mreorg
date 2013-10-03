@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "mreorg",
-    version = "0.0.1.1-rc6",
+    version = "0.0.1.1-rc7",
     author = "Mike Hull",
     author_email = "mikehulluk@gmail.com",
     description = ("Tools for organising and simplifying scripts for modelling"),
@@ -34,9 +34,14 @@ setup(
     # Could also have been done with 'scripts=':
     entry_points = {
         'console_scripts': [
-            'mreorg.curate = mreorg.curator.cmdline.main',
+            'mreorg.curate = mreorg.curator.cmdline.mreorg_curate:main',
         ],
     },
+
+    package_data={
+        'mreorg':['curator/frontend/templates/*.html']
+        },
+
 
     data_files=[('mreorg/etc', ['etc/configspec.ini']),
                 #('config', ['cfg/data.cfg']),
@@ -44,7 +49,7 @@ setup(
                 ],
 
 
-    install_requires=['matplotlib','configobj','Django'],
+    install_requires=['matplotlib','configobj','Django','pygments', 'django-dajaxice'],
 
     long_description=read('README.txt'),
     classifiers=[

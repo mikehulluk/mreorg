@@ -9,14 +9,11 @@ if 'MREORG_CURATIONRUN' in os.environ:
     assert False
     del os.environ['MREORG_CURATIONRUN']
 
-
-
 if not 'MREORG_CONFIG' in os.environ:
     os.environ['MREORG_CONFIG'] = ''
 
 import mreorg
 import mreorg.curator.backend_sim.simmgr_backend
-
 
 # django internally will call this file, when files on the disk change.
 # To allow this; we set a flag as an environmental variable, and

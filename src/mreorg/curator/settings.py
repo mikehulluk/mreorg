@@ -90,6 +90,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'django.contrib.staticfiles',
     #'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -112,5 +113,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 DAJAXICE_MEDIA_PREFIX = 'dajaxice'
 
+
+
 import logging
 logging.basicConfig(level=logging.WARNING)
+
+STATIC_URL='/static/'
+

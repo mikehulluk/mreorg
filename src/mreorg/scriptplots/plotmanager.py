@@ -85,8 +85,10 @@ class PlotManager:
             elif FigureOptions.default_autosave_formats is not None:
                 figtypes = FigureOptions.default_autosave_formats
             # Or the rc file?
-            elif 'default_autosave_formats' in MReOrgConfig.get_ns():
-                figtypes = MReOrgConfig.get_ns()['default_autosave_formats']
+            elif 'Settings' in MReOrgConfig.config and \
+                 'mreorg' in MReOrgConfig.config['Settings'] and \
+                 'default_autosave_formats' in MReOrgConfig.config['Settings']['mreorg']:
+                figtypes = MReOrgConfig.config['Settings']['mreorg']['default_autosave_formats']
 
             # No?, then lets default to everything:
             else:

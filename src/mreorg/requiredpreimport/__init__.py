@@ -191,6 +191,7 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
 
 # Hook in the coverage
 if ScriptFlags.MREORG_ENABLECOVERAGE:
+    raise NotImplementedError()
     import mreorg.config
     conf = mreorg.config.MReOrgConfig.get_ns()
     coverage_opdir = conf['COVERAGE_OUTPUT_DIR']
