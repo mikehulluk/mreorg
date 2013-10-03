@@ -109,6 +109,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
+    
     )
 
 DAJAXICE_MEDIA_PREFIX = 'dajaxice'
@@ -119,4 +120,6 @@ import logging
 logging.basicConfig(level=logging.WARNING)
 
 STATIC_URL='/static/'
-
+#STATICFILES_DIRS = [
+#            '/home/michael/hw/mreorg/src/mreorg/curator/static/'
+#            ] 

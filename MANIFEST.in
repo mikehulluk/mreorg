@@ -1,2 +1,8 @@
 include etc/configspec.ini
 include src/mreorg/curator/frontend/templates/*.html
+include src/mreorg/curator/static/*
+include src/mreorg/curator/static/javascript/*
+include src/mreorg/curator/static/customcss/*
+include src/mreorg/curator/static/javascript-moment/*
+include src/mreorg/curator/static/sphinx/*
+
