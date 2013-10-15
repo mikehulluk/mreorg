@@ -336,7 +336,10 @@ def doeditsimfile(request, simfile_id):
     cwd = os.getcwd()
     os.chdir(os.path.split(sim_file.full_filename)[0])
     data_dict = {'full_filename': sim_file.full_filename}
-    cmds = MReOrgConfig.get_ns().get('drop_into_editor_cmds', ['xterm &'])
+    #cmds = MReOrgConfig.get_ns().get('drop_into_editor_cmds', ['xterm &'])
+    #cmds = MReOrgConfig.get_ns().get('drop_into_editor_cmds', ['xterm &'])
+    #cmds = MReOrgConfig.get_ns().get('drop_into_editor_cmds', ['xterm &'])
+    cmds = MReOrgConfig.config['Settings']['Curate']['drop_into_editor_cmds']
     for cxt_data in cmds:
         t = string.Template(cxt_data).substitute(**data_dict)
         os.system(t)

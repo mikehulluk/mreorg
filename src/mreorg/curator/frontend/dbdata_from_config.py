@@ -7,10 +7,6 @@ import os
 import mreorg
 
 
-def from_default_monitor_dirs():
-    # default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
-    # for fgname, fgglobs in default_filegroups.iteritems():
-    pass
 
 @transaction.commit_on_success
 def update_all_db(directory):
@@ -39,7 +35,12 @@ def update_db_from_config():
 
     # Update the FileGroups:
     with transaction.commit_on_success():
-        default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
+        try:
+            default_filegroups = mreorg.MReOrgConfig.config['CurateAutoloadData']['FileGroups']
+        except KeyError:
+            default_filegroups = {}
+
+        #default_filegroups = mreorg.MReOrgConfig.get_ns().get('default_filegroups',{})
         for fgname, fgglobs in default_filegroups.iteritems():
             filenames = set()
             for fgglob in fgglobs:
@@ -58,7 +59,11 @@ def update_db_from_config():
 
     # Update the RunConfigurations:
     with transaction.commit_on_success():
-        default_runconfigs = mreorg.MReOrgConfig.get_ns().get('default_runconfigs',{})
+        try:
+            default_runconfigs = mreorg.MReOrgConfig.config['CurateAutoloadData']['RunConfigs']
+        except KeyError:
+            default_runconfigs = {}
+        #default_runconfigs = mreorg.MReOrgConfig.get_ns().get('default_runconfigs',{})
         for confname, confinfo in default_runconfigs.iteritems():
             runconf = RunConfiguration.get_or_make(name=confname)
             assert not runconf.is_special(), 'Trying to add a builtin-configuration'
@@ -102,8 +107,6 @@ def rescan_filesystem():
 def mh_adddefault_locations():
     import mreorg
     default_simulations = mreorg.MReOrgConfig.config['Settings']['Curate']['default_tracked_simulations']
-    
-    #default_simulations = mreorg.MReOrgConfig.get_ns().get('default_simulations', [])
 
     with transaction.commit_on_success():
         for l in default_simulations:

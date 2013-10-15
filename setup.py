@@ -10,13 +10,13 @@ def read(fname):
 
 setup(
     name = "mreorg",
-    version = "0.0.1.1-rc3",
+    version = "0.0.1.1-rc9.83",
     author = "Mike Hull",
     author_email = "mikehulluk@gmail.com",
     description = ("Tools for organising and simplifying scripts for modelling"),
     license = "BSD",
     url = "https://github.com/mikehulluk/mreorg",
-    
+
     package_dir = {'':'src' },
     packages=['mreorg',
               'mreorg.dependancies',
@@ -34,18 +34,30 @@ setup(
     # Could also have been done with 'scripts=':
     entry_points = {
         'console_scripts': [
-            'mreorg.curate = mreorg.curator.cmdline.main',
+            'mreorg.curate = mreorg.curator.cmdline.mreorg_curate:main',
         ],
     },
-    
-    data_files=[('etc', ['etc/configspec.ini']),
+
+    package_data={
+        'mreorg':[
+            'curator/frontend/templates/*.html',
+            #'curator/frontend/static/*',
+            'curator/frontend/static/javascript/*',
+            'curator/frontend/static/customcss/*',
+            'curator/frontend/static/javascript-moment/*',
+            'curator/frontend/static/sphinx/*',
+            ]
+        },
+
+
+    data_files=[('mreorg/etc', ['etc/configspec.ini']),
                 #('config', ['cfg/data.cfg']),
                 #('/etc/init.d', ['init-script'])
                 ],
-    
-        
-    requires=['matplotlib','configobj','Django'],
-        
+
+
+    install_requires=['matplotlib','configobj','Django','pygments', 'django-dajaxice'],
+
     long_description=read('README.txt'),
     classifiers=[
         "Development Status :: 3 - Alpha",

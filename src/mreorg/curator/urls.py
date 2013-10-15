@@ -34,6 +34,7 @@ import os
 
 from django.conf import settings
 from django.conf.urls.defaults import include, patterns
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from dajaxice.core import dajaxice_autodiscover
 dajaxice_autodiscover()
@@ -78,14 +79,4 @@ url_patterns = (
 )
 
 
-this_dir = os.path.dirname(__file__)
-
-
-url_patterns = url_patterns + (
-    # Static files:
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.join(this_dir,'static/')}),
-    (r'^site_media/javascript/(?P<path>.*)$', 'django.views.static.serve', {'document_root': os.path.join(this_dir, 'static/javascript/')}),
-    )
-
-
-urlpatterns = patterns('', *url_patterns)
+urlpatterns = patterns('', *url_patterns) + staticfiles_urlpatterns()

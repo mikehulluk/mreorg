@@ -47,11 +47,10 @@ class ScriptFlags(object):
     
     if not 'MREORG_CONFIG' in os.environ:
         raise RuntimeError(r'''
-            The environmental variable "MREORG_CONFIG" is not set
-            Perhaps you should set it, for example:
-            export MREORG_CONFIG='SAVEALL;NOSHOW'
-            or
-            export MREORG_CONFIG=''
+The environmental variable "MREORG_CONFIG" is not set
+Perhaps you should set it, for example:
+export MREORG_CONFIG='' # For no changes to Pylab behaviour
+export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures instead
         ''')
     
     
