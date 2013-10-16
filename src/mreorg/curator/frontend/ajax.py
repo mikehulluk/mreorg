@@ -131,9 +131,7 @@ def update_queue(_request, action):
             for simfile in tracked_sim_files:
                 if simfile.simqueueentry_set.count() > 0:
                     continue
-                sqe = SimQueueEntry.create(
-                    sim_file=simfile,
-                    runconfig=_request.session['current_runconfig'])
+                sqe = SimQueueEntry.create( sim_file=simfile, runconfig=_request.session['current_runconfig'])
         return simplejson.dumps({})
 
     if action == 'clear-all':

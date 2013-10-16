@@ -4,31 +4,39 @@ import sys,os
 from django.core.management import execute_from_command_line
 
 
-# Never curate the infrastructure classes:
-if 'MREORG_CURATIONRUN' in os.environ:
-    assert False
-    del os.environ['MREORG_CURATIONRUN']
 
 if not 'MREORG_CONFIG' in os.environ:
     os.environ['MREORG_CONFIG'] = ''
 
-import mreorg
-import mreorg.curator.backend_sim.simmgr_backend
 
 # django internally will call this file, when files on the disk change.
 # To allow this; we set a flag as an environmental variable, and
 # check to see if we are 're-entering' when running the webserver:
-if mreorg.ScriptFlags.MREORG_CURATION_REENTRY:
-#if 'MREORG_CURATION_REENTRYFLAG' in os.environ:
+if 'CURATION_REENTRYFLAG' in os.environ['MREORG_CONFIG']:
     execute_from_command_line(sys.argv)
+
+
+
+
+def ensure_MREORG_REENTRY_flag_set():
+    # Make sure that the 'CURATION_REENTRYFLAG' is in the list of flags:
+    mreorg_config_str = os.environ.get('MREORG_CONFIG','') 
+    if not 'CURATION_REENTRYFLAG' in mreorg_config_str:
+        mreorg_config_str += ';CURATION_REENTRYFLAG'
+    os.environ['MREORG_CONFIG'] = mreorg_config_str
 
 def cmd_runserver(params):
     os.environ['DJANGO_SETTINGS_MODULE']='mreorg.curator.settings'
-    os.environ['MREORG_CONFIG'] = os.environ.get('MREORG_CONFIG','') + ';CURATION_REENTRYFLAG'
+
+    # Make sure that the 'CURATION_REENTRYFLAG' is in the list of flags:
+    ensure_MREORG_REENTRY_flag_set()
+
+    # OK....
     sys.argv = [ __file__,  'runserver','%d'%params.port]
     execute_from_command_line(sys.argv)
 
 def cmd_runbackend(params):
+    import mreorg.curator.backend_sim.simmgr_backend
     mreorg.curator.backend_sim.simmgr_backend.run_backend()
 
 
@@ -37,11 +45,14 @@ def cmd_builddb(params):
     import mreorg
     db_filename = mreorg.MReOrgConfig.get_simulation_sqllite_filename()
 
-    os.environ['MREORG_CURATION_REENTRYFLAG'] = 'TRUE'
+    # Make sure that the 'CURATION_REENTRYFLAG' is in the list of flags:
+    ensure_MREORG_REENTRY_flag_set()
     if params.rebuild:
         os.unlink(db_filename)
     if os.path.exists(db_filename):
         raise ValueError("The database already exists. Either delete it manually or use the --rebuild flag to delete the existing data")
+    
+    os.environ['DJANGO_SETTINGS_MODULE']='mreorg.curator.settings'
     sys.argv = [ __file__,  'syncdb']
     execute_from_command_line(sys.argv)
 

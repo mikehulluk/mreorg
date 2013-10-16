@@ -86,8 +86,7 @@ class SimDBWriter(object):
             exception_traceback=str(sim_run_info.exception_details[2]),
             simulation_sha1hash=get_file_sha1hash(simfile.full_filename),
             library_sha1hash='00000',
-            runconfig=RunConfiguration.objects.get(id=int(os.environ['_MREORG_RUNCONFIGID'
-                    ])),
+            runconfig=RunConfiguration.objects.get(id=int(os.environ['_MREORG_RUNCONFIGID'])),
             )
 
         simres.save()

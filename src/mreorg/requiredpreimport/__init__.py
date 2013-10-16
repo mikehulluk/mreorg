@@ -202,6 +202,7 @@ if ScriptFlags.MREORG_ENABLECOVERAGE:
     coverage.process_startup()
 
 if ScriptFlags.MREORG_CURATIONRUN:
+    #assert False
     from mreorg.curator.backend_sim.db_writer_hooks import CurationSimDecorator
     CurationSimDecorator.activate()
 

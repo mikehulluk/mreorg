@@ -71,7 +71,6 @@ __all__ = [
     'FigFormat',
     'ensure_directory_exists',
     'get_file_sha1hash',
-    'glob2',
     'FigureLayouts',
     'FigureOptions',
     ]

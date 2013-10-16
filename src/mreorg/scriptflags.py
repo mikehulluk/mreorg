@@ -32,7 +32,7 @@
 
 import os
 import re
-
+import inspect, os
 
 class ScriptFlags(object):
 
@@ -45,7 +45,13 @@ class ScriptFlags(object):
     class attributes.
     """
     
-    if not 'MREORG_CONFIG' in os.environ:
+    # Allow mreorg.curate to run without needing to set flags:
+    entry_point = inspect.stack()[-1][1]
+    if 'mreorg.curate' in entry_point and not 'MREORG_CONFIG' in os.environ:
+         os.environ['MREORG_CONFIG'] = ''
+
+
+    if not 'MREORG_CONFIG' in os.environ and not 'mreorg.curate' in entry_point:
         raise RuntimeError(r'''
 The environmental variable "MREORG_CONFIG" is not set
 Perhaps you should set it, for example:
