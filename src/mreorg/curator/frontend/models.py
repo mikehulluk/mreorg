@@ -60,7 +60,7 @@ class SourceSimDir(models.Model):
 
     @classmethod
     def create(cls, directory_name, should_recurse=True):
-	directory_name = os.path.normpath(directory_name)
+        directory_name = os.path.normpath(directory_name)
         if SourceSimDir.objects.filter(directory_name=directory_name).count() !=0:
             return
 
@@ -112,7 +112,7 @@ class SimFile(models.Model):
     last_read_htmlcode = models.CharField(max_length=100000, null=True)
 
     # Last simulation run:
-    last_run = models.ForeignKey('SimFileRun',null=True, related_name='+')
+    #last_run = models.ForeignKey('SimFileRun',null=True, related_name='+')
 
     @classmethod
     def get_tracked_sims(cls, **kwargs):
@@ -140,6 +140,7 @@ class SimFile(models.Model):
         return False
 
     def recache_from_filesystem(self):
+        print 'Recaching: ', self.full_filename
         with open(self.full_filename) as f:
             code = f.read()
 
@@ -170,12 +171,18 @@ class SimFile(models.Model):
         self.check_and_recache()
         return self.last_read_docstring
 
-    def get_last_run(self, runconfig):
+    def _get_last_run(self, runconfig):
         runs = self.get_runs(runconfig=runconfig)
         if len(runs) == 0:
             return None
         else:
             return self.get_runs(runconfig=runconfig)[0]
+
+    def get_last_run(self, runconfig):
+        if runconfig.id not in self.latest_run_dict:
+            self.latest_run_dict[runconfig.id] = self._get_last_run(runconfig)
+        return self.latest_run_dict[runconfig.id]
+
 
     def get_current_checksum(self):
         return mreorg.get_file_sha1hash(self.full_filename)
@@ -197,10 +204,11 @@ class SimFile(models.Model):
             return last_run.get_status()
 
     def get_last_executiontime(self, runconfig):
-        if not self.last_run(runconfig):
+        last_run = self.get_last_run(runconfig)
+        if not last_run:
             return 'Unknown'
         else:
-            return self.last_run(runconfig).execution_time
+            return last_run.execution_time
 
     def is_queued(self, runconfig):
         return self.simqueueentry_set.filter(runconfig=runconfig).count() != 0
@@ -209,6 +217,22 @@ class SimFile(models.Model):
         p = self.is_queued(runconfig=runconfig)
         LUT = {True: 'SimQueued', False: 'SimNotQueued'}
         return LUT[p]
+
+
+    def is_currently_running(self,runconfig):
+        #print 'Lying about whether I am currently running'
+        return False
+
+
+
+def extra_init_for_simfile(instance, **kwargs):
+    #print 'extra init for simfile', kwargs
+    instance.latest_run_dict = {}
+
+
+from django.db.models.signals import post_init
+post_init.connect(extra_init_for_simfile, SimFile)     
+
 
 
 class RunConfiguration(models.Model):

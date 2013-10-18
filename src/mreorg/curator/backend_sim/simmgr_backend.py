@@ -123,6 +123,7 @@ def simulate(sim_queue_entry):
 def _run_backend():
 
     os.environ['MREORG_CONFIG']=os.environ.get('MREORG_CONFIG','') + ';CURATIONRUN'
+    os.environ['MREORG_CONFIG']=os.environ.get('MREORG_CONFIG','') + ';ENABLECOVERAGE'
 
 
     while True:

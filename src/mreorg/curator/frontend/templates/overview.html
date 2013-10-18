@@ -25,7 +25,7 @@ function pass(data){
 
 function pageInit() {
     countdown_callback()
-     refresh_simfile_status_all();
+    refresh_simfile_status_all();
 }
 
 
@@ -235,7 +235,7 @@ function countdown_callback(){
         <tr class="" id="SimFileID{{sim_file.id}}">
             <td class="Toggle"> <a onclick='deleteSimFile({{sim_file.id}});'> Delete </a>  </td>
             <td class="Status"> <a>  [File does not exist] </a> </td>
-            <td> <a> {{sim_file.get_short_filename }} </a> </td>
+            <td> <a>  {{sim_file.get_short_filename }}  </a> </td>
             <td> <a> </a></td>
             <td> </td>
         </tr>

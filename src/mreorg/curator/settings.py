@@ -50,6 +50,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': db_filename,
+        'OPTIONS': {
+            'timeout': 120,
+        }
     }
 }
 
@@ -99,6 +102,7 @@ INSTALLED_APPS = (
     'mreorg.curator.frontend',
     'django.contrib.humanize',
     'dajaxice',
+    'django_extensions',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (

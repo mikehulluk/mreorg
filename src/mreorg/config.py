@@ -67,6 +67,19 @@ class MReOrgConfig(object):
     def get_image_store_dir(cls):
         path = cls.config['FileSystem']['Curate']['output_image_dir']
         path = os.path.expanduser(path)
+        return mreorg.utils.ensure_directory_exists(path, is_dir=True)
+
+    @classmethod
+    def get_coverage_store_dir(cls):
+        path = cls.config['FileSystem']['Curate']['coverage_dir']
+        path = os.path.expanduser(path)
+        print path
+        return mreorg.utils.ensure_directory_exists(path, is_dir=True)
+
+    @classmethod
+    def get_coverage_configfile(cls):
+        path = cls.config['FileSystem']['Curate']['coverage_configfile']
+        path = os.path.expanduser(path)
         return mreorg.utils.ensure_directory_exists(path)
 
     @classmethod

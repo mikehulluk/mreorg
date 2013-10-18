@@ -83,53 +83,79 @@ class SimFileWithRunConfigProxy(object):
         self.simfile = simfile
         self.runconfig = runconfig
 
+        self._does_file_exist = self.simfile.does_file_exist()
+        self._get_docstring= self.simfile.get_docstring()
+        self._get_short_filename= self.simfile.get_short_filename()
+        self._get_status= self.simfile.get_status(runconfig=self.runconfig)
+        self._get_last_executiontime= self.simfile.get_last_executiontime(runconfig=self.runconfig)
+        self._is_queued= self.simfile.is_queued(runconfig=self.runconfig)
+        self._getCSSQueueState= self.simfile.getCSSQueueState(runconfig=self.runconfig)
+        self._full_filename= self.simfile.full_filename
+        self._id= self.simfile.id
+        self._tracking_status= self.simfile.tracking_status
+        self._get_last_run= self.simfile.get_last_run(runconfig=self.runconfig)
+        self._is_currently_running= self.simfile.is_currently_running(self.runconfig)
+
+
     def does_file_exist(self):
-        return self.simfile.does_file_exist()
+        return self._does_file_exist
 
     def get_docstring(self):
-        return self.simfile.get_docstring()
+        return self._get_docstring
 
     def get_short_filename(self):
-        return self.simfile.get_short_filename()
+        return self._get_short_filename
 
     def get_status(self):
-        return self.simfile.get_status(runconfig=self.runconfig)
+        return self._get_status
 
     def get_last_executiontime(self):
-        return self.simfile.get_last_executiontime(runconfig=self.runconfig)
+        return self._get_last_executiontime
 
     def is_queued(self):
-        return self.simfile.is_queued(runconfig=self.runconfig)
+        return self._is_queued
 
     def getCSSQueueState(self):
-        return self.simfile.getCSSQueueState(runconfig=self.runconfig)
+        return self._getCSSQueueState
 
     @property
     def full_filename(self):
-        return self.simfile.full_filename
+        return self._full_filename
 
     @property
     def id(self):
-        return self.simfile.id
+        return self._id
 
     @property
     def tracking_status(self):
-        return self.simfile.tracking_status
+        return self._tracking_status
 
     def get_last_run(self):
-        return self.simfile.get_last_run(runconfig=self.runconfig)
+        return self._get_last_run
+    
+    def is_currently_running(self):
+        return self._is_currently_running
 
     def __getattr__(self, name):
         print 'looking for attribute:', name
         assert False
 
-    def is_currently_running(self):
-        return self.simfile.is_currently_running(self.runconfig)
-        return True
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def build_proxy_for_sim_files(simfiles, runconfig):
-    return [SimFileWithRunConfigProxy(sim,runconfig) for sim in simfiles]
+    return [SimFileWithRunConfigProxy(sim,runconfig) for sim in simfiles if sim.does_file_exist()]
 
 
 
@@ -284,7 +310,8 @@ def viewsimulationqueue(request):
 
 def view_simulation_failures(request):
     ensure_config(request)
-    simfiles = build_proxy_for_sim_files(SimFile.get_tracked_sims(), runconfig=None)
+    runconfig= request.session['current_runconfig']
+    simfiles = build_proxy_for_sim_files(SimFile.get_tracked_sims(), runconfig=runconfig)
     cxt_data = {
         'failed_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.UnhandledException],
         'timeout_simulations': [fo for fo in simfiles if fo.get_status() == SimRunStatus.TimeOut],

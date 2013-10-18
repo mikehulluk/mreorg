@@ -13,6 +13,7 @@ if not 'MREORG_CONFIG' in os.environ:
 # To allow this; we set a flag as an environmental variable, and
 # check to see if we are 're-entering' when running the webserver:
 if 'CURATION_REENTRYFLAG' in os.environ['MREORG_CONFIG']:
+    print 'Rentry'
     execute_from_command_line(sys.argv)
 
 
@@ -32,8 +33,18 @@ def cmd_runserver(params):
     ensure_MREORG_REENTRY_flag_set()
 
     # OK....
-    sys.argv = [ __file__,  'runserver','%d'%params.port]
+    #cmd = 'runserver' if not params.profile else 'runprofileserver'
+    if params.profile:
+        print 'Building args'
+        sys.argv = [ __file__,  'runprofileserver', '%d'%params.port, ' --kcachegrind', ' --prof-path=/tmp/my-profile-data' ]
+    else:
+        sys.argv = [ __file__,  'runserver', '%d'%params.port]
+    print sys.argv
     execute_from_command_line(sys.argv)
+
+
+
+
 
 def cmd_runbackend(params):
     import mreorg.curator.backend_sim.simmgr_backend
@@ -83,6 +94,7 @@ def build_parser():
 
     parser_runserver = subparsers.add_parser('runserver', help='run the django backend' )
     parser_runserver.add_argument('-p', '--port', type=int, default=8000, help='the port to run django on')
+    parser_runserver.add_argument('--profile', action='store_true', help='profile the server using django-extensions')
     parser_runserver.set_defaults(func=cmd_runserver)
 
 

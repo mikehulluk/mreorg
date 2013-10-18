@@ -120,18 +120,23 @@ def refreshsimlist(_request):
     return simplejson.dumps({'sim_file_states': states})
 
 
+
+
+
 @dajaxice_register
 def update_queue(_request, action):
     print 'Action', action
     tracked_sim_files = SimFile.get_tracked_sims()
     print 'Tracked sim files:', len(tracked_sim_files)
 
+    runconfig=_request.session['current_runconfig']
+
     if action == 'add-all':
         with transaction.commit_on_success():
             for simfile in tracked_sim_files:
                 if simfile.simqueueentry_set.count() > 0:
                     continue
-                sqe = SimQueueEntry.create( sim_file=simfile, runconfig=_request.session['current_runconfig'])
+                SimQueueEntry.create( sim_file=simfile, runconfig=runconfig)
         return simplejson.dumps({})
 
     if action == 'clear-all':
@@ -139,11 +144,30 @@ def update_queue(_request, action):
         return simplejson.dumps({})
 
     # TODO! Move functionality into here!
+    if action == "add-all-failures":
+        with transaction.commit_on_success():
+            for simfile in tracked_sim_files:
+                if simfile.simqueueentry_set.count() > 0:
+                    continue
+                if simfile.get_status(runconfig=runconfig) not in (SimRunStatus.TimeOut, SimRunStatus.UnhandledException, SimRunStatus.NonZeroExitCode, SimRunStatus.FileChanged,SimRunStatus.NeverBeenRun):
+                    continue
+                SimQueueEntry.create( sim_file=simfile, runconfig=_request.session['current_runconfig'])
+        return simplejson.dumps({})
+
+    if action == "add-all-failures-not-timeout":
+        with transaction.commit_on_success():
+            for simfile in tracked_sim_files:
+                if simfile.simqueueentry_set.count() > 0:
+                    continue
+                if simfile.get_status(runconfig=runconfig) not in (SimRunStatus.UnhandledException, SimRunStatus.NonZeroExitCode, SimRunStatus.FileChanged,SimRunStatus.NeverBeenRun):
+                    continue
+                SimQueueEntry.create( sim_file=simfile, runconfig=_request.session['current_runconfig'])
+        return simplejson.dumps({})
 
 
 
     else:
-        assert False, 'Unhandled aciton'
+        assert False, 'Unhandled aciton: %s'% action
     print 'Action', action
     return simplejson.dumps({})
 

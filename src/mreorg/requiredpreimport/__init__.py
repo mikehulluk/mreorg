@@ -191,15 +191,15 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
 
 # Hook in the coverage
 if ScriptFlags.MREORG_ENABLECOVERAGE:
-    raise NotImplementedError()
     import mreorg.config
-    conf = mreorg.config.MReOrgConfig.get_ns()
-    coverage_opdir = conf['COVERAGE_OUTPUT_DIR']
-    if not os.path.exists(coverage_opdir):
-        os.makedirs(coverage_opdir)
-    os.environ['COVERAGE_PROCESS_START'] = conf['COVERAGE_CONFIG_FILE']
+    print 'Activating Coverage'
+    coverage_opdir = mreorg.config.MReOrgConfig.get_coverage_store_dir()
+    os.environ['COVERAGE_PROCESS_START'] = mreorg.config.MReOrgConfig.get_coverage_configfile()
+
     import coverage
     coverage.process_startup()
+
+
 
 if ScriptFlags.MREORG_CURATIONRUN:
     #assert False

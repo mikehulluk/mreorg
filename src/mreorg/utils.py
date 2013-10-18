@@ -84,8 +84,8 @@ def extract_docstring_from_fileobj(fileobj):
     return None
 
 
-def ensure_directory_exists(filename):
-    dirname = os.path.dirname(filename)
+def ensure_directory_exists(filename, is_dir=False):
+    dirname = os.path.dirname(filename) if not is_dir else filename
     if not os.path.exists(dirname) and dirname.strip():
         os.makedirs(dirname)
     return filename

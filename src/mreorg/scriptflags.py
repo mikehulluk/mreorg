@@ -34,6 +34,8 @@ import os
 import re
 import inspect, os
 
+print 'Openning ScriptFlags'
+
 class ScriptFlags(object):
 
     """Control the behaviour of matplotlib within scripts using environmental
@@ -44,7 +46,7 @@ class ScriptFlags(object):
     behaviours can be changed during the script run by setting the relevant
     class attributes.
     """
-    
+
     # Allow mreorg.curate to run without needing to set flags:
     entry_point = inspect.stack()[-1][1]
     if 'mreorg.curate' in entry_point and not 'MREORG_CONFIG' in os.environ:
@@ -58,8 +60,8 @@ Perhaps you should set it, for example:
 export MREORG_CONFIG='' # For no changes to Pylab behaviour
 export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures instead
         ''')
-    
-    
+
+
     _expected_options_new = (
         'NOSHOW',
         'SAVEALL',
@@ -73,6 +75,21 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
         'NOMPLIMPORT',
         )
 
+    # OK, lets look for a class named 'MReorgDefaults' in the calling function:
+    import inspect
+    top_caller = inspect.stack()[-1][0]
+    mreorg_defaults = {}
+    if 'MReorgDefaults' in top_caller.f_locals:
+        for (k,v) in top_caller.f_locals['MReorgDefaults'].__dict__.items():
+            if k in ('__doc__','__module__'):
+                continue
+            assert k in _expected_options_new
+            mreorg_defaults[k] = v
+            print 'Using Default:', k, v
+
+
+
+    # Vreak up the string:
     mreorg_conf_string = os.environ['MREORG_CONFIG']
     mreorg_conf = re.split(r'[,;]', mreorg_conf_string)
     mreorg_conf = [m.strip() for m in mreorg_conf if m.strip()]
@@ -82,17 +99,18 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
             continue
         assert opt in _expected_options_new, 'Unexpected option: %s' % opt
 
-    ENVVAR_MREORG_NOSHOW = 'NOSHOW' in mreorg_conf
-    ENVVAR_MREORG_NOMPLIMPORT = 'NOMPLIMPORT' in mreorg_conf
-    ENVVAR_MREORG_SAVEALL = 'SAVEALL' in mreorg_conf
-    ENVVAR_MREORG_SAVEFIGADDINFO = 'SAVEFIGADDINFO' in mreorg_conf
-    ENVVAR_MREORG_CURATIONRUN = 'CURATIONRUN' in mreorg_conf
-    ENVVAR_MREORG_BATCHRUN = 'BATCHRUN' in mreorg_conf
-    ENVVAR_MREORG_ENABLECOVERAGE = 'ENABLECOVERAGE' in mreorg_conf
-    ENVVAR_MREORG_CURATION_REENTRY = 'CURATION_REENTRYFLAG' in mreorg_conf
 
-    # Temp Hack: lets turn coverage off!
-    ENVVAR_MREORG_ENABLECOVERAGE = False
+    ENVVAR_MREORG_NOSHOW = ('NOSHOW' in mreorg_conf) or ('NOSHOW' in mreorg_defaults)
+    ENVVAR_MREORG_NOMPLIMPORT = ('NOMPLIMPORT' in mreorg_conf) or ('NOMPLIMPORT' in mreorg_conf)
+    ENVVAR_MREORG_SAVEALL = ('SAVEALL' in mreorg_conf) or ('SAVEALL' in mreorg_conf)
+    ENVVAR_MREORG_SAVEFIGADDINFO = ('SAVEFIGADDINFO' in mreorg_conf) or ('SAVEFIGADDINFO' in mreorg_conf)
+    ENVVAR_MREORG_CURATIONRUN = ('CURATIONRUN' in mreorg_conf) or ('CURATIONRUN' in mreorg_conf)
+    ENVVAR_MREORG_BATCHRUN = ('BATCHRUN' in mreorg_conf) or ('BATCHRUN' in mreorg_conf)
+    ENVVAR_MREORG_ENABLECOVERAGE = ('ENABLECOVERAGE' in mreorg_conf) or ('ENABLECOVERAGE' in mreorg_conf)
+    ENVVAR_MREORG_CURATION_REENTRY = ('CURATION_REENTRYFLAG' in mreorg_conf) or ('CURATION_REENTRYFLAG' in mreorg_conf)
+
+    ## Temp Hack: lets turn coverage off!
+    #ENVVAR_MREORG_ENABLECOVERAGE = False
 
     # Don't call pylab.show() if ...
     MREORG_NOSHOW = ENVVAR_MREORG_NOSHOW or \
@@ -123,19 +141,20 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
     MREORG_SAVEFIGADDINFO = ENVVAR_MREORG_SAVEFIGADDINFO
 
     # Setup the environment:
-    MREORG_MPLCONFIG = os.environ.get('MREORG_MPLCONFIG', None)
-    
+    MREORG_MPLCONFIG = None
+    if 'MPLCONFIG' in mreorg_conf:
+        MREORG_MPLCONFIG=mreorg_conf['MPLCONFIG']
+    elif 'MPLCONFIG' in mreorg_defaults:
+        MREORG_MPLCONFIG=mreorg_defaults['MPLCONFIG']
+
     MREORG_MPLCONFIG_FILE = None
-    for opt in mreorg_conf:
-        if opt.startswith('MPLCONFIG='):
-            assert MREORG_MPLCONFIG_FILE == None
-            mpl_conf_name = opt.split('=')[-1]
-            currpath = os.path.dirname(os.path.abspath(__file__))
-            mplconfigdir = os.path.join(currpath, '../../mplconfigs/')
-            target_config_file = os.path.join(mplconfigdir,mpl_conf_name + '.conf')
-            if not os.path.exists(target_config_file):
-                assert False, "Can't find file: %s" % target_config_file
-            MREORG_MPLCONFIG_FILE = target_config_file
+    if MREORG_MPLCONFIG:
+        currpath = os.path.dirname(os.path.abspath(__file__))
+        mplconfigdir = os.path.join(currpath, '../../mplconfigs/')
+        target_config_file = os.path.join(mplconfigdir,MREORG_MPLCONFIG + '.conf')
+        if not os.path.exists(target_config_file):
+            assert False, "Can't find file: %s" % target_config_file
+        MREORG_MPLCONFIG_FILE = target_config_file
 
 
     #if MREORG_MPLCONFIG:
