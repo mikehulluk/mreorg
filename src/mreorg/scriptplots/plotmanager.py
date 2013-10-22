@@ -116,7 +116,7 @@ class PlotManager:
             'figname': figname,
             'figtype': '{%s}' % ','.join(figtypes),
             }
-        print 'PlotMnager:Saving ', filename_tmpl.format(**subst_dict)
+        print 'PlotManger saving: ', filename_tmpl.format(**subst_dict)
 
         # For each filetype:
         for figtype in figtypes:

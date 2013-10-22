@@ -73,6 +73,7 @@ class SimDBWriter(object):
         simfile = SimFile.get_or_make(full_filename=sim_run_info.script_name, make_kwargs={'tracking_status':TrackingStatus.Tracked})
         
 
+        import time
 
         # Create a simulation result object:
         simres = SimFileRun(
@@ -112,8 +113,8 @@ class SimDBWriter(object):
 
                 f_thumb = image_filename.replace('.svg', 'thumb.png')
                 os.system('convert %s -resize 400x300 %s' % (pipes.quote(image_filename),pipes.quote(f_thumb)))
-                #subprocess.check_call( ['convert', '%s -resize 400x300 %s' % (pipes.quote(image_filename),pipes.quote(f_thumb))] )
-                hashstr = hashlib.md5(open(f_thumb).read()).hexdigest()
+                time.sleep(5) # Sometimes, its not ready!
+                #hashstr = hashlib.md5(open(f_thumb).read()).hexdigest()
                 hashstr = mreorg.get_file_sha1hash(f_thumb)
                 opfile2 = output_file_dir + '/' + hashstr + ".png"
                 shutil.copyfile(f_thumb, opfile2)
