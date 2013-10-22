@@ -34,7 +34,6 @@ import os
 import re
 import inspect, os
 
-print 'Openning ScriptFlags'
 
 class ScriptFlags(object):
 
