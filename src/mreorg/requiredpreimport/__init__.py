@@ -176,7 +176,8 @@ if not ScriptFlags.MREORG_DONTIMPORTMATPLOTLIB:
     # SVG hack
     # SVG output is a problem, because of a conversion between pt to px, which I don't really understand.
     # we interecept the call to 'draw_text' at a really low level, in order to rescale the font:
-    do_hack=hack_options['svg_downscale']
+    do_hack=hack_options['svg_downscale'] 
+    do_hack=True
     if matplotlib.get_backend() == 'svg' and FigureOptions.downscale_fontsize_hack and do_hack:
         import matplotlib.backends.backend_svg as svg
         def myfunc(self, ctx, x, y,  text, fp, *args,**kwargs):

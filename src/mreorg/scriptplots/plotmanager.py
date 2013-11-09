@@ -100,8 +100,6 @@ class PlotManager:
         import pylab
         fig = (figure if figure else pylab.gcf())
 
-        # TODO: Move to mreorg layouts:
-        # assert f.number == cls.fig_num
         # Some small changes:
         fig.subplots_adjust(bottom=0.15)
 
@@ -152,9 +150,6 @@ class PlotManager:
                           matplotlib._pylab_helpers.Gcf.get_all_fig_managers()]
         active_figures_new = [a for a in active_figures if not a.number
                               in cls.figures_saved_nums]
-
-        # Add to the list of saved figures
-        # [SavedFigures.figures_saved_nums.add(a.number) for a in active_figures]
 
         # Save the new figures:
         for fig in active_figures_new:

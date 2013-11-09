@@ -1,6 +1,7 @@
 
 
-This directory contains the following dependancies:
+This directory contains 2 packages which are needed by mreorg. These will be 
+automatically imported if they are not installed on the system elsewhere.
 
 glob2:
 ======

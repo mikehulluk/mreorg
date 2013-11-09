@@ -87,15 +87,19 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
             print 'Using Default:', k, v
 
 
+    
 
-    # Vreak up the string:
+    # Vreak up the string into a dictionary, for things with an '='
     mreorg_conf_string = os.environ['MREORG_CONFIG']
     mreorg_conf = re.split(r'[,;]', mreorg_conf_string)
     mreorg_conf = [m.strip() for m in mreorg_conf if m.strip()]
+    
+    mreorg_conf = dict( [m.split("=") if '=' in m else (m,None) for m in mreorg_conf] )
+    print 'ConfigOoptins', mreorg_conf
 
     for opt in mreorg_conf:
-        if '=' in opt:
-            continue
+        #if '=' in opt:
+        #    continue
         assert opt in _expected_options_new, 'Unexpected option: %s' % opt
 
 
@@ -154,6 +158,7 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
         if not os.path.exists(target_config_file):
             assert False, "Can't find file: %s" % target_config_file
         MREORG_MPLCONFIG_FILE = target_config_file
+        print 'Using config file: ', target_config_file
 
 
     #if MREORG_MPLCONFIG:

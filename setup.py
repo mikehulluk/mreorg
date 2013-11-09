@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "mreorg",
-    version = "0.1",
+    version = "0.1.1",
     author = "Mike Hull",
     author_email = "mikehulluk@gmail.com",
     description = ("Tools for organising and simplifying scripts for modelling"),
