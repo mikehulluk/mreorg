@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 # svgutils.py
-
+from lxml import etree
 import svgutils.transform as sg
+import collections
+
 cm_to_pt = 28.346456693
 #The spec says 1pt is 1.25px, 
 def add_file_mpl(fig, filename, x_cm, y_cm,):
@@ -37,11 +39,56 @@ def add_text(fig,  text, x_cm, y_cm, size=12, weight='bold', rotate=None, textal
     txt1 = sg.TextElement(x_pt,y_pt, text, size=size, weight=weight, **kwargs)
     fig.append(txt1)
 
-def add_figlabel(fig,  text, x_cm, y_cm, size=10, weight='bold', rotate=None, textalign=None, style=None, **kwargs):
+
+def add_path(fig, pts, style=None):
+
+
+    p = sg.PathElement(pts=pts, style=style)
+    fig.append(p)
+
+
+def define_marker(fig, marker_name, marker_dict, path_dict):
+
+        m = sg.MarkerElement(marker_name, marker_dict, path_dict)
+
+        defs = etree.Element('defs',)
+        defs.append(m.root)
+        fig.root.append(defs)
+
+        return m
+
+
+MarkerData = collections.namedtuple('MarkerData', "marker_dict path_dict")
+
+
+def define_marker_std(fig, marker_name):
+     std_markers = {
+        'Arrow1Mend': MarkerData(
+                        path_dict = { 'd':"M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z ",
+                                  'style':"fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;",
+                                  'transform':"scale(0.4) rotate(180) translate(10,0)"},
+                        marker_dict = {'orient':"auto",
+                        'refY':"0.0",
+                        'refX':"0.0",
+                        'id':'Arrow1Mend',
+                        'style':"overflow:visible;"} ),
+                    }
+
+     marker_data = std_markers[marker_name]
+     define_marker( fig=fig,
+                    marker_name=marker_name,
+                    marker_dict=marker_data.marker_dict,
+                    path_dict=marker_data.path_dict,
+                    )
+
+    
+
+
+def add_figlabel(fig,  text, x_cm, y_cm, size=12, weight='bold', rotate=None, textalign=None, style=None, font=None, **kwargs):
     # Keep trailing '.'
     if text.endswith('.'):
         text = text[:-1]
-    text = text + '.'
+    #text = text + '.'
 
     x_pt = x_cm * cm_to_pt
     y_pt = y_cm * cm_to_pt
@@ -55,8 +102,14 @@ def add_figlabel(fig,  text, x_cm, y_cm, size=10, weight='bold', rotate=None, te
     if style is not None:
         kwargs['style'] = style
 
-    txt1 = sg.TextElement(x_pt,y_pt, text, size=size, weight=weight, **kwargs)
+    if font is None:
+        font = 'Arial'
+
+    txt1 = sg.TextElement(x_pt,y_pt, text, size=size, weight=weight, font=font, **kwargs)
     fig.append(txt1)
+
+
+
 
 
 def write_rect_to_file(filename, x_cm, y_cm):

@@ -1,16 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from xml.dom.minidom import parse, parseString
-import xml.etree.ElementTree as ET
 import os
-
-import xml
-import xmlwitch
-
 import collections
 from functools import partial
 import shutil
+
+
+import xml.etree.ElementTree as ET
+import xml
+import xmlwitch
+
 
 
 def normalise_measurement(length):
@@ -35,7 +35,6 @@ def getWidthHeight(filename):
     width = normalise_measurement(root.attrib['width'])
 
     (height, width) = (int(height), int(width))
-    # print height, width
     return (width, height)
 
 

@@ -39,7 +39,8 @@ class _FigureOptions(object):
 
     _defaults = {
             'draft':False,
-            'default_autosave_formats' : None
+            'default_autosave_formats' : None,
+            'downscale_fontsize_hack' :False,
             }
 
     

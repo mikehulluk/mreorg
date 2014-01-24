@@ -134,7 +134,12 @@ class PlotManager:
             # Save the figure:
             full_filename = os.path.join(os.getcwd(), filename)
             mreorg.ensure_directory_exists(full_filename)
-            fig.savefig(full_filename)
+            try:
+                fig.savefig(full_filename)
+            except ValueError as e:
+                print 'mreorg error: unable to save figure: ', full_filename
+                print e
+                print '(ignoring error)'
             PlotManager.figures_saved.append(fig)
             PlotManager.figures_saved_nums.append(fig.number)
             PlotManager.figures_saved_filenames.append(full_filename)

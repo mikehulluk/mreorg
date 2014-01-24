@@ -17,7 +17,7 @@ Python is a widely used language in computational sciences for modelling
 and data analysis; however, with large amounts of data, scripts can 
 quickly become unwiedly. |mreorg| is a library containing functions and
 tools to manage large numbers of scripts and thier output. It was written
-by Mike Hull as part of his Ph. D, to help manage scripts used in building
+by Mike Hull as part of his Ph. D, in order manage scripts used in building
 models in computational neuroscience. It is designed to be as non-invasive 
 to scripts as possible. An  ``import mreorg`` statement is generally all that
 needs to be added to a script.
@@ -29,6 +29,10 @@ Main features:
      - configure behaviour of ``show()`` using environmental variables,
        so the same script can be used to generate graphs on screen, or just save 
        them to a file, without changing the contents of the file.
+     - allow multiple matplotlib configurations
+
+  * Uses Bartosz Telenczuk's `svg_utils <https://github.com/btel/svg_utils>`_ package,
+    for creating an .svg file out of several smaller ones.
   
   * A stand-alone application |mreorg.curate|, for managing collections of 
     scripts. 
@@ -59,11 +63,14 @@ To install |mreorg| locally (in the home directory):
 	export PYTHONPATH='$PYTHONPATH:/home/YOURUSERNAME/mreorg/src/'
 	export PATH='$PATH:/home/YOURUSERNAME/mreorg/bin/'
 
- 3. Re-run your login script to take effect (or logout then log back in)::
+ 3. Add the dependancies: (TODO)
+    glob2, xmlwitch (for web frontend), svg_utils for building images out of smaller images.
+
+ 4. Re-run your login script to take effect (or logout then log back in)::
 	
 	source ~/.bashrc
 	
- 4. |mreorg.curate| uses the `django` framework and `dajaxice` for displaying the webpages.
+ 5. |mreorg.curate| uses the `django` framework and `dajaxice` for displaying the webpages.
     On Ubuntu (12.4), these can be installed with::
 
 	 $ sudo apt-get install python-django python-django-dajaxice.

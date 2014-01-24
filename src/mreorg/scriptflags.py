@@ -72,7 +72,8 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
         'TIMEOUT',
         'MPLCONFIG',
         'NOMPLIMPORT',
-        )
+
+    )
 
     # OK, lets look for a class named 'MReorgDefaults' in the calling function:
     import inspect
@@ -84,7 +85,7 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
                 continue
             assert k in _expected_options_new
             mreorg_defaults[k] = v
-            print 'Using Default:', k, v
+            #print 'Using Default:', k, v
 
 
     
@@ -95,11 +96,9 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
     mreorg_conf = [m.strip() for m in mreorg_conf if m.strip()]
     
     mreorg_conf = dict( [m.split("=") if '=' in m else (m,None) for m in mreorg_conf] )
-    print 'ConfigOoptins', mreorg_conf
+    #print 'ConfigOoptins', mreorg_conf
 
     for opt in mreorg_conf:
-        #if '=' in opt:
-        #    continue
         assert opt in _expected_options_new, 'Unexpected option: %s' % opt
 
 
@@ -111,9 +110,8 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
     ENVVAR_MREORG_BATCHRUN = ('BATCHRUN' in mreorg_conf) or ('BATCHRUN' in mreorg_conf)
     ENVVAR_MREORG_ENABLECOVERAGE = ('ENABLECOVERAGE' in mreorg_conf) or ('ENABLECOVERAGE' in mreorg_conf)
     ENVVAR_MREORG_CURATION_REENTRY = ('CURATION_REENTRYFLAG' in mreorg_conf) or ('CURATION_REENTRYFLAG' in mreorg_conf)
+    
 
-    ## Temp Hack: lets turn coverage off!
-    #ENVVAR_MREORG_ENABLECOVERAGE = False
 
     # Don't call pylab.show() if ...
     MREORG_NOSHOW = ENVVAR_MREORG_NOSHOW or \
@@ -161,15 +159,6 @@ export MREORG_CONFIG='SAVEALL;NOSHOW' # To suppress 'show' and save figures inst
         print 'Using config file: ', target_config_file
 
 
-    #if MREORG_MPLCONFIG:
-    #    currpath = os.path.dirname( os.path.abspath(__file__) )
-    #    mplconfigdir = os.path.join( currpath, '../../mplconfigs/')
-    #    target_config_file = os.path.join(mplconfigdir,MREORG_MPLCONFIG + '.conf')
-    #    if not os.path.exists(target_config_file):
-    #        assert False, "Can't find file: %s" % target_config_file
-    #    MREORG_MPLCONFIG_FILE=target_config_file
-    #else:
-    #    MREORG_MPLCONFIG_FILE=None
 
 # Look out for unexpected flags:
 for key in os.environ:

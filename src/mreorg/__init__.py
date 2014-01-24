@@ -30,8 +30,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------
 
-import os
-import sys
+#import os
+#import sys
 
 import utils
 from mreorg.utils import ensure_directory_exists
