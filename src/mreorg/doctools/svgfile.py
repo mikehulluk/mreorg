@@ -9,7 +9,12 @@ import shutil
 
 import xml.etree.ElementTree as ET
 import xml
-import xmlwitch
+import xml.sax
+
+try:
+    import xmlwitch
+except ImportError:
+    print "Unable to import xmlwitch (needed to write XML/SVG files)"
 
 
 
