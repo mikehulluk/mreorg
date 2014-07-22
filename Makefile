@@ -6,4 +6,5 @@ clean:
 	find . -name "*.pyc" -exec rm {} \;
 	find . -name "*.py.new" -exec rm {} \;
 	python setup.py clean
-	rm -rf build/ dist/
+	rm -rfv src/mreorg.egg-info/
+	rm -rfv build/ dist/

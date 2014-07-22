@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "mreorg",
-    version = "0.1.1",
+    version = "0.1.2",
     author = "Mike Hull",
     author_email = "mikehulluk@gmail.com",
     description = ("Tools for organising and simplifying scripts for modelling"),
@@ -42,7 +42,8 @@ setup(
         'mreorg':[
             'curator/frontend/templates/*.html',
             'curator/frontend/static/javascript/*',
-            'curator/frontend/static/customcss/*',
+            'curator/frontend/static/customcss/*.css',
+            'curator/frontend/static/customcss/images/*',
             'curator/frontend/static/javascript-moment/*',
             'curator/frontend/static/sphinx/*',
             ]
